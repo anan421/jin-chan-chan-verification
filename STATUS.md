@@ -538,3 +538,10 @@
 - 批结论：预测本身还是不行（猜中 1/83）；三轮全退回，main 未动。变好的是上限与分布的形状，不是猜中的次数。详见 design/batch-4-report.md。
 - 停止条件记账：连续没有变好的轮次已到 3 轮（第 10、11、12 轮），按循环设计应停，报结果。但 Gu 2026-11-21 22:06 说“重要的是多尝试”，是否继续由 Gu 定夺。下一批方向（若继续）：换合并方式 → 首发种类给不同期望 → 果实 6（单独成批）→ 收敛守卫。
 - 仍待办（本批未动）：收敛守卫（审计改法 8）、果实 6、c_lever 归一化假象、ensemble 语义对齐、C5 与语义层词汇不一致、reverify 临时目录不清理、semantic-kinds.md §7 fixture 数字漂移。
+
+## 锦标赛第 4 轮：例外覆盖（2026-11-22；分支 loop/round4-exception-override）
+
+- 做法：先查资料（60/83）为基准，默认保留基准；只有 E1–E4 强证据（公开反对、冲突的宣布计划、没参加联合主题、不同的头条事件，带轮次日期之前的日期和来源）才改基准。标准事前写定（design/exception-criteria.md），不在考题上调。13 个单轮预测员单轮隔离；题目文件由 build_questions.py 从先查资料 83 道预测生成，答案字段（actual_kind、correct）已去掉并通过泄露检查；两处结构差异已处理（24 道第 1 轮格式用 date 字段，59 道重做格式用 round_date、event_real_date 字段）。
+- 结果：59/83，没过先查资料 60/83，净 -1。配对：都对 59、只覆盖对 0、只基准对 1、都错 23。覆盖只触发 1 次（S4 4-1 HUAWEI pangu → ascend，E2：CloudMatrix 384 发布 2025-07-26–28，HPCWire 2025-07-30），实际是 pangu，改错了。13 轮里 12 轮打平，1 轮输（S4 4-1 10/10 → 9/10），0 轮赢。
+- 第 3 轮 5 道独赢一道也没复现（S4 1-2 MUSK colossus：E1 事实成立但轮次日期前无替代种类可改；S5 3-2 TSMC bis_rule：错的方向反了，例外逻辑修不了“基准没猜主题种类”的错；S5 5-1 SFTB anthropic_ipo、S5 1-1 / S5 6-2 MUSK financing：无 E1–E4 证据）。结论：例外事后看得见，事前看不见；不要采用例外覆盖。
+- 详见 design/exception-override-round4.md。live 模型未动（git diff d044512 对 payoff-model.json、predict.py、backtest.py、data.json 为空）。未合 main，未推 GitHub。
