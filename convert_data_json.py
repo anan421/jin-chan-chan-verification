@@ -204,6 +204,7 @@ SEMANTIC_VOCABULARY = [
     "tongyi", "hunyuan", "ascend", "doubao", "wenxin", "pangu",
     "llama", "claude", "gemini", "megaspeed", "energy", "financing",
     "capex", "open_source",
+    "datacenter", "compliance", "invest_plan",
 ]
 SEMANTIC_UNKNOWN = "unknown"
 
@@ -292,7 +293,8 @@ def classify_semantic(action, player, season, round_code):
     if "Megaspeed" in t:
         return "megaspeed"
     if ("核电" in t or "三哩岛" in t or "电力" in t or "绿电" in t
-            or "燃气电厂" in t or "供电" in t):
+            or "燃气电厂" in t or "供电" in t or "能源" in t
+            or "并网" in t):
         return "energy"
     if "融资" in t or "债务" in t or "借钱" in t:
         return "financing"
@@ -300,6 +302,27 @@ def classify_semantic(action, player, season, round_code):
         return "capex"
     if "开源" in t and "不开源" not in t:
         return "open_source"
+    # --- third expansion (2026-11-22, round 5 sample expansion):
+    # rules 30-32, in this order. Same discipline as rules 16-29:
+    # full-table keyword probe on the same data.json (sha256
+    # 07995677...); new rules run after all earlier rules, so they
+    # can only classify from the unknown pool (guarded by
+    # EXPECTED_LEGACY_COUNTS). "能源"/"并网" extend the energy rule
+    # (rule 26): full-table hits 2 + 2, all unknown, all in S4 3-2.
+    # datacenter: "园区" hits 14 (4 already energy, 10 unknown) and
+    # "数据中心" hits 2 (both unknown); the energy rule fires first,
+    # so the 4 energy moves stay energy. compliance: "自查" hits 5,
+    # all unknown, all S5 3-2 (BIS-rule self-checks). invest_plan:
+    # "宣布"+"投入" hits 4 (S3 1-1 1, S4 1-2 3), all announcements
+    # of multi-year investment plans/periods; the bare word "投入"
+    # hits 9 (5 of them states, not announcements) and stays a
+    # diffusion word, not a kind.
+    if "园区" in t or "数据中心" in t:
+        return "datacenter"
+    if "自查" in t:
+        return "compliance"
+    if "宣布" in t and "投入" in t:
+        return "invest_plan"
     return SEMANTIC_UNKNOWN
 
 # Page-asserted figures. Cross-checked against page text at run time.

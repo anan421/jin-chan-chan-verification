@@ -175,7 +175,10 @@
    "energy",
    "financing",
    "capex",
-   "open_source"
+   "open_source",
+   "datacenter",
+   "compliance",
+   "invest_plan"
   ],
   "unknown_marker": "unknown",
   "distribution": {
@@ -187,13 +190,16 @@
    "chatgpt": 3,
    "claude": 5,
    "colossus": 4,
+   "compliance": 5,
+   "datacenter": 11,
    "doubao": 8,
    "doubao_price_war": 4,
-   "energy": 10,
+   "energy": 13,
    "financing": 19,
    "gemini": 4,
    "huang_resign": 1,
    "hunyuan": 11,
+   "invest_plan": 4,
    "llama": 5,
    "megaspeed": 1,
    "msft_invest": 7,
@@ -206,12 +212,12 @@
    "spacex_xai": 4,
    "stargate": 15,
    "tongyi": 11,
-   "unknown": 346,
+   "unknown": 323,
    "v3": 2,
    "wenxin": 11
   },
-  "classified": 212,
-  "unknown": 346,
+  "classified": 235,
+  "unknown": 323,
   "note": "Per-move substantive action thread, classified from the move's own action text (see design/semantic-kinds.md). action_kind (round-type slug) is unchanged. generic and openai_mar26 have no instance in the real trace."
  },
  "rules": [
