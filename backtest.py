@@ -61,6 +61,23 @@ A metric counts as a signal only when it exceeds its baseline by
 margin_pp (10 pp); below that it is recorded below_threshold
 (opinion, never a block, and never an auto-revision trigger).
 
+First-appearance kinds (round 11, 2026-11-21): on a semantic
+trace the candidate set is the whole known vocabulary
+(SEMANTIC_VOCABULARY, 31 kinds, banned kinds excluded per round),
+not just the kinds seen in the prefix. A recorded kind is
+"first-appearance" in a test round when it has zero count in the
+prefix before that round. It is never hard-guessed: it enters
+the reported distribution only through the floor prior
+1 / (N + K) from predict.base_rates (N = known-kind moves in the
+prefix, K = vocabulary size), and its expected increment is the
+prefix global mean. The backtest report carries a
+first_appearance section: how many test records are
+first-appearance, how many of them were hit, which ones, the
+per-kind hit counts, and the M1 ceiling before (recorded kind in
+the prefix kinds) and after (recorded kind in the candidate set).
+On a pre-semantic trace the old rule applies (candidates are the
+prefix kinds, no prior), so the fixture backtest is unchanged.
+
 Usage:
     python3 backtest.py <trace.json> --payoff <payoff.json>
         [--out report.json] [--summary summary.txt]
@@ -296,6 +313,65 @@ def expectation_diagnostics(records):
             "per_kind_n_at_prediction": per_kind}
 
 
+def first_appearance_diagnostics(records):
+    """Round-11 diagnostics over test records: which classifiable
+    records are first-appearance (their recorded kind has zero
+    count in the prefix before that round), how many of them were
+    hit, which ones, the per-kind hit counts, and the M1 ceiling
+    before and after the round-11 change. The ceiling "before" is
+    the classifiable records whose recorded kind was already in
+    the prefix kinds (reachable under the old prefix-kind
+    candidate rule); the ceiling "after" is the classifiable
+    records whose recorded kind is in the round's candidate set
+    (reachable under the vocabulary rule). Both are counted from
+    the records, not asserted. The per-record flags
+    (first_appearance, recorded_in_candidates) are set in
+    run_window, where the prefix is in scope."""
+    cls = [r for r in records if r.get("m1_classifiable")]
+    first = [r for r in cls if r.get("first_appearance")]
+    hits = [r for r in first if r.get("m1")]
+    by_kind = {}
+    for r in first:
+        k = r["recorded_action"]
+        e = by_kind.setdefault(k, {"records": 0, "hits": 0})
+        e["records"] += 1
+        if r.get("m1"):
+            e["hits"] += 1
+    predicted_first = [r for r in records
+                       if r.get("predicted_first_appearance")]
+    return {
+        "n_classifiable": len(cls),
+        "n_first_appearance": len(first),
+        "first_appearance_hits": len(hits),
+        "first_appearance_hit_records": [
+            {"season": r["season"], "round": r["round"],
+             "player": r["player"], "key": r["key"],
+             "recorded_action": r["recorded_action"],
+             "predicted_action": r["predicted_action"]}
+            for r in hits],
+        "first_appearance_records": [
+            {"season": r["season"], "round": r["round"],
+             "player": r["player"], "key": r["key"],
+             "recorded_action": r["recorded_action"],
+             "predicted_action": r["predicted_action"],
+             "hit": bool(r.get("m1"))}
+            for r in first],
+        "by_kind": by_kind,
+        "ceiling_before": sum(1 for r in cls
+                              if not r.get("first_appearance")),
+        "ceiling_after": sum(1 for r in cls
+                             if r.get("recorded_in_candidates")),
+        "predicted_first_appearance_n": len(predicted_first),
+        "predicted_first_appearance_records": [
+            {"season": r["season"], "round": r["round"],
+             "player": r["player"], "key": r["key"],
+             "predicted_action": r["predicted_action"],
+             "recorded_action": r["recorded_action"],
+             "hit": bool(r.get("m1"))}
+            for r in predicted_first],
+    }
+
+
 def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
                calibration=None, include_distributions=False):
     """Predict every round in `seasons` from its prefix. Returns
@@ -309,6 +385,13 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
     rules = trace["rules"]
     moves = trace["moves"]
     pmap = {p["id"]: p for p in trace["players"]}
+    # Round 11: on a semantic trace the candidate set is the whole
+    # known vocabulary and first-appearance kinds get a floor prior;
+    # on a pre-semantic trace (fixture) the old prefix-kind rule
+    # applies and there is no prior, so the fixture backtest is
+    # unchanged. One flag for the whole run: the layer is a property
+    # of the trace, not of a round.
+    semantic = P.has_semantic_layer(trace)
     records = []
     for season in sorted(seasons):
         season_row = next(s for s in trace["seasons"]
@@ -326,6 +409,18 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
             exp = P.make_expectation(
                 per_mean, glob_mean,
                 global_mean=tuple(support["global_mean"]))
+            # The prefix kind set, for the first-appearance flags
+            # below. A kind is first-appearance in this round when
+            # it is not in this set. Only the prefix is used: no
+            # information from this round or later.
+            prefix_kinds = ({kind_of(x) for x in prefix} - {"unknown"})
+            # Round 11 floor prior, from the prefix only. A
+            # first-appearance kind gets the floor 1 / (N + K),
+            # K = vocabulary size (see predict.base_rates for why
+            # K is the vocabulary, not the pool).
+            prior = (P.base_rates(prefix,
+                                  vocabulary=P.SEMANTIC_VOCABULARY)
+                     if semantic else None)
             last = {}
             for m in prefix:
                 pid = m["player"]
@@ -345,15 +440,21 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
                 for ov in overlays:
                     banned |= set(ov["params"].get(
                         "banned_action_kinds", []))
-                kinds_here = [k for k in
-                              sorted({kind_of(x) for x in prefix}
-                                     - {"unknown"})
-                              if k not in banned]
+                if semantic:
+                    # Round 11: the whole known vocabulary, banned
+                    # kinds excluded. The vocabulary is a list of
+                    # kind NAMES fixed before prediction; every
+                    # count, mean and prior comes from the prefix.
+                    kinds_here = [k for k in P.SEMANTIC_VOCABULARY
+                                  if k not in banned]
+                else:
+                    kinds_here = [k for k in
+                                  sorted(prefix_kinds)
+                                  if k not in banned]
                 if not kinds_here:
                     rec = kind_of(m)
                     kinds_here = ([rec] if rec != "unknown" else
-                                  sorted({kind_of(x) for x in prefix}
-                                         - {"unknown"}))
+                                  sorted(prefix_kinds))
                 candidates[pid] = kinds_here
             start = {pid: kind_of(last[pid])
                      for pid in last
@@ -368,7 +469,7 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
                              base0["params"]["hp_cap"])
             res = P.best_response(state, payoff_params, tau, candidates,
                                   exp, start, acting, hp_bounds,
-                                  calibration=calibration)
+                                  calibration=calibration, base=prior)
             dhp_obs = defaultdict(list)
             for m in prefix:
                 dhp_obs[m["player"]].append(m["hp_delta"])
@@ -392,6 +493,13 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
                     "predicted_action": pred_kind,
                     "recorded_action": rec_kind,
                     "modal_probability": res["modal"][pid]["probability"],
+                    "first_appearance": (rec_kind != "unknown"
+                                         and rec_kind not in prefix_kinds),
+                    "recorded_in_candidates": (
+                        rec_kind in candidates[pid]),
+                    "predicted_first_appearance": (
+                        pred_kind is not None
+                        and pred_kind not in prefix_kinds),
                     "predicted_kind_n": n_kind,
                     "predicted_kind_n_player": n_cell,
                     "predicted_kind_shrunk": shrunk,
@@ -480,6 +588,7 @@ def main(argv=None):
     test_tables["overall"]["m6_gap"] = calib["m6"]
     test_tables["overall"]["m6_pass"] = calib["m6_pass"]
     exp_diag = expectation_diagnostics(test_records)
+    first_diag = first_appearance_diagnostics(test_records)
     report = {
         "trace": args.trace,
         "payoff_model": {"version": payoff.get("version"),
@@ -504,7 +613,17 @@ def main(argv=None):
                            "(substantive action thread); 'unknown' is "
                            "excluded from candidates and from the M1 "
                            "denominator (m1_unknown_n). Traces without "
-                           "semantic_kind fall back to action_kind."),
+                           "semantic_kind fall back to action_kind. "
+                           "Round 11: on a semantic trace the "
+                           "candidate set is the whole known "
+                           "vocabulary (SEMANTIC_VOCABULARY, 31 "
+                           "kinds, banned kinds excluded per round), "
+                           "not just the kinds seen in the prefix; a "
+                           "first-appearance kind (zero prefix "
+                           "count) enters only through the floor "
+                           "prior 1 / (N + K), K = vocabulary size, "
+                           "and its expected increment is the prefix "
+                           "global mean. See first_appearance."),
         },
         "thresholds": {"margin_pp": margin_pp, "m5_tolerance": tol,
                        "below_threshold": "opinion"},
@@ -537,6 +656,7 @@ def main(argv=None):
                      "the test window was never used for fitting."),
         },
         "expectation_diagnostics": exp_diag,
+        "first_appearance": first_diag,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
                       for i in (1, 2, 3, 4, 5)},
@@ -590,6 +710,14 @@ def main(argv=None):
         f"pred_dist={dist['counts']} entropy={dist['entropy_bits']} "
         f"bits max_share={dist['max_share']} ({dist['max_kind']}) "
         f"v3={dist['v3_count']}")
+    lines.append(
+        f"  first-appearance: n={first_diag['n_first_appearance']}/"
+        f"{first_diag['n_classifiable']} hits="
+        f"{first_diag['first_appearance_hits']} ceiling_before="
+        f"{first_diag['ceiling_before']} ceiling_after="
+        f"{first_diag['ceiling_after']} predicted_first="
+        f"{first_diag['predicted_first_appearance_n']} "
+        f"by_kind={first_diag['by_kind']}")
     summary = "\n".join(lines)
     print(summary)
     if args.summary:

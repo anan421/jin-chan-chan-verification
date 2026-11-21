@@ -60,6 +60,27 @@ Calibration (round 9, 2026-11-21; design/round-9-calibration.md):
   test measurement share one implementation. When
   rules/calibration.json is absent, calibration is None and the
   raw distributions pass through unchanged.
+
+First-appearance kinds (round 11, 2026-11-21;
+design/round-11-first-appearance.md): on a trace with the
+semantic layer, the candidate set is the whole known vocabulary
+(SEMANTIC_VOCABULARY, 31 kinds, "unknown" excluded, banned kinds
+excluded per round), not just the kinds seen in the prefix. A kind
+is "first-appearance" at a prediction point when it has zero
+count in the prefix before that point. It is never hard-guessed:
+it enters the reported distribution only through a floor prior,
+1 / (N + K), N = known-kind moves in the prefix, K = vocabulary
+size (31). K is the candidate-set size, not the pool of kinds
+seen so far: the prior must sum to 1 over the candidate set, and
+the small-pool floor 1 / (N + K_pool) would sum to more than 1
+over the candidates and systematically inflate rare kinds. A
+first-appearance kind's expected increment is the prefix global
+mean (the n = 0 limit of the shrinkage formula, from prefix data
+only). The prior changes only the reported distribution and the
+modal action read off it; the best-response iteration still
+argmaxes raw utility, so iterations / convergence are untouched.
+Traces without the semantic layer (e.g. the fixture) keep the old
+rule: candidates are the kinds seen in the prefix, no prior.
   gamma = discount (A8) is read but NOT applied here: per design
   §3 it weights fitting evidence by recency (decision weight
   gamma**(R-r)); it does not discount future rewards in
@@ -114,6 +135,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import calibration as CAL  # noqa: E402  (post-hoc rescaling, round 9)
 import check  # noqa: E402  (resolve_rules, penalty_value, run)
+from convert_data_json import (  # noqa: E402  (round 11: the known
+    SEMANTIC_VOCABULARY)  # semantic-kind vocabulary; single source
+# of truth, shared with the converter and the backtest.
 
 HP_SEGMENTS = [
     ("king", 90, None), ("master", 80, 89), ("diamond", 70, 79),
@@ -311,6 +335,112 @@ def support_lookup(support, pid, kind):
     return n_kind, n_cell, bool(kinfo["shrunk"])
 
 
+def has_semantic_layer(trace):
+    """True when the trace carries the semantic-kind layer (moves
+    with a semantic_kind field). The real trace does; the fixture
+    predates the layer and does not. Round 11 gates the vocabulary
+    candidate set and the floor prior on this: a trace without the
+    layer keeps the old prefix-kind candidates and no prior, so the
+    fixture backtest is unchanged."""
+    return any("semantic_kind" in m for m in trace["moves"])
+
+
+def candidate_kinds(trace):
+    """The kind set a player may be predicted to take, before the
+    per-round banned-kind exclusion. On a semantic trace it is the
+    whole known vocabulary (SEMANTIC_VOCABULARY, sorted;
+    "unknown" is not in the vocabulary and is never a candidate).
+    On a pre-semantic trace it is the kinds that occur in the
+    trace, minus "unknown" (the old rule). The vocabulary is a
+    list of kind NAMES fixed before prediction: using it adds no
+    information from after the prediction point. Only the names
+    are taken from the vocabulary; every count, mean and prior
+    below is computed from the prefix only."""
+    if has_semantic_layer(trace):
+        return sorted(SEMANTIC_VOCABULARY)
+    return sorted({kind_of(m) for m in trace["moves"]} - {"unknown"})
+
+
+BASE_RATE_PSEUDOCOUNT = 1.0
+
+
+def base_rates(moves, vocabulary=None):
+    """Base rates: how often each action kind actually occurred in
+    `moves`, the prefix available at prediction time (round 7,
+    research fruit 1: start from the base rate, then adjust with
+    the scoring rule; reused in round 11 for the first-appearance
+    floor prior). This is the single implementation shared by
+    predict.py (live forecast, full trace) and backtest.py
+    (walk-forward prefix); both call it on exactly the prefix
+    their expected deltas come from, so the two prefixes agree.
+
+    Counts are global, over all players. "unknown" moves are
+    excluded from both the counts and the denominator: unknown is
+    a classification gap, not an action a player can take.
+    Smoothing is one pseudocount per kind (Laplace, alpha = 1.0):
+    p(kind) = (count + 1) / (N + K), N = known-kind moves in the
+    prefix, K = the size of the set the prior is a distribution
+    over. When `vocabulary` is given (round 11), K is the
+    vocabulary size: the prior must sum to 1 over the candidate
+    set, which is now the vocabulary, so every vocabulary kind
+    gets exactly one pseudocount and the prior sums to
+    (N + K) / (N + K) = 1. The small-pool choice K = distinct
+    kinds seen in the prefix would make the prior sum to
+    (N + K_vocabulary) / (N + K_pool) > 1 over the candidates and
+    would systematically inflate rare kinds (the round-10
+    reviewer's warning): with K_pool < 31 the floor 1 / (N +
+    K_pool) is higher than the vocabulary floor 1 / (N + 31).
+    When `vocabulary` is None, K falls back to the distinct kinds
+    seen (the round-7 rule, kept for callers without a
+    vocabulary). No probability is ever 0. A kind with no prefix
+    history gets the floor value 1 / (N + K): the smoothed
+    probability of a zero-count kind. The mode is the most
+    frequent kind (ties: highest count, then kind name ascending,
+    deterministic); it is the base-rate-only guess used by the
+    backtest diagnostic. A kind is "first-appearance" at
+    prediction time when it has no count in the prefix: it is
+    flagged, never hard-guessed, and can only enter through the
+    floor value."""
+    counts = {}
+    n = 0
+    for m in moves:
+        kind = kind_of(m)
+        if kind == "unknown":
+            continue
+        counts[kind] = counts.get(kind, 0) + 1
+        n += 1
+    if vocabulary is not None:
+        k = len([v for v in vocabulary if v != "unknown"])
+    else:
+        k = len(counts)
+    denom = n + BASE_RATE_PSEUDOCOUNT * k if k else 1.0
+    floor = BASE_RATE_PSEUDOCOUNT / denom if k else 1.0
+    probs = {kind: (c + BASE_RATE_PSEUDOCOUNT) / denom
+             for kind, c in counts.items()}
+    mode = None
+    if counts:
+        mode = sorted(counts, key=lambda kk: (-counts[kk], kk))[0]
+    return {"counts": counts, "n": n, "kinds": k,
+            "pseudocount": BASE_RATE_PSEUDOCOUNT, "floor": floor,
+            "probabilities": probs, "mode": mode}
+
+
+def combine_with_base_rates(dist, base):
+    """Multiply a model distribution by the base-rate prior and
+    renormalise: combined(kind) ~ model_p(kind) * base_p(kind).
+    In log space this is adding log base_p with weight 1. A kind
+    in the model distribution with no prefix history gets the
+    floor value from base_rates(). Returns full-precision
+    probabilities; the caller rounds for storage. The base rates
+    are a prior, not a parameter: nothing here is stored in
+    payoff-model.json, whose version does not change."""
+    probs = base["probabilities"]
+    floor = base["floor"]
+    weighted = {k: v * probs.get(k, floor) for k, v in dist.items()}
+    total = sum(weighted.values()) or 1.0
+    return {k: v / total for k, v in weighted.items()}
+
+
 def make_expectation(per_mean, glob_mean, global_mean=None):
     """exp(pid, kind) -> (dHP, dgold). per (player, kind) first, then
     per kind, then the fallback. global_mean, when given, is the
@@ -371,7 +501,7 @@ def utility(params, hp_before, hp_after, dhp, dgold, lever, compliance,
 
 
 def best_response(state, params, tau, candidates, exp, start_actions,
-                  acting, hp_bounds, calibration=None):
+                  acting, hp_bounds, calibration=None, base=None):
     """Best-response dynamics. state: pid -> (hp, gold).
     candidates: pid -> sorted list of kinds. exp: (pid, kind) ->
     (dHP, dgold). acting: players who move this round. calibration:
@@ -381,6 +511,18 @@ def best_response(state, params, tau, candidates, exp, start_actions,
     scaling, monotone: the modal action never changes, only the
     stated probabilities); utilities and the dynamics are
     untouched, so iterations / convergence are unaffected.
+    base: a base_rates() table or None (round 11). When given,
+    each player's softmax distribution is multiplied by the
+    base-rate prior and renormalised (combine_with_base_rates)
+    BEFORE the calibration rescaling; the modal action is then
+    read off the combined distribution. A first-appearance kind
+    (zero prefix count) enters only through the floor prior
+    1 / (N + K). When None the distribution is the plain softmax,
+    exactly as before (so ensemble.py, which does not pass base,
+    is unchanged). The best-response iteration itself is
+    untouched: it still argmaxes utility, and only the reported
+    distribution (and the modal action derived from it) carries
+    the prior.
     Returns a dict with actions, distributions, utilities,
     iterations, converged and cycle."""
     floor, cap = hp_bounds
@@ -449,6 +591,12 @@ def best_response(state, params, tau, candidates, exp, start_actions,
                    (1.0 if v == mx else 0.0) for k, v in utils.items()}
         total = sum(weights.values()) or 1.0
         raw_dist = {k: w / total for k, w in weights.items()}
+        # Round 11: multiply the model distribution by the base-rate
+        # prior and renormalise (log-space addition, weight 1).
+        # First-appearance kinds enter only through the floor prior.
+        # Top3 mass is read off the final (combined) distribution.
+        if base is not None:
+            raw_dist = combine_with_base_rates(raw_dist, base)
         # Post-hoc calibration (round 9): one shared rescaling,
         # applied here so live forecast and backtest measure the
         # same distributions. Monotone: argmax never changes.
@@ -895,14 +1043,19 @@ def apply_scenario_rules(rules, scenario, base_rule_id, current_date,
 
 def forecast_rounds(state, params, tau, candidates, exp, start_actions,
                     acting, hp_bounds, horizon, cap_rounds, pmap,
-                    calibration=None):
+                    calibration=None, base=None):
     """Best-response dynamics, round by round. Shared by the
     baseline run and the per-scenario runs. calibration is passed
     through to best_response (round 9): the same rescaling for
-    every forecast, baseline and scenarios alike. Returns (forecast,
-    effective_horizon). Forecast rows carry the round, the
-    round-tiered confidence, convergence, and per-player
-    distributions / modal actions / expected deltas."""
+    every forecast, baseline and scenarios alike. base is passed
+    through the same way (round 11): the same floor prior for
+    every forecast. Returns (forecast, effective_horizon).
+    Forecast rows carry the round, the round-tiered confidence,
+    convergence, and per-player distributions / modal actions /
+    expected deltas. Boundary: the multi-round state propagation
+    below follows the modal action, so with horizon > 1 the prior
+    (which moves the modal) can steer later rounds' states; the
+    best-response iteration itself still argmaxes raw utility."""
     effective_horizon = min(horizon, cap_rounds)
     forecast = []
     round_state = dict(state)
@@ -911,7 +1064,7 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
     for rnd in range(1, effective_horizon + 1):
         res = best_response(round_state, params, tau, candidates, exp,
                             round_start, acting_now, hp_bounds,
-                            calibration=calibration)
+                            calibration=calibration, base=base)
         forecast.append({
             "round": rnd, "confidence": confidence_tier(rnd),
             "iterations": res["iterations"],
@@ -945,18 +1098,22 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
 def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                   start_actions, acting, cap_rounds, horizon, pmap,
                   players_by_key, rules, max_date, base_rule_id,
-                  base_first, calibration=None):
+                  base_first, calibration=None, prior=None):
     """Best-response dynamics under each rule scenario. Returns
     {"scenarios": [...], "comparison": {...}}. Shared inputs (state,
     expectations, start actions) come from the baseline run; only
     the candidate sets and HP bounds change per scenario. No trigger
     probability is assigned anywhere: scenarios are conditional
-    branches, not a distribution."""
+    branches, not a distribution. prior (round 11) is the same
+    floor prior the baseline run uses, passed through to
+    forecast_rounds."""
     # "unknown" is a classification gap, not an action a player can
-    # take; it is excluded from the candidate set (same rule as
-    # backtest.py: candidates = prefix kinds - {"unknown"}), so it
-    # cannot absorb softmax probability mass.
-    all_kinds = sorted({kind_of(m) for m in trace["moves"]} - {"unknown"})
+    # take; it is excluded from the candidate set (round 11: on a
+    # semantic trace the candidate set is the whole vocabulary
+    # minus banned kinds, so a banned kind that never appears in
+    # the trace is still pruned), so it cannot absorb softmax
+    # probability mass.
+    all_kinds = candidate_kinds(trace)
     base_modal = {row["player"]: row["modal_action"]
                   for row in base_first}
     base_dist = {row["player"]: row["distribution"]
@@ -980,7 +1137,7 @@ def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
         forecast, effective = forecast_rounds(
             state, params, tau, candidates, exp, s_start, acting,
             hp_bounds, horizon, cap_rounds, pmap,
-            calibration=calibration)
+            calibration=calibration, base=prior)
         changed, max_shift = [], 0.0
         if forecast:
             for row in forecast[0]["players"]:
@@ -1117,10 +1274,19 @@ def main(argv=None):
     current = current_states(trace)
     lasts = last_moves(trace)
     # "unknown" excluded: classification gap, not a playable kind
-    # (same rule as backtest.py). Candidates below derive from this
-    # set, so start_actions (filtered by candidates membership)
-    # can never hold an "unknown" start either.
-    all_kinds = sorted({kind_of(m) for m in moves} - {"unknown"})
+    # (same rule as backtest.py). Round 11: on a semantic trace the
+    # candidate set is the whole vocabulary, so start_actions
+    # (filtered by candidates membership) can never hold an
+    # "unknown" start either. On a pre-semantic trace the old
+    # prefix-kind rule applies (see candidate_kinds).
+    all_kinds = candidate_kinds(trace)
+    # Round 11 floor prior: base rates over the full trace (the
+    # live prefix), with K = vocabulary size, so a kind never seen
+    # in the trace gets the floor 1 / (N + K) instead of being
+    # excluded. On a pre-semantic trace there is no prior (None),
+    # exactly as before.
+    prior = (base_rates(moves, vocabulary=SEMANTIC_VOCABULARY)
+             if has_semantic_layer(trace) else None)
     candidates = {}
     for p in players:
         pid = p["id"]
@@ -1157,7 +1323,7 @@ def main(argv=None):
     forecast, effective_horizon = forecast_rounds(
         state, params, tau, candidates, exp, start_actions, acting,
         hp_bounds, args.horizon, cap_rounds, pmap,
-        calibration=calibration)
+        calibration=calibration, base=prior)
     first = forecast[0]
     modal = {row["player"]: {"action": row["modal_action"]}
              for row in first["players"]}
@@ -1219,7 +1385,7 @@ def main(argv=None):
             scenarios_doc, trace, params, tau, state, exp, start_actions,
             acting, cap_rounds, args.horizon, pmap, players_by_key,
             rules, max_date, base_now["rule_id"], first["players"],
-            calibration=calibration)
+            calibration=calibration, prior=prior)
         scenarios_output = {
             "version": 1,
             "trace": args.trace,
@@ -1395,6 +1561,26 @@ def main(argv=None):
                      "uncalibrated."),
         },
         "expectation": expectation_diag,
+        "candidate_set": {
+            "rule": ("vocabulary (round 11)" if prior is not None
+                     else "prefix kinds"),
+            "vocabulary_size": (len(SEMANTIC_VOCABULARY)
+                                if prior is not None else None),
+            "floor_prior": prior["floor"] if prior is not None else None,
+            "floor_prior_n": prior["n"] if prior is not None else None,
+            "note": ("Round 11: on a semantic trace the candidate "
+                     "set is the whole known vocabulary "
+                     "(SEMANTIC_VOCABULARY, 31 kinds, banned kinds "
+                     "excluded per round). A kind with no count in "
+                     "the prefix is first-appearance: it is never "
+                     "hard-guessed, it enters only through the "
+                     "floor prior 1 / (N + K), N = known-kind "
+                     "moves in the prefix, K = vocabulary size. "
+                     "Its expected increment is the prefix global "
+                     "mean. The prior moves only the reported "
+                     "distribution and modal action; the "
+                     "best-response iteration still argmaxes raw "
+                     "utility.")},
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
                           "cycle": first["cycle"]},
@@ -1438,6 +1624,13 @@ def main(argv=None):
         f"{exp_round1['n_players']} "
         f"(share={exp_round1['shrunk_share']}) per_kind_n="
         f"{exp_round1['per_kind_n']}",
+        (f"predict: candidate set vocabulary "
+         f"(round 11): {len(SEMANTIC_VOCABULARY)} kinds, "
+         f"floor prior={prior['floor']} (N={prior['n']}, "
+         f"K={prior['kinds']})"
+         if prior is not None else
+         "predict: candidate set prefix kinds (no semantic layer, "
+         "no floor prior)"),
         f"predict: {SMOKE_NOTE}",
     ]
     for row in first["players"]:
