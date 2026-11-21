@@ -478,3 +478,29 @@
 - ensemble.py 仍从 action_kind 建候选集（真实 trace 上集成未重跑）。
 - C5 与语义层词汇不一致（overseas_rental 语义层有 2 个实例，C5 只查 action_kind）。
 - live v3 的 alpha_gamma_note 过期句、backtest.py/predict.py 的 smoke 备注硬编码，待下次写相关文件时一并改。
+
+## 语义词汇扩展 + 第二次真拟合（2026-11-21 晚）
+
+### ① 词汇扩展：规则 16–29，新种类 14 个
+- 转换器 `convert_data_json.py`：`SEMANTIC_VOCABULARY` 17 → 31 种；`classify_semantic()` 追加规则 16–29，整块排在 15 条旧规则之后（第一命中即定）。新种类：tongyi、hunyuan、ascend、doubao、wenxin、pangu、llama、claude、gemini、megaspeed、energy、financing、capex、open_source。文心/盘古不在任务枚举清单内，是探针发现的同形产品线（BIDU 11 条、HUAWEI 6 条），一并覆盖，见 design/semantic-kinds.md。
+- 探针核验（全量 558 条）：通义 12 条（1 条已是 blackwell）、混元 10 条、昇腾 10 条（1 条已是 r1）、豆包 10 条（2 条已是价格战）、文心 13 条（2 条已是价格战）、Llama 6 条、Claude 5 条、Gemini 3 条 + Bard 1 条、核电 2 条扩为 energy 10 条（同轮电力/绿电/燃气/供电）、Megaspeed 1 条、融资 11 条 + 债务 5 条 + 借钱 3 条 = financing 19 条、资本开支 16 条中 15 条归 capex（1 条 AAPL 含借钱，归 financing）、开源 37 条中 24 条归 open_source（产品名 11 条、bis_rule 1 条、不开源 1 条除外）。融资探针结论：不过宽，11 命中全是融资线程。订单/推理/算力/股价等扩散词不建种类（见 design/semantic-kinds.md §5 剩余缺口表）。
+- 回归保证三重：内存模拟先验 73 条不变；重抽取后与备份 trace 比对，非语义字段 0 差异、旧已分类 73 条逐项不变、新分类 139 条全来自 unknown 池；转换器自检新增 `EXPECTED_LEGACY_COUNTS` 冻结 15 种旧种类计数（任一移动即失败）。设计文档 design/semantic-kinds.md 已更新（§2 表、§3 规则 16–29、§4a 新歧义排除、第 4 节“产品名本身不对应任何种类”旧说法已标注废止、§5 缺口表更新、§7 新回测数、§9 自检三项、§11 本次重抽取）。
+
+### ② 重抽取 + 历史层重验
+- data.json 未动（重拷贝后 sha256 仍为 07995677…）。旧 trace 已备份：`traces/trace-2026-11-21-2fd0b38f.json`。新 trace：meta.trace_sha256 4ec473d2…，文件实测 sha256 f4bcebd9…，meta.source_sha256 07995677…（= data.json）。
+- 新覆盖率：212 条已分类、346 条 unknown（62.0%，原 86.9%）；拟合窗口 S1–S3 已分类 129/324 条；回测窗口 S4–S5 M1 分母 83 条（原 41 条）。
+- 历史层重跑：`runs/2026-11-21_131852/` 总体 pass（检查器 0 失败、0 gap，Lean 构建退出码 0）。C5/C6 修法未动、未回退。
+
+### ③ 重拟合 + hold-out（runs/fit-real-2026-11-21-02/，fit-2026-11-21-02；不写 live）
+- 拟合（S1–S3，n=126，占位 v2 作 --payoff，--status auto）：共享 α=1.0、γ=0.9、τ=0.25、违规率 0.952044（加权；未加权 0.960317 = 121/126），权重 (w_hp 0、w_gold 0、c_lever 0.445106、c_rule 0.890213、w_pos 0.096961)；v1 投影违规率 0.960317。占位同窗口 0.880952（111/126）——拟合比占位差 10 条决策，方向与第一次反了（第一次好 3 条）。五类：china_vendor n=59 违规率 0.876806、chip_supplier n=5 0.6、cloud_hyperscaler n=29 0.896552、leveraged_infra n=7 0.725063、model_lab n=26 0.884615。Bootstrap：w_gold 为 0 占比 0.96，w_hp 为 0 占比 0.70。
+- 结构下限：首发 34/126（27.0%，原 41.9%）；可学习子集 92 条，拟合 87/92 错，占位 77/92 错——拟合在可学习子集上也差 10 条。α 网格仍平坦（α=0.25/0.5/0.75 在 γ=1.0 时未加权违规率全是 0.952381），α 未被数据识别；τ=0.25 仍是网格下限。
+- Hold-out（S4–S5，n=234，M1 分母 83）：拟合 v1 投影 M1 2.41%（2/83，都在 S4；基线 4.30%）、M2 34.19%、M3 24.79%、M4 35.90%（唯一信号）、M5 82.48%；占位 M1 0.0%、M2 35.04%、M3 25.21%、M4 36.32%、M5 82.05%。拟合赢 M1（+2.41pp）与 M5（+0.43pp），输 M2/M3/M4——混合，未达采用标准。
+- 采用规则已改（v3 的教训，见 design/fitting-layer.md 新增附录）：只有 hold-out 优于占位才采用，样本内好不算。结论：**不采用**。live payoff-model.json 未动（仍为 v3，fit-2026-11-21-01，sha256 0e3d6345…，与第一次拟合后相同）。拟合输出只在 runs/fit-real-2026-11-21-02/（fit-report.json 含 post_fit、payoff-model-fitted.json/v1、backtest-fitted.json 备注已订正、backtest-placeholder.json、backtest-fixture-regression.json、predict-convergence-check.json、negative-control/）。
+- 两个诚实问题都复现：权重塌缩（w_hp=w_gold=0，c_rule 占优但不可识别）；负向控制 broken 与 ok 违规率完全相同（S1–S3 0.732026，全窗口 0.822222；四份报告与第一次逐项数值 0 差异）。新增：拟合反噬（可学习子集上拟合比占位差 10 条）；收敛恶化（拟合 v2 在 horizon 7 下 7 轮全部 20 次迭代循环；对照：占位 v2 在同一新 trace 上 7 轮全部 1–2 次迭代收敛，循环是拟合权重造成的）。
+- Fixture 回归：fit/backtest 在 fixture 上数字与改前逐项相同（负向控制四份报告 0 差异；回测 M1 10.26%、M2 44.44%、M3 55.56%、M4 46.15%、M5 85.47%，与冒烟逐项相同；仅新增语义层字段）。
+
+### 还缺（下一 lane）
+- 信号，不是覆盖率：已分类 73 → 212 条、可学习决策 18 → 92 条，拟合反而更差。下一步是 Gu 三步方案的第③步：改模型或改预测目标（只预测对事件的反应，不预测事件本身）。
+- ensemble.py 仍从 action_kind 建候选集（真实 trace 上集成未重跑）。
+- C5 与语义层词汇不一致（overseas_rental 语义层有 2 个实例，C5 只查 action_kind）。
+- live v3 的 alpha_gamma_note 过期句、backtest.py/predict.py 的 smoke 备注硬编码，待下次写相关文件时一并改；收敛处理是独立任务。
