@@ -32,6 +32,13 @@ Metrics (design section 5):
   over probability buckets, on the classifiable subset; threshold
   M6 < 0.2. The top bucket [0.99, 1.0] holds the near-certain
   claims, including modal p = 1.0.
+  M7 feasibility violation rate (audit fix 5, round 5): the share
+  of test records whose predicted kind is infeasible for that
+  player at prediction time (exogenous, outside eligible_players,
+  or a one_shot kind the player already did in the prefix before
+  that round). M7 must be 0; otherwise M1-M5 are not credible.
+  Naming: the audit calls this rate "M6", but M6 is already
+  calibration, so this rate is M7 and M6 is unchanged.
 
 Kind layer (semantic kinds, added 2026-11-21): moves carry
 semantic_kind (the substantive action thread) beside action_kind
@@ -223,6 +230,41 @@ def calibration(records):
                      "claims, including modal p = 1.0.")}
 
 
+# --- M7 feasibility (audit fix 5, round 5) ---------------------------
+def feasibility_summary(records):
+    """M7: feasibility violation rate over test records. A record
+    violates when its predicted kind is infeasible for that player
+    at prediction time (the record's m7_violation flag, judged on
+    that round's prefix by predict.kind_feasible). The denominator
+    is records with a prediction (predicted_action is not None);
+    a record with no prediction (empty candidate set after the
+    mask) is not a violation and is reported separately as
+    m7_no_prediction_n. M7 must be 0; otherwise M1-M5 are not
+    credible. Named M7 because the audit's "M6" for this rate
+    collides with the existing M6 calibration gap, which is
+    unchanged."""
+    from collections import Counter
+    pred = [r for r in records if r.get("predicted_action") is not None]
+    viol = [r for r in pred if r.get("m7_violation")]
+    rate = len(viol) / len(pred) if pred else 0.0
+    return {"m7_violation_rate": round(rate, 6),
+            "m7_violations": len(viol),
+            "m7_n": len(pred),
+            "m7_no_prediction_n": len(records) - len(pred),
+            "m7_pass": len(viol) == 0,
+            "violations_by_kind": dict(Counter(r["predicted_action"]
+                                               for r in viol)),
+            "violations_by_player": dict(Counter(r["key"] for r in viol)),
+            "note": ("M7 is the share of test predictions whose kind "
+                     "is infeasible for that player at prediction "
+                     "time (exogenous, outside eligible_players, or "
+                     "a one_shot kind the player already did in the "
+                     "prefix). Named M7 because the audit's 'M6' "
+                     "for this rate collides with the existing M6 "
+                     "calibration gap, which is unchanged. M7 must "
+                     "be 0; otherwise M1-M5 are not credible.")}
+
+
 def prediction_distribution(records):
     """Distribution of predicted actions over `records`: counts,
     Shannon entropy (bits) of the modal-action distribution, the
@@ -282,9 +324,13 @@ def expectation_diagnostics(records):
             "per_kind_n_at_prediction": per_kind}
 
 
-def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
+def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
+               feasible=None):
     """Predict every round in `seasons` from its prefix. Returns
-    (records, per_round_meta)."""
+    (records, per_round_meta). The feasibility mask (audit fix 5)
+    filters each round's candidate set on that round's prefix only
+    (no future information); each record carries m7_violation,
+    judged on the same prefix."""
     rules = trace["rules"]
     moves = trace["moves"]
     pmap = {p["id"]: p for p in trace["players"]}
@@ -333,6 +379,17 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                     kinds_here = ([rec] if rec != "unknown" else
                                   sorted({kind_of(x) for x in prefix}
                                          - {"unknown"}))
+                # Feasibility mask (audit fix 5, round 5): filter
+                # before best-response, judged on this round's
+                # prefix only (no future information). If the mask
+                # empties the list the player gets no prediction
+                # this round (modal None: an M1 miss, not an M7
+                # violation); on this trace the unrestricted kinds
+                # keep the list non-empty.
+                kinds_here = [k for k in kinds_here
+                              if P.kind_feasible(
+                                  k, pid, pmap[pid].get("key"), prefix,
+                                  feasible or {})]
                 candidates[pid] = kinds_here
             start = {pid: kind_of(last[pid])
                      for pid in last
@@ -369,6 +426,11 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                     "key": pmap[pid].get("key"),
                     "predicted_action": pred_kind,
                     "recorded_action": rec_kind,
+                    "m7_violation": (
+                        pred_kind is not None
+                        and not P.kind_feasible(
+                            pred_kind, pid, pmap[pid].get("key"), prefix,
+                            feasible or {})),
                     "modal_probability": res["modal"][pid]["probability"],
                     "predicted_kind_n": n_kind,
                     "predicted_kind_n_player": n_cell,
@@ -383,7 +445,8 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                     "m3": P.sign(pdgold) == P.sign(m["gold_delta"]),
                     "m4": P.hp_segment(pred_hp) == P.hp_segment(rec_hp),
                     "m5": abs(pdhp - m["hp_delta"]) <= tol,
-                    "b1": 1.0 / len(candidates[pid]),
+                    "b1": (1.0 / len(candidates[pid])
+                           if candidates[pid] else 0.0),
                     "b2": 0.5, "b3": 0.5, "b4": 1.0 / 8,
                     "b5": m5_baseline(min(obs), max(obs),
                                       m["hp_delta"], tol),
@@ -408,6 +471,7 @@ def main(argv=None):
         return 2
     params = {k: v["value"] for k, v in payoff["parameters"].items()}
     tau = params.get("temperature", 1.0)
+    feasible = P.load_feasible_kinds(payoff)
     thresholds = payoff.get("thresholds", {})
     margin_pp = thresholds.get("margin_pp", 10)
     tol = thresholds.get("m5_tolerance", 10)
@@ -421,9 +485,9 @@ def main(argv=None):
         return 2
 
     test_records = run_window(trace, params, tau, test_seasons,
-                              margin_pp, tol)
+                              margin_pp, tol, feasible)
     full_records = run_window(trace, params, tau, seasons,
-                              margin_pp, tol)
+                              margin_pp, tol, feasible)
 
     def tables(records):
         overall = add_thresholds(aggregate(records), margin_pp)
@@ -447,6 +511,10 @@ def main(argv=None):
     calib = calibration(test_records)
     test_tables["overall"]["m6_gap"] = calib["m6"]
     test_tables["overall"]["m6_pass"] = calib["m6_pass"]
+    feas = feasibility_summary(test_records)
+    test_tables["overall"]["m7_violation_rate"] = \
+        feas["m7_violation_rate"]
+    test_tables["overall"]["m7_pass"] = feas["m7_pass"]
     exp_diag = expectation_diagnostics(test_records)
     report = {
         "trace": args.trace,
@@ -481,6 +549,7 @@ def main(argv=None):
                                                       []),
         "verdict": ("fail" if below_any else "pass"),
         "calibration": calib,
+        "feasibility": feas,
         "expectation_diagnostics": exp_diag,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
@@ -522,6 +591,11 @@ def main(argv=None):
            f"mean_p={top['mean_predicted_p']} "
            f"hit={top['actual_hit_rate']} gap={top['gap']})"
            if top and top["n"] else ""))
+    lines.append(
+        f"  M7: violation_rate={feas['m7_violation_rate']} "
+        f"({feas['m7_violations']}/{feas['m7_n']} violations) "
+        f"pass={feas['m7_pass']} "
+        f"no_prediction={feas['m7_no_prediction_n']}")
     dist = exp_diag["prediction_distribution"]
     lines.append(
         f"  expectation: shrunk={exp_diag['shrunk_predictions']}/"

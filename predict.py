@@ -33,6 +33,19 @@ no trigger probability is assigned anywhere (no data supports one).
 Output is a standalone JSON file; merging into the merged report is
 not wired (run.sh / merge_report.py untouched).
 
+Feasibility mask (audit fix 5, round 5): rules/payoff-model.json
+"feasible_kinds" lists, per kind, eligible_players (player keys),
+one_shot and exogenous. The mask filters every candidate set before
+best-response dynamics (baseline and per-scenario runs): exogenous
+kinds never enter argmax, a listed kind is open only to its eligible
+players, and a one_shot kind leaves a player's candidates once that
+player already has a prefix move of that kind (prefix = history
+available at prediction time). A kind absent from the table is open
+to every player. M7 is the feasibility violation rate (share of
+predictions whose kind is infeasible for that player); it is named
+M7 because the audit's "M6" for this rate collides with the M6
+calibration gap defined in batch 1 (round 3), which is unchanged.
+
 Utility (per payoff-model.json v2, design/fitting-layer.md §3-4):
   u = w_hp*[(hp_after)^alpha - (hp_before)^alpha] + w_gold*dgold
       - c_lever*leverage_penalty - c_rule*compliance_cost
@@ -152,6 +165,111 @@ def kind_of(m):
     action_kind values already are semantic kinds). Same rule as
     backtest.kind_of; keep the two in sync."""
     return m.get("semantic_kind") or m["action_kind"]
+
+
+# --- feasibility mask (audit fix 5, round 5) -------------------------
+def load_feasible_kinds(payoff):
+    """The feasible_kinds table from the payoff model. Returns {}
+    when the payoff file predates the table: with no table every
+    kind is feasible for every player (old behaviour), so old
+    payoff files keep working."""
+    table = payoff.get("feasible_kinds")
+    return table if isinstance(table, dict) else {}
+
+
+def kind_feasible(kind, pid, player_key, prefix_moves, feasible):
+    """True when `kind` is a feasible action for the player with id
+    `pid` (key `player_key`), judged on the prefix history
+    available at prediction time. A kind absent from the table is
+    feasible for every player. An exogenous kind is feasible for
+    nobody: it never enters argmax (scenario input only). A listed
+    kind is feasible only for its eligible_players (null means not
+    applicable as a player action, as for bis_rule). A one_shot
+    kind is infeasible for a player once that player already has a
+    prefix move of that kind. "unknown" is never feasible here
+    (classification gap, not an action); callers already exclude it
+    from the kind set, so this is a backstop. This one function is
+    the single source of truth for both the mask and the M7
+    measurement; M7 is computed from the table and the prefix, not
+    by trusting that the mask ran."""
+    if kind is None or kind == "unknown":
+        return False
+    kinds = feasible.get("kinds") or {}
+    row = kinds.get(kind)
+    if row is None:
+        return True
+    if row.get("exogenous"):
+        return False
+    eligible = row.get("eligible_players")
+    if eligible is not None and player_key not in eligible:
+        return False
+    if row.get("one_shot"):
+        for m in prefix_moves:
+            if kind_of(m) == kind and m.get("player") == pid:
+                return False
+    return True
+
+
+def apply_feasibility_mask(candidates, feasible, prefix_moves, pmap):
+    """Filter each player's candidate list through the feasible_kinds
+    table, judged on the prefix history available at prediction
+    time. Returns (filtered, removed) where removed maps pid to the
+    kinds taken out of that player's list. Kinds absent from the
+    table pass through untouched. Callers apply this before
+    best-response dynamics (and before start_actions are filtered
+    by candidate membership), so a filtered-out kind can never be
+    a start action, a best response, or a modal prediction."""
+    filtered, removed = {}, {}
+    for pid, kinds in candidates.items():
+        key = pmap.get(pid, {}).get("key") if isinstance(pmap, dict) \
+            else None
+        keep = [k for k in kinds
+                if kind_feasible(k, pid, key, prefix_moves, feasible)]
+        removed[pid] = [k for k in kinds if k not in keep]
+        filtered[pid] = keep
+    return filtered, removed
+
+
+def feasibility_report(first_players, feasible, prefix_moves, pmap):
+    """M7 feasibility violation rate (audit fix 5, round 5) over the
+    round-1 forecast: the share of players with a modal action
+    whose modal kind is infeasible for that player at prediction
+    time. M7 must be 0; otherwise the M1-M5 numbers are not
+    credible (the model is predicting actions the player cannot
+    take). Naming: the audit calls this rate "M6", but M6 is
+    already the calibration gap (batch 1, round 3), so this rate
+    is M7 and M6 calibration is unchanged. Players with no modal
+    action (empty candidate set) are not violations and are not
+    in the denominator: no kind was predicted."""
+    n_pred = 0
+    violations = []
+    for row in first_players:
+        kind = row.get("modal_action")
+        if kind is None:
+            continue
+        n_pred += 1
+        pid = row["player"]
+        key = pmap.get(pid, {}).get("key") if isinstance(pmap, dict) \
+            else None
+        if not kind_feasible(kind, pid, key, prefix_moves, feasible):
+            violations.append({
+                "player": pid, "key": key, "kind": kind,
+                "modal_probability": row.get("modal_probability")})
+    rate = (len(violations) / n_pred) if n_pred else 0.0
+    return {"m7_violation_rate": round(rate, 6),
+            "m7_violations": len(violations),
+            "m7_n": n_pred,
+            "m7_pass": len(violations) == 0,
+            "violations": violations,
+            "table_version": feasible.get("version"),
+            "note": ("M7 is the share of round-1 modal predictions "
+                     "whose kind is infeasible for that player "
+                     "(exogenous, outside eligible_players, or a "
+                     "one_shot kind the player already did in the "
+                     "prefix). Named M7 because the audit's 'M6' "
+                     "for this rate collides with the existing M6 "
+                     "calibration gap, which is unchanged. M7 must "
+                     "be 0; otherwise M1-M5 are not credible.")}
 
 
 MIN_SUPPORT = 5
@@ -904,13 +1022,16 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
 def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                   start_actions, acting, cap_rounds, horizon, pmap,
                   players_by_key, rules, max_date, base_rule_id,
-                  base_first):
+                  base_first, feasible=None):
     """Best-response dynamics under each rule scenario. Returns
     {"scenarios": [...], "comparison": {...}}. Shared inputs (state,
     expectations, start actions) come from the baseline run; only
     the candidate sets and HP bounds change per scenario. No trigger
     probability is assigned anywhere: scenarios are conditional
-    branches, not a distribution."""
+    branches, not a distribution. The feasibility mask (audit fix 5)
+    applies inside each scenario run too, judged on the full
+    history, before start actions are filtered by candidate
+    membership."""
     # "unknown" is a classification gap, not an action a player can
     # take; it is excluded from the candidate set (same rule as
     # backtest.py: candidates = prefix kinds - {"unknown"}), so it
@@ -933,6 +1054,8 @@ def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
             for ov in overlays:
                 banned |= set(ov["params"].get("banned_action_kinds", []))
             candidates[pid] = [k for k in all_kinds if k not in banned]
+        candidates, _scenario_mask = apply_feasibility_mask(
+            candidates, feasible or {}, trace["moves"], pmap)
         hp_bounds = (applied["hp_floor"][1], applied["hp_cap"][1])
         s_start = {pid: a for pid, a in start_actions.items()
                    if a in candidates.get(pid, [])}
@@ -1082,6 +1205,13 @@ def main(argv=None):
         for ov in overlays:
             banned |= set(ov["params"].get("banned_action_kinds", []))
         candidates[pid] = [k for k in all_kinds if k not in banned]
+    # Feasibility mask (audit fix 5, round 5): filter before
+    # best-response dynamics, judged on the full history (the live
+    # prefix). start_actions below is filtered by candidate
+    # membership, so a masked-out kind can never be a start action.
+    feasible = load_feasible_kinds(payoff)
+    candidates, mask_removed = apply_feasibility_mask(
+        candidates, feasible, moves, pmap)
     per_mean, glob_mean = expected_deltas(moves)
     support = expectation_support(moves)
     exp = make_expectation(per_mean, glob_mean,
@@ -1117,6 +1247,14 @@ def main(argv=None):
     # round-1 forecast collapses onto p = 1.0 modal actions, and how
     # concentrated the modal actions are across players.
     degeneracy = degeneracy_metrics(first["players"])
+    # Feasibility (audit fix 5, round 5): M7 over the round-1 modal
+    # predictions, judged on the full history. mask_removed lists
+    # the kinds the mask took out of each player's candidate set.
+    feasibility = feasibility_report(first["players"], feasible, moves,
+                                     pmap)
+    feasibility["mask_removed"] = {
+        pmap[pid].get("key"): kinds for pid, kinds in
+        mask_removed.items() if kinds}
     # Expectation diagnostics (audit fix 4, round 4): how many of
     # the round-1 modal predictions rest on a shrunk expectation
     # (thin cell or thin kind, n < 5) rather than a raw mean, and
@@ -1170,7 +1308,8 @@ def main(argv=None):
         body = run_scenarios(
             scenarios_doc, trace, params, tau, state, exp, start_actions,
             acting, cap_rounds, args.horizon, pmap, players_by_key,
-            rules, max_date, base_now["rule_id"], first["players"])
+            rules, max_date, base_now["rule_id"], first["players"],
+            feasible)
         scenarios_output = {
             "version": 1,
             "trace": args.trace,
@@ -1325,6 +1464,7 @@ def main(argv=None):
         } for row in first["players"]],
         "forecast_rounds": forecast,
         "degeneracy": degeneracy,
+        "feasibility": feasibility,
         "expectation": expectation_diag,
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
@@ -1356,6 +1496,10 @@ def main(argv=None):
         f"degenerate={degeneracy['degenerate']} "
         f"modal_action_entropy_bits="
         f"{degeneracy['modal_action_entropy_bits']}",
+        f"predict: feasibility M7={feasibility['m7_violation_rate']} "
+        f"({feasibility['m7_violations']}/{feasibility['m7_n']} "
+        f"violations) pass={feasibility['m7_pass']} "
+        f"mask_removed={feasibility['mask_removed']}",
         f"predict: expectation min_support={MIN_SUPPORT} k="
         f"{SHRINKAGE_K} shrunk_predictions="
         f"{exp_round1['shrunk_predictions']}/"
