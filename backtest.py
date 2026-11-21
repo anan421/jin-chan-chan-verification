@@ -297,7 +297,8 @@ def expectation_diagnostics(records):
 
 
 def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
-               calibration=None, include_distributions=False):
+               calibration=None, include_distributions=False,
+               player_types=None):
     """Predict every round in `seasons` from its prefix. Returns
     (records, per_round_meta). calibration is passed through to
     predict.best_response() (round 9): the modal probabilities in
@@ -305,7 +306,12 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
     given, the raw ones when it is None. include_distributions
     attaches the full (calibrated) distribution to each record;
     fit_calibration.py uses it to fit on the fit window, the
-    regular report leaves it off to stay lean."""
+    regular report leaves it off to stay lean. player_types is a
+    pid -> type map (round 10): when given, each round's
+    predictions use the resolved per-player reference-class prior
+    from that round's walk-forward prefix (P.per_player_rates);
+    when None (fit_calibration.py, which needs the raw model
+    distributions) no prior is applied."""
     rules = trace["rules"]
     moves = trace["moves"]
     pmap = {p["id"]: p for p in trace["players"]}
@@ -326,6 +332,15 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
             exp = P.make_expectation(
                 per_mean, glob_mean,
                 global_mean=tuple(support["global_mean"]))
+            # Round 10 (fruit 4): per-player reference-class priors
+            # from this round's walk-forward prefix, the same prefix
+            # the expectations above come from (predict.py uses the
+            # full trace for the live forecast; here the prefix grows
+            # round by round). Single implementation:
+            # P.per_player_rates. When player_types is None
+            # (fit_calibration.py) no prior is applied.
+            priors_table = (P.per_player_rates(prefix, player_types)
+                            if player_types is not None else None)
             last = {}
             for m in prefix:
                 pid = m["player"]
@@ -366,9 +381,16 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
             if base0 is not None:
                 hp_bounds = (base0["params"]["hp_floor"],
                              base0["params"]["hp_cap"])
+            # Round 10: resolve one prior per acting player from
+            # this round's prefix table (own / type / global).
+            prior_by_player = (
+                {pid: P.resolve_prior(priors_table, pid, player_types)
+                 for pid in acting}
+                if priors_table is not None else None)
             res = P.best_response(state, payoff_params, tau, candidates,
                                   exp, start, acting, hp_bounds,
-                                  calibration=calibration)
+                                  calibration=calibration,
+                                  priors=prior_by_player)
             dhp_obs = defaultdict(list)
             for m in prefix:
                 dhp_obs[m["player"]].append(m["hp_delta"])
@@ -386,11 +408,35 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
                 rec_hp = P.clamp(cur_hp + m["hp_delta"], lo_b, hi_b)
                 obs = dhp_obs.get(pid, [m["hp_delta"]])
                 rec_kind = kind_of(m)
+                # Round 10 diagnostics. prior_only_guess: the mode
+                # of the resolved reference-class prior for this
+                # player (own / type / global hierarchy) -- fruit
+                # 4's own measure: the reference class alone,
+                # against the model and against the global-only
+                # guess. global_only_guess: the global table's mode
+                # (round 7's base-only guess; it must reproduce
+                # 6/83 on this window). prior_level / prior_n: which
+                # level resolved for this player at this round and
+                # how many known-kind moves supported it.
+                prior = (prior_by_player or {}).get(pid)
+                prior_guess = (prior["table"]["mode"]
+                               if prior is not None else None)
+                global_guess = (priors_table["global"]["mode"]
+                                if priors_table is not None else None)
                 rec = {
                     "season": season, "round": rnd, "player": pid,
                     "key": pmap[pid].get("key"),
                     "predicted_action": pred_kind,
                     "recorded_action": rec_kind,
+                    "prior_level": prior["level"] if prior else None,
+                    "prior_n": (prior["table"]["n"]
+                                if prior is not None else None),
+                    "prior_only_guess": prior_guess,
+                    "prior_only_hit": (prior_guess == rec_kind
+                                       and rec_kind != "unknown"),
+                    "global_only_guess": global_guess,
+                    "global_only_hit": (global_guess == rec_kind
+                                        and rec_kind != "unknown"),
                     "modal_probability": res["modal"][pid]["probability"],
                     "predicted_kind_n": n_kind,
                     "predicted_kind_n_player": n_cell,
@@ -449,13 +495,21 @@ def main(argv=None):
         print("backtest: trace needs more than 3 seasons for a "
               "walk-forward test window", file=sys.stderr)
         return 2
+    # Round 10 (fruit 4): pid -> player type, from the payoff
+    # model's five tiers; threaded into run_window so each round's
+    # priors resolve own / type / global from that round's prefix.
+    type_of = {p["key"]: p["type"] for p in payoff.get("players", [])}
+    player_types = {p["id"]: type_of.get(p["key"])
+                    for p in trace["players"]}
 
     test_records = run_window(trace, params, tau, test_seasons,
                               margin_pp, tol,
-                              calibration=calibration_params)
+                              calibration=calibration_params,
+                              player_types=player_types)
     full_records = run_window(trace, params, tau, seasons,
                               margin_pp, tol,
-                              calibration=calibration_params)
+                              calibration=calibration_params,
+                              player_types=player_types)
 
     def tables(records):
         overall = add_thresholds(aggregate(records), margin_pp)
@@ -480,6 +534,60 @@ def main(argv=None):
     test_tables["overall"]["m6_gap"] = calib["m6"]
     test_tables["overall"]["m6_pass"] = calib["m6_pass"]
     exp_diag = expectation_diagnostics(test_records)
+    # Round 10 (fruit 4): reference-class-only diagnostics on the
+    # test window. prior-only = the resolved prior's mode for every
+    # record; global-only = the global table's mode (round 7's
+    # base-only guess, same denominator as M1). Fruit 4's
+    # falsification check: per-player-only does not beat
+    # global-only. Level breakdown: hits by the level the prior
+    # resolved at for that record.
+    cls_recs = [r for r in test_records if r.get("m1_classifiable")]
+    prior_hits = sum(1 for r in cls_recs if r.get("prior_only_hit"))
+    global_hits = sum(1 for r in cls_recs if r.get("global_only_hit"))
+    level_counts = {}
+    level_hits = {}
+    for r in cls_recs:
+        lv = r.get("prior_level")
+        level_counts[lv] = level_counts.get(lv, 0) + 1
+        if r.get("prior_only_hit"):
+            level_hits[lv] = level_hits.get(lv, 0) + 1
+    per_player_diag = {
+        "method": ("Per-player reference-class prior (round 10, "
+                   "research fruit 4): each player's kind "
+                   "distribution from the walk-forward prefix, "
+                   "Laplace-smoothed with one pseudocount per kind, "
+                   "p = (count + 1) / (N + K); the model distribution "
+                   "is multiplied by the prior and renormalised. "
+                   "Resolution per player: own history when its "
+                   "known-kind count n >= 5 (MIN_SUPPORT, round 4), "
+                   "else the same-type average when its n >= 5, else "
+                   "the global average. 'unknown' moves are excluded "
+                   "from counts and denominator. The prior is computed "
+                   "from the trace, not stored in payoff-model.json."),
+        "min_support": P.MIN_SUPPORT,
+        "pseudocount": P.PER_PLAYER_PSEUDOCOUNT,
+        "diagnostic": {
+            "prior_only_guess": ("resolved prior mode (own / type / "
+                                 "global) for every record"),
+            "global_only_guess": "global table mode for every record",
+            "prior_only_hits": prior_hits,
+            "global_only_hits": global_hits,
+            "n_classifiable": len(cls_recs),
+            "prior_only_hit_rate": (round(prior_hits / len(cls_recs), 4)
+                                    if cls_recs else None),
+            "global_only_hit_rate": (round(global_hits / len(cls_recs),
+                                           4)
+                                     if cls_recs else None),
+            "model_m1_hits": sum(1 for r in cls_recs if r["m1"]),
+            "note": ("Prior-only hits vs global-only hits vs model M1 "
+                     "hits, same denominator. Fruit 4's falsification "
+                     "check: if prior-only does not beat global-only, "
+                     "the reference class adds nothing over the "
+                     "global average on this window.")},
+        "levels": {lv: {"records": level_counts.get(lv, 0),
+                        "prior_only_hits": level_hits.get(lv, 0)}
+                   for lv in ("player", "type", "global")},
+    }
     report = {
         "trace": args.trace,
         "payoff_model": {"version": payoff.get("version"),
@@ -537,6 +645,7 @@ def main(argv=None):
                      "the test window was never used for fitting."),
         },
         "expectation_diagnostics": exp_diag,
+        "per_player_rates": per_player_diag,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
                       for i in (1, 2, 3, 4, 5)},
@@ -590,6 +699,15 @@ def main(argv=None):
         f"pred_dist={dist['counts']} entropy={dist['entropy_bits']} "
         f"bits max_share={dist['max_share']} ({dist['max_kind']}) "
         f"v3={dist['v3_count']}")
+    ppd = per_player_diag["diagnostic"]
+    lines.append(
+        f"  per_player_rates: prior-only guess hits="
+        f"{ppd['prior_only_hits']}/{ppd['n_classifiable']} "
+        f"(rate={ppd['prior_only_hit_rate']}) vs global-only hits="
+        f"{ppd['global_only_hits']}/{ppd['n_classifiable']} "
+        f"(rate={ppd['global_only_hit_rate']}) vs model M1 hits="
+        f"{ppd['model_m1_hits']}/{ppd['n_classifiable']} "
+        f"levels={per_player_diag['levels']}")
     summary = "\n".join(lines)
     print(summary)
     if args.summary:

@@ -311,6 +311,112 @@ def support_lookup(support, pid, kind):
     return n_kind, n_cell, bool(kinfo["shrunk"])
 
 
+PER_PLAYER_PSEUDOCOUNT = 1.0
+
+
+def _rates_table(counts):
+    """One Laplace-smoothed kind distribution from kind counts
+    ('unknown' already excluded). p(kind) = (count + 1) / (N + K),
+    N = known-kind moves in the pool, K = distinct known kinds in
+    the pool; a kind with no history in the pool gets the floor
+    1 / (N + K), never 0. mode is the most frequent kind (ties:
+    highest count, then kind name ascending, deterministic) --
+    the same mode rule as round 7's base_rates(), so the global
+    table here reproduces round 7's base-only guess exactly.
+    The common denominator (N + K) cancels when this table is
+    used as a multiplier in combine_with_prior, so only the
+    counts shape the combined distribution."""
+    n = sum(counts.values())
+    k = len(counts)
+    denom = n + PER_PLAYER_PSEUDOCOUNT * k if k else 1.0
+    floor = PER_PLAYER_PSEUDOCOUNT / denom if k else 1.0
+    probs = {kind: (c + PER_PLAYER_PSEUDOCOUNT) / denom
+             for kind, c in counts.items()}
+    mode = None
+    if counts:
+        mode = sorted(counts, key=lambda kk: (-counts[kk], kk))[0]
+    return {"counts": dict(counts), "n": n, "kinds": k,
+            "pseudocount": PER_PLAYER_PSEUDOCOUNT, "floor": floor,
+            "probabilities": probs, "mode": mode}
+
+
+def per_player_rates(moves, player_types=None):
+    """Reference-class prior tables (round 10, research fruit 4):
+    one smoothed kind distribution per player, per player type,
+    and one global table. Single implementation shared by
+    predict.py (live forecast, full trace) and backtest.py
+    (walk-forward prefix); both call it on exactly the prefix
+    their expected deltas come from, so the two prefixes agree.
+    player_types: pid -> type key (chip_supplier,
+    cloud_hyperscaler, model_lab, leveraged_infra, china_vendor,
+    from rules/payoff-model.json 'players'); a player with no
+    type entry has no type table and falls from own history
+    straight to global. 'unknown' moves are excluded from every
+    count and denominator: unknown is a classification gap, not
+    an action a player can take. The tables are priors, not
+    parameters: nothing here is stored in payoff-model.json,
+    whose version does not change."""
+    per = defaultdict(dict)
+    typ = defaultdict(dict)
+    glob = {}
+    for m in moves:
+        kind = kind_of(m)
+        if kind == "unknown":
+            continue
+        pid = m["player"]
+        cell = per[pid]
+        cell[kind] = cell.get(kind, 0) + 1
+        t = (player_types or {}).get(pid)
+        if t is not None:
+            tcell = typ[t]
+            tcell[kind] = tcell.get(kind, 0) + 1
+        glob[kind] = glob.get(kind, 0) + 1
+    return {"min_support": MIN_SUPPORT,
+            "pseudocount": PER_PLAYER_PSEUDOCOUNT,
+            "global": _rates_table(glob),
+            "types": {t: _rates_table(c) for t, c in typ.items()},
+            "players": {pid: _rates_table(c)
+                        for pid, c in per.items()}}
+
+
+def resolve_prior(priors, pid, player_types=None):
+    """Resolve one prior for a player from a per_player_rates()
+    table. Returns {"table": table, "level": level}. Resolution:
+    the player's own history when its known-kind count
+    n >= MIN_SUPPORT (5, round 4's minimum-support rule: too
+    little history is not used hard as the player's own mean);
+    else the same-type average when its n >= MIN_SUPPORT; else
+    the global average. A player with no type entry skips the
+    type level. The level is returned beside the table so
+    callers can report how many predictions actually rested on
+    a player's own history."""
+    ptab = priors["players"].get(pid)
+    if ptab is not None and ptab["n"] >= priors["min_support"]:
+        return {"table": ptab, "level": "player"}
+    t = (player_types or {}).get(pid)
+    if t is not None:
+        ttab = priors["types"].get(t)
+        if ttab is not None and ttab["n"] >= priors["min_support"]:
+            return {"table": ttab, "level": "type"}
+    return {"table": priors["global"], "level": "global"}
+
+
+def combine_with_prior(dist, table):
+    """Multiply a model distribution by a reference-class prior
+    and renormalise: combined(kind) ~ model_p(kind) *
+    prior_p(kind). Same shape as round 7's
+    combine_with_base_rates, but the prior is the resolved
+    per-player table (own / type / global), not one global
+    table. A kind with no history at the resolved level gets
+    that level's floor value. Returns full-precision
+    probabilities; the caller rounds for storage."""
+    probs = table["probabilities"]
+    floor = table["floor"]
+    weighted = {k: v * probs.get(k, floor) for k, v in dist.items()}
+    total = sum(weighted.values()) or 1.0
+    return {k: v / total for k, v in weighted.items()}
+
+
 def make_expectation(per_mean, glob_mean, global_mean=None):
     """exp(pid, kind) -> (dHP, dgold). per (player, kind) first, then
     per kind, then the fallback. global_mean, when given, is the
@@ -371,7 +477,7 @@ def utility(params, hp_before, hp_after, dhp, dgold, lever, compliance,
 
 
 def best_response(state, params, tau, candidates, exp, start_actions,
-                  acting, hp_bounds, calibration=None):
+                  acting, hp_bounds, calibration=None, priors=None):
     """Best-response dynamics. state: pid -> (hp, gold).
     candidates: pid -> sorted list of kinds. exp: (pid, kind) ->
     (dHP, dgold). acting: players who move this round. calibration:
@@ -381,8 +487,23 @@ def best_response(state, params, tau, candidates, exp, start_actions,
     scaling, monotone: the modal action never changes, only the
     stated probabilities); utilities and the dynamics are
     untouched, so iterations / convergence are unaffected.
-    Returns a dict with actions, distributions, utilities,
-    iterations, converged and cycle."""
+    priors: a dict pid -> {"table": rates table, "level":
+    "player" | "type" | "global"} as returned by resolve_prior
+    (round 10), or None for no prior. When given, each player's
+    softmax distribution is multiplied by that player's resolved
+    reference-class prior and renormalised
+    (combine_with_prior); the modal action is then read off the
+    combined distribution. When None the distribution is the
+    plain softmax, exactly as before (so ensemble.py, which does
+    not pass priors, is unchanged). The best-response dynamics
+    themselves are untouched: the iteration still argmaxes raw
+    utility, and only the reported distribution (and the modal
+    action derived from it) carries the prior. The multi-round
+    state advance in forecast_rounds follows the modal action,
+    so it follows the prior-affected modal -- same boundary as
+    round 7's base-rate prior.
+    Returns a dict with actions, distributions, utilities, modal,
+    priors (pid -> level used), iterations, converged and cycle."""
     floor, cap = hp_bounds
     actions = {}
     for pid in acting:
@@ -424,7 +545,7 @@ def best_response(state, params, tau, candidates, exp, start_actions,
             converged = True
             break
     # Final-iteration utilities -> softmax distribution per player.
-    distributions, utilities, modal = {}, {}, {}
+    distributions, utilities, modal, prior_levels = {}, {}, {}, {}
     for pid in acting:
         others_post = {}
         for q, (hp, gold) in state.items():
@@ -449,10 +570,23 @@ def best_response(state, params, tau, candidates, exp, start_actions,
                    (1.0 if v == mx else 0.0) for k, v in utils.items()}
         total = sum(weights.values()) or 1.0
         raw_dist = {k: w / total for k, w in weights.items()}
+        # Round 10: multiply the model distribution by the
+        # resolved per-player reference-class prior and
+        # renormalise (combine_with_prior), before calibration.
+        # The prior can move the modal action; the best-response
+        # iteration above still argmaxes raw utility, so the
+        # dynamics (actions, iterations, convergence) are
+        # untouched -- only the reported distribution and the
+        # modal action read off it carry the prior.
+        prior = priors.get(pid) if priors else None
+        final_dist = (combine_with_prior(raw_dist, prior["table"])
+                      if prior is not None else raw_dist)
+        prior_levels[pid] = prior["level"] if prior is not None \
+            else None
         # Post-hoc calibration (round 9): one shared rescaling,
         # applied here so live forecast and backtest measure the
         # same distributions. Monotone: argmax never changes.
-        dist = CAL.apply_calibration(raw_dist, calibration)
+        dist = CAL.apply_calibration(final_dist, calibration)
         dist = {k: round(v, 6) for k, v in dist.items()}
         modal_kind = max(dist, key=lambda k: (dist[k], k)) if dist else None
         top3 = round(sum(sorted(dist.values(), reverse=True)[:3]), 6)
@@ -464,6 +598,7 @@ def best_response(state, params, tau, candidates, exp, start_actions,
                       "top3_mass": top3}
     return {"actions": actions, "distributions": distributions,
             "utilities": utilities, "modal": modal,
+            "priors": prior_levels,
             "iterations": iterations, "converged": converged,
             "cycle": not converged}
 
@@ -895,14 +1030,18 @@ def apply_scenario_rules(rules, scenario, base_rule_id, current_date,
 
 def forecast_rounds(state, params, tau, candidates, exp, start_actions,
                     acting, hp_bounds, horizon, cap_rounds, pmap,
-                    calibration=None):
+                    calibration=None, priors=None):
     """Best-response dynamics, round by round. Shared by the
     baseline run and the per-scenario runs. calibration is passed
     through to best_response (round 9): the same rescaling for
-    every forecast, baseline and scenarios alike. Returns (forecast,
-    effective_horizon). Forecast rows carry the round, the
-    round-tiered confidence, convergence, and per-player
-    distributions / modal actions / expected deltas."""
+    every forecast, baseline and scenarios alike. priors is a
+    dict pid -> {"table", "level"} as returned by resolve_prior
+    (round 10): it is passed through to best_response, so the
+    same resolved per-player prior multiplies every round's
+    distribution. Returns (forecast, effective_horizon). Forecast
+    rows carry the round, the round-tiered confidence,
+    convergence, and per-player distributions / modal actions /
+    expected deltas."""
     effective_horizon = min(horizon, cap_rounds)
     forecast = []
     round_state = dict(state)
@@ -911,7 +1050,7 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
     for rnd in range(1, effective_horizon + 1):
         res = best_response(round_state, params, tau, candidates, exp,
                             round_start, acting_now, hp_bounds,
-                            calibration=calibration)
+                            calibration=calibration, priors=priors)
         forecast.append({
             "round": rnd, "confidence": confidence_tier(rnd),
             "iterations": res["iterations"],
@@ -945,13 +1084,15 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
 def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                   start_actions, acting, cap_rounds, horizon, pmap,
                   players_by_key, rules, max_date, base_rule_id,
-                  base_first, calibration=None):
+                  base_first, calibration=None, priors=None):
     """Best-response dynamics under each rule scenario. Returns
     {"scenarios": [...], "comparison": {...}}. Shared inputs (state,
     expectations, start actions) come from the baseline run; only
-    the candidate sets and HP bounds change per scenario. No trigger
-    probability is assigned anywhere: scenarios are conditional
-    branches, not a distribution."""
+    the candidate sets and HP bounds change per scenario. priors is
+    passed through to forecast_rounds (round 10), so every scenario
+    branch uses the same resolved per-player priors as the baseline
+    run. No trigger probability is assigned anywhere: scenarios are
+    conditional branches, not a distribution."""
     # "unknown" is a classification gap, not an action a player can
     # take; it is excluded from the candidate set (same rule as
     # backtest.py: candidates = prefix kinds - {"unknown"}), so it
@@ -980,7 +1121,7 @@ def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
         forecast, effective = forecast_rounds(
             state, params, tau, candidates, exp, s_start, acting,
             hp_bounds, horizon, cap_rounds, pmap,
-            calibration=calibration)
+            calibration=calibration, priors=priors)
         changed, max_shift = [], 0.0
         if forecast:
             for row in forecast[0]["players"]:
@@ -1133,6 +1274,16 @@ def main(argv=None):
     support = expectation_support(moves)
     exp = make_expectation(per_mean, glob_mean,
                            global_mean=tuple(support["global_mean"]))
+    # Round 10 (fruit 4): per-player reference-class priors from
+    # the full trace, the same prefix the expectations above come
+    # from. Not a parameter: nothing is stored in
+    # payoff-model.json. A player's own history is used only at
+    # n >= MIN_SUPPORT (5); below that the same-type average,
+    # then the global average (resolve_prior).
+    player_types = {p["id"]: type_of.get(p["key"]) for p in players}
+    priors_table = per_player_rates(moves, player_types)
+    priors = {pid: resolve_prior(priors_table, pid, player_types)
+              for pid in pmap}
     start_actions = {pid: kind_of(lasts[pid])
                      for pid in lasts if kind_of(lasts[pid])
                      in candidates.get(pid, [])}
@@ -1157,7 +1308,7 @@ def main(argv=None):
     forecast, effective_horizon = forecast_rounds(
         state, params, tau, candidates, exp, start_actions, acting,
         hp_bounds, args.horizon, cap_rounds, pmap,
-        calibration=calibration)
+        calibration=calibration, priors=priors)
     first = forecast[0]
     modal = {row["player"]: {"action": row["modal_action"]}
              for row in first["players"]}
@@ -1219,7 +1370,7 @@ def main(argv=None):
             scenarios_doc, trace, params, tau, state, exp, start_actions,
             acting, cap_rounds, args.horizon, pmap, players_by_key,
             rules, max_date, base_now["rule_id"], first["players"],
-            calibration=calibration)
+            calibration=calibration, priors=priors)
         scenarios_output = {
             "version": 1,
             "trace": args.trace,
@@ -1395,6 +1546,38 @@ def main(argv=None):
                      "uncalibrated."),
         },
         "expectation": expectation_diag,
+        "per_player_rates": {
+            "method": ("Per-player reference-class prior (round 10, "
+                       "research fruit 4): each player's kind "
+                       "distribution from the prediction-time prefix, "
+                       "Laplace-smoothed with one pseudocount per "
+                       "kind, p = (count + 1) / (N + K); the model "
+                       "distribution is multiplied by the prior and "
+                       "renormalised. Resolution per player: own "
+                       "history when its known-kind count n >= 5 "
+                       "(MIN_SUPPORT, round 4), else the same-type "
+                       "average when its n >= 5, else the global "
+                       "average. 'unknown' moves are excluded from "
+                       "counts and denominator. The prior is computed "
+                       "from the trace, not stored in "
+                       "payoff-model.json. It changes the reported "
+                       "distribution and the modal action read off "
+                       "it; the best-response iteration still "
+                       "argmaxes raw utility."),
+            "min_support": MIN_SUPPORT,
+            "pseudocount": PER_PLAYER_PSEUDOCOUNT,
+            "levels": {lv: sum(1 for pid in acting
+                               if priors[pid]["level"] == lv)
+                       for lv in ("player", "type", "global")},
+            "global_mode_kind": priors_table["global"]["mode"],
+            "global_n": priors_table["global"]["n"],
+            "per_player": {
+                pmap[pid].get("key"): {
+                    "level": priors[pid]["level"],
+                    "n": priors[pid]["table"]["n"],
+                    "mode": priors[pid]["table"]["mode"],
+                } for pid in sorted(pmap)},
+        },
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
                           "cycle": first["cycle"]},
@@ -1438,6 +1621,11 @@ def main(argv=None):
         f"{exp_round1['n_players']} "
         f"(share={exp_round1['shrunk_share']}) per_kind_n="
         f"{exp_round1['per_kind_n']}",
+        f"predict: per_player_rates levels="
+        f"{ {lv: sum(1 for pid in acting if priors[pid]['level'] == lv) for lv in ('player', 'type', 'global')} } "
+        f"global_mode={priors_table['global']['mode']} "
+        f"global_n={priors_table['global']['n']} "
+        f"min_support={MIN_SUPPORT}",
         f"predict: {SMOKE_NOTE}",
     ]
     for row in first["players"]:
