@@ -10,7 +10,14 @@ Per test round only the trace prefix before that round is used
 (no future information): the current state is chained per player
 by the C2/C3 ledger rule (HP clamped per the rule in effect at
 each move's date, gold accumulated, no season-end penalty term),
-and expected deltas come from the prefix only.
+and expected deltas come from the prefix only. Expected deltas
+use the minimum-support rule (audit fix 4, round 4): a kind or
+(player, kind) mean is used raw only at n >= 5; below that it is
+shrunk toward the coarser mean with k = 5 (see
+predict.expected_deltas). The report's expectation_diagnostics
+section says how many test predictions rested on a shrunk
+expectation, the prediction distribution (entropy, max share,
+v3 count), and the instance count behind each predicted kind.
 
 Metrics (design section 5):
   M1 semantic-kind equality, measured on the classifiable subset
@@ -98,24 +105,17 @@ def kind_of(m):
 
 
 def semantic_expected_deltas(moves):
-    """Replicate predict.expected_deltas grouped by semantic kind
-    (per (player, kind) and per kind mean (dHP, dgold)). The
-    expectation/best-response helpers in predict.py are kind-agnostic,
-    so they take these means unchanged. "unknown" is included in the
-    means (it is a real set of past moves) but is never a candidate:
-    it is a classification gap, not an action a player can take."""
-    per = defaultdict(lambda: [0, 0, 0])
-    glob = defaultdict(lambda: [0, 0, 0])
-    for m in moves:
-        k = kind_of(m)
-        for table, key in ((per, (m["player"], k)), (glob, k)):
-            s = table[key]
-            s[0] += m["hp_delta"]
-            s[1] += m["gold_delta"]
-            s[2] += 1
-    per_mean = {k: (v[0] / v[2], v[1] / v[2]) for k, v in per.items()}
-    glob_mean = {k: (v[0] / v[2], v[1] / v[2]) for k, v in glob.items()}
-    return per_mean, glob_mean
+    """Expectation means grouped by semantic kind (per (player,
+    kind) and per kind mean (dHP, dgold)). This is a direct
+    delegation to predict.expected_deltas, not a second copy: the
+    two must stay the same logic (round 4 found them drifting
+    before), so there is one implementation. predict's version
+    applies the minimum-support rule (n < 5 shrinks toward the
+    coarser mean, k = 5; see predict.expected_deltas). "unknown" is
+    included in the means (it is a real set of past moves) but is
+    never a candidate: it is a classification gap, not an action a
+    player can take."""
+    return P.expected_deltas(moves)
 
 
 def m5_baseline(lo, hi, recorded, tol):
@@ -223,6 +223,65 @@ def calibration(records):
                      "claims, including modal p = 1.0.")}
 
 
+def prediction_distribution(records):
+    """Distribution of predicted actions over `records`: counts,
+    Shannon entropy (bits) of the modal-action distribution, the
+    largest kind share, and the v3 count. Audit fix 4 measures
+    concentration here: a kind with 2 instances must not decide
+    hundreds of predictions, so the max share must stay below 50%
+    and the v3 count must fall to the order of its real frequency
+    (v3 never actually occurs in the S4-S5 test window)."""
+    import math
+    n = len(records)
+    counts = {}
+    for r in records:
+        a = r["predicted_action"]
+        counts[a] = counts.get(a, 0) + 1
+    entropy = 0.0
+    for c in counts.values():
+        p = c / n if n else 0.0
+        if p:
+            entropy -= p * math.log2(p)
+    top_kind, top_n = (max(counts.items(), key=lambda kv: kv[1])
+                       if counts else (None, 0))
+    return {"n": n, "counts": counts,
+            "entropy_bits": round(entropy, 4),
+            "max_kind": top_kind, "max_n": top_n,
+            "max_share": round(top_n / n, 4) if n else 0.0,
+            "v3_count": counts.get("v3", 0)}
+
+
+def expectation_diagnostics(records):
+    """Round-4 diagnostics over test records: how many predictions
+    rested on a shrunk expectation (thin cell or thin kind, n < 5),
+    the prediction distribution (counts / entropy / max share /
+    v3 count), and, per predicted kind, the instance count n behind
+    it at prediction time (min / max over the records where it was
+    predicted; n grows as the walk-forward prefix grows)."""
+    n = len(records)
+    shrunk = sum(1 for r in records if r.get("predicted_kind_shrunk"))
+    fallback = sum(1 for r in records
+                   if r.get("predicted_kind_n", 0) == 0)
+    per_kind = {}
+    for r in records:
+        k = r["predicted_action"]
+        nk = r.get("predicted_kind_n", 0)
+        e = per_kind.setdefault(k, {"records": 0, "min_n": nk,
+                                    "max_n": nk})
+        e["records"] += 1
+        e["min_n"] = min(e["min_n"], nk)
+        e["max_n"] = max(e["max_n"], nk)
+    return {"min_support": P.MIN_SUPPORT, "shrinkage_k": P.SHRINKAGE_K,
+            "method": ("n < 5: shrink toward the coarser mean, "
+                       "expected = (n * kind_mean + k * global_mean) "
+                       "/ (n + k), k = 5; n >= 5: raw mean"),
+            "n": n, "shrunk_predictions": shrunk,
+            "shrunk_share": round(shrunk / n, 4) if n else 0.0,
+            "fallback_to_global": fallback,
+            "prediction_distribution": prediction_distribution(records),
+            "per_kind_n_at_prediction": per_kind}
+
+
 def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
     """Predict every round in `seasons` from its prefix. Returns
     (records, per_round_meta)."""
@@ -242,7 +301,10 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                 continue
             state = chain_state(trace, prefix)
             per_mean, glob_mean = semantic_expected_deltas(prefix)
-            exp = P.make_expectation(per_mean, glob_mean)
+            support = P.expectation_support(prefix)
+            exp = P.make_expectation(
+                per_mean, glob_mean,
+                global_mean=tuple(support["global_mean"]))
             last = {}
             for m in prefix:
                 pid = m["player"]
@@ -292,6 +354,8 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                 pid = m["player"]
                 pred_kind = res["modal"][pid]["action"]
                 pdhp, pdgold = exp(pid, pred_kind)
+                n_kind, n_cell, shrunk = P.support_lookup(
+                    support, pid, pred_kind)
                 cur_hp, _ = state[pid]
                 base_m, _ = check.resolve_rules(rules, m["date"], pid)
                 lo_b = base_m["params"]["hp_floor"] if base_m else 0
@@ -306,6 +370,9 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                     "predicted_action": pred_kind,
                     "recorded_action": rec_kind,
                     "modal_probability": res["modal"][pid]["probability"],
+                    "predicted_kind_n": n_kind,
+                    "predicted_kind_n_player": n_cell,
+                    "predicted_kind_shrunk": shrunk,
                     "predicted_dhp": round(pdhp, 4),
                     "recorded_dhp": m["hp_delta"],
                     "predicted_dgold": round(pdgold, 4),
@@ -380,6 +447,7 @@ def main(argv=None):
     calib = calibration(test_records)
     test_tables["overall"]["m6_gap"] = calib["m6"]
     test_tables["overall"]["m6_pass"] = calib["m6_pass"]
+    exp_diag = expectation_diagnostics(test_records)
     report = {
         "trace": args.trace,
         "payoff_model": {"version": payoff.get("version"),
@@ -413,6 +481,7 @@ def main(argv=None):
                                                       []),
         "verdict": ("fail" if below_any else "pass"),
         "calibration": calib,
+        "expectation_diagnostics": exp_diag,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
                       for i in (1, 2, 3, 4, 5)},
@@ -453,6 +522,14 @@ def main(argv=None):
            f"mean_p={top['mean_predicted_p']} "
            f"hit={top['actual_hit_rate']} gap={top['gap']})"
            if top and top["n"] else ""))
+    dist = exp_diag["prediction_distribution"]
+    lines.append(
+        f"  expectation: shrunk={exp_diag['shrunk_predictions']}/"
+        f"{exp_diag['n']} (share={exp_diag['shrunk_share']}) "
+        f"fallback_to_global={exp_diag['fallback_to_global']} "
+        f"pred_dist={dist['counts']} entropy={dist['entropy_bits']} "
+        f"bits max_share={dist['max_share']} ({dist['max_kind']}) "
+        f"v3={dist['v3_count']}")
     summary = "\n".join(lines)
     print(summary)
     if args.summary:

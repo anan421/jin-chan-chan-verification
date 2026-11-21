@@ -154,10 +154,19 @@ def kind_of(m):
     return m.get("semantic_kind") or m["action_kind"]
 
 
-def expected_deltas(moves):
-    """Return (per (player, kind), per kind) mean (dHP, dgold)."""
+MIN_SUPPORT = 5
+SHRINKAGE_K = 5
+
+
+def _expectation_tables(moves):
+    """Raw sums and counts behind expected_deltas / expectation_support.
+    Returns {"per": {(pid, kind): [sum_dhp, sum_dgold, n]},
+    "kind": {kind: [sum_dhp, sum_dgold, n]},
+    "global": [sum_dhp, sum_dgold, n]}. n is the instance count in
+    `moves`, the prefix available at prediction time."""
     per = defaultdict(lambda: [0, 0, 0])
     glob = defaultdict(lambda: [0, 0, 0])
+    total = [0, 0, 0]
     for m in moves:
         kind = kind_of(m)
         for table, key in ((per, (m["player"], kind)),
@@ -166,17 +175,133 @@ def expected_deltas(moves):
             s[0] += m["hp_delta"]
             s[1] += m["gold_delta"]
             s[2] += 1
-    per_mean = {k: (v[0] / v[2], v[1] / v[2]) for k, v in per.items()}
-    glob_mean = {k: (v[0] / v[2], v[1] / v[2]) for k, v in glob.items()}
-    return per_mean, glob_mean
+        total[0] += m["hp_delta"]
+        total[1] += m["gold_delta"]
+        total[2] += 1
+    return {"per": dict(per), "kind": dict(glob), "global": total}
 
 
-def make_expectation(per_mean, glob_mean):
+def _shrink(raw_mean, n, prior_mean):
+    """Shrinkage toward the prior mean with k = SHRINKAGE_K:
+    (n * raw + k * prior) / (n + k). At n = 0 this is the prior."""
+    return ((n * raw_mean[0] + SHRINKAGE_K * prior_mean[0]) / (n + SHRINKAGE_K),
+            (n * raw_mean[1] + SHRINKAGE_K * prior_mean[1]) / (n + SHRINKAGE_K))
+
+
+def expected_deltas(moves):
+    """Return (per (player, kind), per kind) mean (dHP, dgold), with
+    minimum support and shrinkage (audit fix 4, round 4).
+
+    n is the instance count in `moves`, the prefix available at
+    prediction time (the full history for a live forecast, the
+    prefix before the test round in a backtest). A mean is used raw
+    only when n >= MIN_SUPPORT (5); below that it is shrunk toward
+    the coarser level with k = SHRINKAGE_K (5):
+      expected = (n * kind_mean + k * global_mean) / (n + k).
+    Hierarchy: a (player, kind) cell is shrunk toward its kind mean
+    (itself already shrunk toward the global mean when the kind is
+    thin); a kind mean is shrunk toward the global mean over all
+    prefix moves. A kind with n < 5 therefore can no longer set a
+    prediction on its own two observations: v3 (n = 2, raw dHP
+    +7.0) shrinks to about +2.3 dHP on the S1-S3 prefix.
+
+    Shrinkage, not exclusion, was chosen: excluding thin kinds
+    would delete real (if weak) evidence and shrink the candidate
+    set by fiat; shrinkage keeps every kind playable but pulls its
+    expectation toward the global mean in proportion to how little
+    supports it, so a thin kind must also win on the position term
+    to be picked.
+
+    NOT grouped by HP segment or rules version in this round: on
+    the S1-S3 prefix, (player, segment, version, kind) cells number
+    94 and none reaches n >= 5 (max n = 4), so that grouping could
+    never be used raw and would only add shrinkage noise. See
+    design/round-4-min-support.md for the counts. The grouping is
+    deferred, not silently dropped.
+
+    Same (per_mean, glob_mean) return shape as before, so existing
+    callers (fit.py, ensemble.py, backtest.py) keep working and all
+    use the shrunk expectations."""
+    t = _expectation_tables(moves)
+    n_tot = t["global"][2]
+    glob_mean = ((t["global"][0] / n_tot, t["global"][1] / n_tot)
+                 if n_tot else (0.0, 0.0))
+    glob_shrunk = {}
+    for kind, v in t["kind"].items():
+        raw = (v[0] / v[2], v[1] / v[2])
+        glob_shrunk[kind] = (raw if v[2] >= MIN_SUPPORT
+                             else _shrink(raw, v[2], glob_mean))
+    per_mean = {}
+    for (pid, kind), v in t["per"].items():
+        raw = (v[0] / v[2], v[1] / v[2])
+        per_mean[(pid, kind)] = (raw if v[2] >= MIN_SUPPORT
+                                 else _shrink(raw, v[2],
+                                              glob_shrunk[kind]))
+    return per_mean, glob_shrunk
+
+
+def expectation_support(moves):
+    """Diagnostics for the same tables expected_deltas uses: the
+    global mean, and per kind / per (player, kind) cell the instance
+    count n and whether its mean was shrunk. JSON-able. Same n
+    definition as expected_deltas: count in `moves`, the prefix
+    available at prediction time."""
+    t = _expectation_tables(moves)
+    n_tot = t["global"][2]
+    glob_mean = ((t["global"][0] / n_tot, t["global"][1] / n_tot)
+                 if n_tot else (0.0, 0.0))
+    kinds = {}
+    for kind, v in t["kind"].items():
+        raw = (v[0] / v[2], v[1] / v[2])
+        shrunk = v[2] < MIN_SUPPORT
+        kinds[kind] = {
+            "n": v[2],
+            "raw_mean": [round(raw[0], 4), round(raw[1], 4)],
+            "value": [round(x, 4) for x in
+                      (_shrink(raw, v[2], glob_mean) if shrunk else raw)],
+            "shrunk": shrunk}
+    cells = {}
+    for (pid, kind), v in t["per"].items():
+        cells[f"{pid}|{kind}"] = {"n": v[2],
+                                  "shrunk": v[2] < MIN_SUPPORT}
+    return {"min_support": MIN_SUPPORT, "shrinkage_k": SHRINKAGE_K,
+            "global_mean": [round(glob_mean[0], 4),
+                            round(glob_mean[1], 4)],
+            "global_n": n_tot, "kinds": kinds, "cells": cells}
+
+
+def support_lookup(support, pid, kind):
+    """(n_kind, n_cell, shrunk) for one (player, kind) lookup against
+    an expectation_support() table. shrunk is True when the value
+    actually used came from a shrunk cell or a shrunk kind mean.
+    A kind never seen in the prefix falls back to the global mean
+    (n_kind 0, shrunk True)."""
+    kinfo = support["kinds"].get(kind)
+    cinfo = support["cells"].get(f"{pid}|{kind}")
+    n_kind = kinfo["n"] if kinfo else 0
+    n_cell = cinfo["n"] if cinfo else 0
+    if cinfo is None and kinfo is None:
+        return n_kind, n_cell, True
+    if cinfo is not None:
+        return n_kind, n_cell, bool(cinfo["shrunk"] or
+                                    (kinfo and kinfo["shrunk"]))
+    return n_kind, n_cell, bool(kinfo["shrunk"])
+
+
+def make_expectation(per_mean, glob_mean, global_mean=None):
+    """exp(pid, kind) -> (dHP, dgold). per (player, kind) first, then
+    per kind, then the fallback. global_mean, when given, is the
+    fallback for a kind never seen in the prefix: it is the n = 0
+    limit of the shrinkage formula, (0 * kind + k * global) / k.
+    When global_mean is None the fallback stays (0.0, 0.0), the old
+    behaviour (callers that do not pass it are unaffected)."""
     def exp(pid, kind):
         if (pid, kind) in per_mean:
             return per_mean[(pid, kind)]
         if kind in glob_mean:
             return glob_mean[kind]
+        if global_mean is not None:
+            return global_mean
         return (0.0, 0.0)
     return exp
 
@@ -958,7 +1083,9 @@ def main(argv=None):
             banned |= set(ov["params"].get("banned_action_kinds", []))
         candidates[pid] = [k for k in all_kinds if k not in banned]
     per_mean, glob_mean = expected_deltas(moves)
-    exp = make_expectation(per_mean, glob_mean)
+    support = expectation_support(moves)
+    exp = make_expectation(per_mean, glob_mean,
+                           global_mean=tuple(support["global_mean"]))
     start_actions = {pid: kind_of(lasts[pid])
                      for pid in lasts if kind_of(lasts[pid])
                      in candidates.get(pid, [])}
@@ -990,6 +1117,36 @@ def main(argv=None):
     # round-1 forecast collapses onto p = 1.0 modal actions, and how
     # concentrated the modal actions are across players.
     degeneracy = degeneracy_metrics(first["players"])
+    # Expectation diagnostics (audit fix 4, round 4): how many of
+    # the round-1 modal predictions rest on a shrunk expectation
+    # (thin cell or thin kind, n < 5) rather than a raw mean, and
+    # the instance count behind each predicted kind.
+    exp_round1 = {"n_players": len(first["players"]),
+                  "shrunk_predictions": 0, "fallback_to_global": 0,
+                  "per_kind_n": {}}
+    for row in first["players"]:
+        kind = row["modal_action"]
+        if kind is None:
+            continue
+        n_kind, _n_cell, shrunk = support_lookup(support, row["player"],
+                                                 kind)
+        if shrunk:
+            exp_round1["shrunk_predictions"] += 1
+        if kind not in support["kinds"]:
+            exp_round1["fallback_to_global"] += 1
+        exp_round1["per_kind_n"][kind] = n_kind
+    exp_round1["shrunk_share"] = round(
+        exp_round1["shrunk_predictions"] / exp_round1["n_players"], 4) \
+        if exp_round1["n_players"] else 0.0
+    expectation_diag = {
+        "min_support": MIN_SUPPORT, "shrinkage_k": SHRINKAGE_K,
+        "method": ("n < 5: shrink toward the coarser mean, "
+                   "expected = (n * kind_mean + k * global_mean) "
+                   "/ (n + k), k = 5; n >= 5: raw mean"),
+        "global_mean": support["global_mean"],
+        "global_n": support["global_n"],
+        "kinds": support["kinds"],
+        "round1": exp_round1}
 
     # --- rule scenarios -----------------------------------------------
     scenarios_output = None
@@ -1168,6 +1325,7 @@ def main(argv=None):
         } for row in first["players"]],
         "forecast_rounds": forecast,
         "degeneracy": degeneracy,
+        "expectation": expectation_diag,
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
                           "cycle": first["cycle"]},
@@ -1198,6 +1356,12 @@ def main(argv=None):
         f"degenerate={degeneracy['degenerate']} "
         f"modal_action_entropy_bits="
         f"{degeneracy['modal_action_entropy_bits']}",
+        f"predict: expectation min_support={MIN_SUPPORT} k="
+        f"{SHRINKAGE_K} shrunk_predictions="
+        f"{exp_round1['shrunk_predictions']}/"
+        f"{exp_round1['n_players']} "
+        f"(share={exp_round1['shrunk_share']}) per_kind_n="
+        f"{exp_round1['per_kind_n']}",
         f"predict: {SMOKE_NOTE}",
     ]
     for row in first["players"]:
