@@ -35,8 +35,12 @@ not wired (run.sh / merge_report.py untouched).
 
 Utility (per payoff-model.json v2, design/fitting-layer.md §3-4):
   u = w_hp*[(hp_after)^alpha - (hp_before)^alpha] + w_gold*dgold
-      - c_lever*leverage_penalty - c_rule*compliance_cost
-      + w_pos*position_term
+      - c_lever*leverage_penalty + w_pos*position_term
+  (Round 6, 2026-11-21: the - c_rule*compliance_cost term was
+  removed. f_rule was 0 for every legal kind, so c_rule was
+  unidentified; it only moved through normalisation. No priced
+  legal action is evidenced. If evidence appears, re-add it with
+  an evidence pointer.)
   alpha = hp_exponent (A9); alpha = 1 is exactly v1 (linear dHP).
   At alpha = 1 the HP term uses the caller's expected dHP verbatim
   (not re-derived from clamped HPs, which would round), so v1 is
@@ -49,7 +53,10 @@ Utility (per payoff-model.json v2, design/fitting-layer.md §3-4):
   hp_after is the HP after the expected increment, clamped to the
   rule bounds; hp_before is the round-start HP. Gold stays linear.
   leverage_penalty = 1 when the expected gold result is negative,
-  else 0. compliance_cost = 0 for every legal kind in this version.
+  else 0. (Round 6: no compliance-cost term. The compliance
+  argument of utility() is retained for call-site compatibility
+  and ignored; there is no compliance cost to price in this
+  version.)
   position_term = old rank - new rank after applying the expected
   increments (rank by HP desc, then gold desc).
 
@@ -317,8 +324,12 @@ def utility(params, hp_before, hp_after, dhp, dgold, lever, compliance,
             position):
     """v2 utility (payoff-model.json v2, design/fitting-layer.md
     §3-4): u = w_hp * [(hp_after)^alpha - (hp_before)^alpha]
-    + w_gold*dgold - c_lever*lever - c_rule*compliance
+    + w_gold*dgold - c_lever*lever
     + w_pos*position. alpha = params['hp_exponent'] (default 1.0).
+    (Round 6, 2026-11-21: the - c_rule*compliance term was
+    removed; c_rule was unidentified because compliance was 0
+    for every legal kind. The compliance argument is kept so
+    call sites do not change; it is ignored, not priced at 0.)
     hp_after is the HP after the expected increment, clamped to
     the rule bounds (the caller clamps); hp_before is the
     round-start HP. Gold stays linear. dhp is the caller's
@@ -339,7 +350,7 @@ def utility(params, hp_before, hp_after, dhp, dgold, lever, compliance,
     else:
         f_hp = hp_after ** alpha - hp_before ** alpha
     return (params["w_hp"] * f_hp + params["w_gold"] * dgold
-            - params["c_lever"] * lever - params["c_rule"] * compliance
+            - params["c_lever"] * lever
             + params["w_pos"] * position)
 
 

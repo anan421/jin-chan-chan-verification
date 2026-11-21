@@ -24,7 +24,7 @@ Gu 的三句话：
 
 收益函数写成：
 
-`u_i(s, a_i, a_-i) = w_hp · ΔHP_i + w_gold · Δgold_i − c_lever · 杠杆惩罚 − c_rule · 合规成本 + w_pos · 位置项`
+`u_i(s, a_i, a_-i) = w_hp · ΔHP_i + w_gold · Δgold_i − c_lever · 杠杆惩罚 + w_pos · 位置项`（第 6 轮删合规成本项：c_rule 未识别，见 `design/round-6-drop-crule.md`）
 
 - ΔHP 与 Δgold：动作的血量与金币变化。取自 `Move` 的 `hpDelta` 与 `goldDelta`。`DState` 与 `Move` 能决定的量只有这些。
 - 杠杆惩罚：金币为负且动作标了负债时计入。`liability` 标志已在 `Dynamics.lean` 里。
