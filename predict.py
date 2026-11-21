@@ -295,6 +295,71 @@ def support_lookup(support, pid, kind):
     return n_kind, n_cell, bool(kinfo["shrunk"])
 
 
+BASE_RATE_PSEUDOCOUNT = 1.0
+
+
+def base_rates(moves):
+    """Base rates: how often each action kind actually occurred in
+    `moves`, the prefix available at prediction time (round 7,
+    research fruit 1: start from the base rate, then adjust with
+    the scoring rule). This is the single implementation shared by
+    predict.py (live forecast, full trace) and backtest.py
+    (walk-forward prefix); both call it on exactly the prefix
+    their expected deltas come from, so the two prefixes agree.
+
+    Counts are global, over all players: fruit 1 is the overall
+    frequency of each kind, not a per-player reference class
+    (per-player classes are fruit 4, a later round). "unknown"
+    moves are excluded from both the counts and the denominator:
+    unknown is a classification gap, not an action a player can
+    take. Smoothing is one pseudocount per kind (Laplace,
+    alpha = 1.0): p(kind) = (count + 1) / (N + K), N = known-kind
+    moves in the prefix, K = distinct known kinds. No probability
+    is ever 0. A kind with no prefix history gets the floor value
+    1 / (N + K): the smoothed probability of a zero-count kind.
+    The mode is the most frequent kind (ties: highest count, then
+    kind name ascending, deterministic); it is the base-rate-only
+    guess used by the backtest diagnostic. A kind is "novel" at
+    prediction time when it has no count in the prefix: it is
+    flagged, never hard-guessed, and can only enter through the
+    floor value."""
+    counts = {}
+    n = 0
+    for m in moves:
+        kind = kind_of(m)
+        if kind == "unknown":
+            continue
+        counts[kind] = counts.get(kind, 0) + 1
+        n += 1
+    k = len(counts)
+    denom = n + BASE_RATE_PSEUDOCOUNT * k if k else 1.0
+    floor = BASE_RATE_PSEUDOCOUNT / denom if k else 1.0
+    probs = {kind: (c + BASE_RATE_PSEUDOCOUNT) / denom
+             for kind, c in counts.items()}
+    mode = None
+    if counts:
+        mode = sorted(counts, key=lambda kk: (-counts[kk], kk))[0]
+    return {"counts": counts, "n": n, "kinds": k,
+            "pseudocount": BASE_RATE_PSEUDOCOUNT, "floor": floor,
+            "probabilities": probs, "mode": mode}
+
+
+def combine_with_base_rates(dist, base):
+    """Multiply a model distribution by the base-rate prior and
+    renormalise: combined(kind) ~ model_p(kind) * base_p(kind).
+    In log space this is adding log base_p with weight 1. A kind
+    in the model distribution with no prefix history gets the
+    floor value from base_rates(). Returns full-precision
+    probabilities; the caller rounds for storage. The base rates
+    are a prior, not a parameter: nothing here is stored in
+    payoff-model.json, whose version does not change."""
+    probs = base["probabilities"]
+    floor = base["floor"]
+    weighted = {k: v * probs.get(k, floor) for k, v in dist.items()}
+    total = sum(weighted.values()) or 1.0
+    return {k: v / total for k, v in weighted.items()}
+
+
 def make_expectation(per_mean, glob_mean, global_mean=None):
     """exp(pid, kind) -> (dHP, dgold). per (player, kind) first, then
     per kind, then the fallback. global_mean, when given, is the
@@ -355,11 +420,20 @@ def utility(params, hp_before, hp_after, dhp, dgold, lever, compliance,
 
 
 def best_response(state, params, tau, candidates, exp, start_actions,
-                  acting, hp_bounds):
+                  acting, hp_bounds, base=None):
     """Best-response dynamics. state: pid -> (hp, gold).
     candidates: pid -> sorted list of kinds. exp: (pid, kind) ->
-    (dHP, dgold). acting: players who move this round. Returns a
-    dict with actions, distributions, utilities, iterations,
+    (dHP, dgold). acting: players who move this round. base: a
+    base_rates() table or None. When given, each player's softmax
+    distribution is multiplied by the base-rate prior and
+    renormalised (combine_with_base_rates); the modal action is
+    then read off the combined distribution. When None the
+    distribution is the plain softmax, exactly as before (so
+    ensemble.py, which does not pass base, is unchanged). The
+    best-response dynamics themselves are untouched: the iteration
+    still argmaxes utility, and only the reported distribution
+    (and the modal action derived from it) carries the prior.
+    Returns a dict with actions, distributions, utilities, iterations,
     converged and cycle."""
     floor, cap = hp_bounds
     actions = {}
@@ -427,9 +501,14 @@ def best_response(state, params, tau, candidates, exp, start_actions,
                    (1.0 if v == mx else 0.0) for k, v in utils.items()}
         total = sum(weights.values()) or 1.0
         raw_dist = {k: w / total for k, w in weights.items()}
-        dist = {k: round(v, 6) for k, v in raw_dist.items()}
+        # Round 7: multiply the model distribution by the base-rate
+        # prior and renormalise (log-space addition, weight 1).
+        # top3 mass is read off the final (combined) distribution.
+        final_dist = (combine_with_base_rates(raw_dist, base)
+                      if base is not None else raw_dist)
+        dist = {k: round(v, 6) for k, v in final_dist.items()}
         modal_kind = max(dist, key=lambda k: (dist[k], k)) if dist else None
-        top3 = round(sum(sorted(raw_dist.values(), reverse=True)[:3]), 6)
+        top3 = round(sum(sorted(final_dist.values(), reverse=True)[:3]), 6)
         distributions[pid] = dist
         utilities[pid] = {k: round(v, 6) for k, v in utils.items()}
         modal[pid] = {"action": modal_kind,
@@ -868,9 +947,12 @@ def apply_scenario_rules(rules, scenario, base_rule_id, current_date,
 
 
 def forecast_rounds(state, params, tau, candidates, exp, start_actions,
-                    acting, hp_bounds, horizon, cap_rounds, pmap):
+                    acting, hp_bounds, horizon, cap_rounds, pmap,
+                    base=None):
     """Best-response dynamics, round by round. Shared by the
-    baseline run and the per-scenario runs. Returns (forecast,
+    baseline run and the per-scenario runs. base is a base_rates()
+    table (or None): it is passed through to best_response, so the
+    same prior multiplies every round's distribution. Returns (forecast,
     effective_horizon). Forecast rows carry the round, the
     round-tiered confidence, convergence, and per-player
     distributions / modal actions / expected deltas."""
@@ -881,7 +963,7 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
     acting_now = list(acting)
     for rnd in range(1, effective_horizon + 1):
         res = best_response(round_state, params, tau, candidates, exp,
-                            round_start, acting_now, hp_bounds)
+                            round_start, acting_now, hp_bounds, base=base)
         forecast.append({
             "round": rnd, "confidence": confidence_tier(rnd),
             "iterations": res["iterations"],
@@ -915,7 +997,7 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
 def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                   start_actions, acting, cap_rounds, horizon, pmap,
                   players_by_key, rules, max_date, base_rule_id,
-                  base_first):
+                  base_first, base=None):
     """Best-response dynamics under each rule scenario. Returns
     {"scenarios": [...], "comparison": {...}}. Shared inputs (state,
     expectations, start actions) come from the baseline run; only
@@ -949,7 +1031,7 @@ def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                    if a in candidates.get(pid, [])}
         forecast, effective = forecast_rounds(
             state, params, tau, candidates, exp, s_start, acting,
-            hp_bounds, horizon, cap_rounds, pmap)
+            hp_bounds, horizon, cap_rounds, pmap, base=base)
         changed, max_shift = [], 0.0
         if forecast:
             for row in forecast[0]["players"]:
@@ -1097,6 +1179,10 @@ def main(argv=None):
     support = expectation_support(moves)
     exp = make_expectation(per_mean, glob_mean,
                            global_mean=tuple(support["global_mean"]))
+    # Round 7 (fruit 1): base rates from the full trace, the same
+    # prefix the expectations above come from. Not a parameter:
+    # nothing is stored in payoff-model.json.
+    base = base_rates(moves)
     start_actions = {pid: kind_of(lasts[pid])
                      for pid in lasts if kind_of(lasts[pid])
                      in candidates.get(pid, [])}
@@ -1120,7 +1206,7 @@ def main(argv=None):
             "confidence": "low"}
     forecast, effective_horizon = forecast_rounds(
         state, params, tau, candidates, exp, start_actions, acting,
-        hp_bounds, args.horizon, cap_rounds, pmap)
+        hp_bounds, args.horizon, cap_rounds, pmap, base=base)
     first = forecast[0]
     modal = {row["player"]: {"action": row["modal_action"]}
              for row in first["players"]}
@@ -1181,7 +1267,8 @@ def main(argv=None):
         body = run_scenarios(
             scenarios_doc, trace, params, tau, state, exp, start_actions,
             acting, cap_rounds, args.horizon, pmap, players_by_key,
-            rules, max_date, base_now["rule_id"], first["players"])
+            rules, max_date, base_now["rule_id"], first["players"],
+            base=base)
         scenarios_output = {
             "version": 1,
             "trace": args.trace,
@@ -1337,6 +1424,27 @@ def main(argv=None):
         "forecast_rounds": forecast,
         "degeneracy": degeneracy,
         "expectation": expectation_diag,
+        "base_rates": {
+            "method": ("Base-rate prior (round 7, research fruit 1): "
+                       "each kind's frequency in the full trace "
+                       "prefix, smoothed with one pseudocount per "
+                       "kind, p = (count + 1) / (N + K); the model "
+                       "distribution is multiplied by the prior and "
+                       "renormalised (log-space addition, weight 1). "
+                       "'unknown' moves are excluded from counts and "
+                       "denominator. A kind with no prefix history "
+                       "gets the floor value, never 0, and is never "
+                       "hard-guessed. The prior is computed from the "
+                       "trace, not stored in payoff-model.json."),
+            "pseudocount": base["pseudocount"],
+            "n_known_moves": base["n"],
+            "distinct_kinds": base["kinds"],
+            "floor": round(base["floor"], 6),
+            "mode_kind": base["mode"],
+            "probabilities": {k: round(v, 6) for k, v in
+                              sorted(base["probabilities"].items(),
+                                     key=lambda kv: -kv[1])},
+            "counts": base["counts"]},
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
                           "cycle": first["cycle"]},
@@ -1373,6 +1481,10 @@ def main(argv=None):
         f"{exp_round1['n_players']} "
         f"(share={exp_round1['shrunk_share']}) per_kind_n="
         f"{exp_round1['per_kind_n']}",
+        f"predict: base_rates n={base['n']} kinds={base['kinds']} "
+        f"pseudocount={base['pseudocount']} floor={base['floor']:.6f} "
+        f"mode={base['mode']} "
+        f"top={sorted(base['probabilities'].items(), key=lambda kv: -kv[1])[:3]}",
         f"predict: {SMOKE_NOTE}",
     ]
     for row in first["players"]:

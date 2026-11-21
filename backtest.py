@@ -305,6 +305,12 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
             exp = P.make_expectation(
                 per_mean, glob_mean,
                 global_mean=tuple(support["global_mean"]))
+            # Round 7 (fruit 1): base rates from this round's
+            # walk-forward prefix, the same prefix the expectations
+            # above come from (predict.py uses the full trace for
+            # the live forecast; here the prefix grows round by
+            # round). Single implementation: P.base_rates.
+            base_prior = P.base_rates(prefix)
             last = {}
             for m in prefix:
                 pid = m["player"]
@@ -346,7 +352,7 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                 hp_bounds = (base0["params"]["hp_floor"],
                              base0["params"]["hp_cap"])
             res = P.best_response(state, payoff_params, tau, candidates,
-                                  exp, start, acting, hp_bounds)
+                                  exp, start, acting, hp_bounds, base=base_prior)
             dhp_obs = defaultdict(list)
             for m in prefix:
                 dhp_obs[m["player"]].append(m["hp_delta"])
@@ -364,11 +370,25 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                 rec_hp = P.clamp(cur_hp + m["hp_delta"], lo_b, hi_b)
                 obs = dhp_obs.get(pid, [m["hp_delta"]])
                 rec_kind = kind_of(m)
+                # Round 7 diagnostics. base_only_guess: the prefix's
+                # most frequent kind, guessed for every record
+                # (fruit 1's own measure: base rates only, against
+                # the model). recorded_kind_novel: the recorded kind
+                # never appeared in the prefix, so it was not in the
+                # candidate set and could not be predicted; this is
+                # the structural floor on M1, not a model miss.
+                base_guess = base_prior["mode"]
                 records.append({
                     "season": season, "round": rnd, "player": pid,
                     "key": pmap[pid].get("key"),
                     "predicted_action": pred_kind,
                     "recorded_action": rec_kind,
+                    "base_only_guess": base_guess,
+                    "base_only_hit": (base_guess == rec_kind
+                                      and rec_kind != "unknown"),
+                    "recorded_kind_novel": (
+                        rec_kind != "unknown"
+                        and rec_kind not in base_prior["counts"]),
                     "modal_probability": res["modal"][pid]["probability"],
                     "predicted_kind_n": n_kind,
                     "predicted_kind_n_player": n_cell,
@@ -448,6 +468,52 @@ def main(argv=None):
     test_tables["overall"]["m6_gap"] = calib["m6"]
     test_tables["overall"]["m6_pass"] = calib["m6_pass"]
     exp_diag = expectation_diagnostics(test_records)
+    # Round 7 (fruit 1): base-rate-only diagnostic and novel-kind
+    # count, on the test window. The base-only guess is the prefix
+    # mode for every record; it is scored on the same classifiable
+    # denominator as M1 (83), so the two numbers compare directly.
+    # A novel recorded kind was not in the prefix, hence not in the
+    # candidate set: no model using this candidate rule can hit it.
+    cls_recs = [r for r in test_records if r.get("m1_classifiable")]
+    base_hits = sum(1 for r in cls_recs if r.get("base_only_hit"))
+    novel_all = [r for r in test_records
+                 if r.get("recorded_kind_novel")]
+    novel_cls = [r for r in cls_recs if r.get("recorded_kind_novel")]
+    novel_kinds = sorted({r["recorded_action"] for r in novel_all})
+    base_diag = {
+        "method": ("Base-rate prior (round 7, research fruit 1): each "
+                   "kind's frequency in the walk-forward prefix, "
+                   "smoothed with one pseudocount per kind, "
+                   "p = (count + 1) / (N + K); the model distribution "
+                   "is multiplied by the prior and renormalised "
+                   "(log-space addition, weight 1). The prior is "
+                   "computed from the trace, not stored in "
+                   "payoff-model.json. 'unknown' moves are excluded "
+                   "from counts and denominator."),
+        "pseudocount": P.BASE_RATE_PSEUDOCOUNT,
+        "diagnostic": {
+            "guess": "prefix mode (most frequent kind) for every record",
+            "hits": base_hits,
+            "n_classifiable": len(cls_recs),
+            "hit_rate": round(base_hits / len(cls_recs), 4)
+            if cls_recs else None,
+            "m1_baseline": test_tables["overall"].get("m1_baseline"),
+            "model_m1_hits": sum(1 for r in cls_recs if r["m1"]),
+            "note": ("Base-rate-only hits vs model M1 hits, same "
+                     "denominator. Fruit 1's falsification check: if "
+                     "base-only does not beat the model, the fruit "
+                     "has not shown its value on this window.")},
+        "novel_kinds": {
+            "n_records": len(novel_all),
+            "n_classifiable": len(novel_cls),
+            "n_test_records": len(test_records),
+            "kinds": novel_kinds,
+            "note": ("Test records whose recorded kind never appeared "
+                     "in the prefix before that round. They were not "
+                     "in the candidate set, so no prediction under "
+                     "this candidate rule can hit them; they bound "
+                     "M1 from above.")},
+    }
     report = {
         "trace": args.trace,
         "payoff_model": {"version": payoff.get("version"),
@@ -482,6 +548,7 @@ def main(argv=None):
         "verdict": ("fail" if below_any else "pass"),
         "calibration": calib,
         "expectation_diagnostics": exp_diag,
+        "base_rates": base_diag,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
                       for i in (1, 2, 3, 4, 5)},
@@ -530,6 +597,15 @@ def main(argv=None):
         f"pred_dist={dist['counts']} entropy={dist['entropy_bits']} "
         f"bits max_share={dist['max_share']} ({dist['max_kind']}) "
         f"v3={dist['v3_count']}")
+    bd = base_diag["diagnostic"]
+    lines.append(
+        f"  base_rates: base-only guess hits={bd['hits']}/"
+        f"{bd['n_classifiable']} (rate={bd['hit_rate']}) vs model "
+        f"M1 hits={bd['model_m1_hits']}/{bd['n_classifiable']} "
+        f"novel recorded kinds: "
+        f"{base_diag['novel_kinds']['n_records']} records "
+        f"({base_diag['novel_kinds']['n_classifiable']} classifiable) "
+        f"kinds={base_diag['novel_kinds']['kinds']}")
     summary = "\n".join(lines)
     print(summary)
     if args.summary:
