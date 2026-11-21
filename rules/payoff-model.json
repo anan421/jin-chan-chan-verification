@@ -1,0 +1,322 @@
+{
+  "assumptions": [
+    {
+      "id": "A1",
+      "parameter": "w_hp",
+      "text": "w_hp = 1.0 is a placeholder; no evidence."
+    },
+    {
+      "id": "A2",
+      "parameter": "w_gold",
+      "text": "w_gold = 1.0 is a placeholder; no evidence."
+    },
+    {
+      "id": "A3",
+      "parameter": "c_lever",
+      "text": "c_lever = 5.0 is a placeholder; leverage penalty is 1 when the expected gold result is negative, else 0."
+    },
+    {
+      "id": "A4",
+      "parameter": "c_rule",
+      "text": "c_rule = 10.0 is a placeholder; compliance cost is 0 for every legal action kind in this version."
+    },
+    {
+      "id": "A5",
+      "parameter": "w_pos",
+      "text": "w_pos = 1.0 is a placeholder; position term is old rank minus new rank after applying expected increments."
+    },
+    {
+      "id": "A6",
+      "parameter": "temperature",
+      "text": "temperature tau = 1.0 is a placeholder; no evidence."
+    },
+    {
+      "id": "A7",
+      "parameter": null,
+      "text": "AAPL is placed in the cloud-hyperscaler tier by judgement, not by evidence; this is an assumption."
+    },
+    {
+      "id": "A8",
+      "parameter": "discount",
+      "text": "discount gamma = 1.0 is a placeholder; recency weighting exponent in fitting (decision weight gamma ** (R - r)); gamma = 1.0 is equal weighting. It weights evidence in fitting, not future rewards."
+    },
+    {
+      "id": "A9",
+      "parameter": "hp_exponent",
+      "text": "hp_exponent alpha = 1.0 is a placeholder; HP value power exponent, f_hp = (hp_after)^alpha - (hp_before)^alpha; alpha = 1.0 is linear, i.e. v1."
+    }
+  ],
+  "fit": {
+    "status": "fitted",
+    "method": "revealed preference / max-margin: average structured perceptron on prefix-only decisions, others fixed on recorded kinds, 30 epochs, eta 0.1, unit-L2 scale, discount-weighted by gamma, HP power alpha, softmax temperature by maximum likelihood, round-resampled bootstrap for uncertainty",
+    "trace": "traces/trace-latest.json",
+    "trace_sha256": "fd79d114387f30e19139c91d086446ac63df1fa4efdb8894e302abfbc4b99a63",
+    "trace_schema": 4,
+    "is_fixture_trace": false,
+    "fit_seasons": [
+      1,
+      2,
+      3
+    ],
+    "n_decisions": 31,
+    "violation_rate": 0.709677,
+    "violation_rate_unweighted": 0.709677,
+    "alpha": 0.75,
+    "gamma": 1.0,
+    "temperature": 0.25,
+    "alpha_gamma_note": "v2 fit: alpha and gamma selected by grid search; predict.py (v1) ignores discount and hp_exponent until it adopts the v2 utility form.",
+    "bootstrap": {
+      "B": 50,
+      "unit": "round",
+      "seed": 20261121,
+      "weights": {
+        "w_hp": {
+          "mean": 0.089448,
+          "std": 0.068477,
+          "p5": 0.001143,
+          "p95": 0.179503,
+          "zero_fraction": 0.02
+        },
+        "w_gold": {
+          "mean": 0.020519,
+          "std": 0.071967,
+          "p5": 0.0,
+          "p95": 0.214656,
+          "zero_fraction": 0.92
+        },
+        "c_lever": {
+          "mean": 0.399534,
+          "std": 0.09773,
+          "p5": 0.111546,
+          "p95": 0.447213,
+          "zero_fraction": 0.0
+        },
+        "c_rule": {
+          "mean": 0.799067,
+          "std": 0.19546,
+          "p5": 0.223091,
+          "p95": 0.894426,
+          "zero_fraction": 0.0
+        },
+        "w_pos": {
+          "mean": 0.233857,
+          "std": 0.284832,
+          "p5": 0.000134,
+          "p95": 0.937307,
+          "zero_fraction": 0.06
+        }
+      }
+    },
+    "fit_date": "2026-11-21",
+    "note": "Real fit on the real trace traces/trace-latest.json (schema 4; 558/558 moves carry semantic_kind). Values are fitted, not placeholders. Fit window S1,S2,S3 holds 31 classifiable decisions; 292 unknown moves in the window carry no supervision signal. In-sample only; not calibration-grade on its own.",
+    "note_zh": "真实 trace traces/trace-latest.json（schema 4；558/558 条 move 带 semantic_kind）上的真实拟合。值是拟合值，不是占位值。拟合窗口 S1,S2,S3 有 31 条可分类决策；窗口内 292 条 unknown move 不提供监督信号。仅样本内，不单独当校准证据。",
+    "fit_id": "fit-2026-11-21-01"
+  },
+  "note": "Real fit on the real trace traces/trace-latest.json (schema 4; 558/558 moves carry semantic_kind). Values are fitted, not placeholders. Fit window S1,S2,S3 holds 31 classifiable decisions; 292 unknown moves in the window carry no supervision signal. In-sample only; not calibration-grade on its own.",
+  "note_zh": "真实 trace traces/trace-latest.json（schema 4；558/558 条 move 带 semantic_kind）上的真实拟合。值是拟合值，不是占位值。拟合窗口 S1,S2,S3 有 31 条可分类决策；窗口内 292 条 unknown move 不提供监督信号。仅样本内，不单独当校准证据。",
+  "parameters": {
+    "w_hp": {
+      "value": 0.001469,
+      "status": "fitted",
+      "assumption": "A1",
+      "meaning": "weight on HP change"
+    },
+    "w_gold": {
+      "value": 0.0,
+      "status": "fitted",
+      "assumption": "A2",
+      "meaning": "weight on gold change"
+    },
+    "c_lever": {
+      "value": 0.447213,
+      "status": "fitted",
+      "assumption": "A3",
+      "meaning": "leverage penalty coefficient; penalty is 1 when the expected gold result is negative, else 0"
+    },
+    "c_rule": {
+      "value": 0.894425,
+      "status": "fitted",
+      "assumption": "A4",
+      "meaning": "compliance cost coefficient; cost is 0 for every legal action kind in this version (no priced legal action is evidenced)"
+    },
+    "w_pos": {
+      "value": 0.001488,
+      "status": "fitted",
+      "assumption": "A5",
+      "meaning": "weight on ranking-position change (old rank minus new rank after applying expected increments)"
+    },
+    "temperature": {
+      "value": 0.25,
+      "status": "fitted",
+      "assumption": "A6",
+      "meaning": "softmax temperature tau over candidate-action utilities"
+    },
+    "discount": {
+      "value": 1.0,
+      "status": "fitted",
+      "assumption": "A8",
+      "meaning": "recency weighting exponent in fitting: decision weight gamma ** (R - r); gamma = 1.0 is equal weighting"
+    },
+    "hp_exponent": {
+      "value": 0.75,
+      "status": "fitted",
+      "assumption": "A9",
+      "meaning": "HP value power exponent: f_hp = (hp_after)^alpha - (hp_before)^alpha; alpha = 1.0 is linear, i.e. v1"
+    }
+  },
+  "player_types": {
+    "china_vendor": {
+      "label_zh": "中国厂商",
+      "parameters": {
+        "w_hp": 0.00174,
+        "w_gold": 0.0,
+        "c_lever": 0.443698,
+        "c_rule": 0.887397,
+        "w_pos": 0.125125,
+        "temperature": 0.25,
+        "discount": 0.9,
+        "hp_exponent": 1.0
+      }
+    },
+    "chip_supplier": {
+      "label_zh": "芯片供应商",
+      "parameters": {
+        "w_hp": 0.088388,
+        "w_gold": 0.088388,
+        "c_lever": 0.441942,
+        "c_rule": 0.883883,
+        "w_pos": 0.088388,
+        "temperature": 0.25,
+        "discount": 1.0,
+        "hp_exponent": 1.0
+      }
+    },
+    "cloud_hyperscaler": {
+      "label_zh": "云超大规模",
+      "parameters": {
+        "w_hp": 0.088388,
+        "w_gold": 0.088388,
+        "c_lever": 0.441942,
+        "c_rule": 0.883883,
+        "w_pos": 0.088388,
+        "temperature": 0.25,
+        "discount": 1.0,
+        "hp_exponent": 1.0
+      }
+    },
+    "leveraged_infra": {
+      "label_zh": "杠杆基建",
+      "parameters": {
+        "w_hp": 0.088388,
+        "w_gold": 0.088388,
+        "c_lever": 0.441942,
+        "c_rule": 0.883883,
+        "w_pos": 0.088388,
+        "temperature": 0.25,
+        "discount": 1.0,
+        "hp_exponent": 1.0
+      }
+    },
+    "model_lab": {
+      "label_zh": "模型实验室",
+      "parameters": {
+        "w_hp": 0.212186,
+        "w_gold": 0.0,
+        "c_lever": 0.434487,
+        "c_rule": 0.868973,
+        "w_pos": 0.10528,
+        "temperature": 0.25,
+        "discount": 0.9,
+        "hp_exponent": 1.0
+      }
+    }
+  },
+  "players": [
+    {
+      "key": "NVDA",
+      "type": "chip_supplier"
+    },
+    {
+      "key": "TSMC",
+      "type": "chip_supplier"
+    },
+    {
+      "key": "MSFT",
+      "type": "cloud_hyperscaler"
+    },
+    {
+      "key": "GOOG",
+      "type": "cloud_hyperscaler"
+    },
+    {
+      "key": "AMZN",
+      "type": "cloud_hyperscaler"
+    },
+    {
+      "key": "META",
+      "type": "cloud_hyperscaler"
+    },
+    {
+      "key": "AAPL",
+      "type": "cloud_hyperscaler"
+    },
+    {
+      "key": "OAI",
+      "type": "model_lab"
+    },
+    {
+      "key": "ANTH",
+      "type": "model_lab"
+    },
+    {
+      "key": "MUSK",
+      "type": "model_lab"
+    },
+    {
+      "key": "ORCL",
+      "type": "leveraged_infra"
+    },
+    {
+      "key": "SFTB",
+      "type": "leveraged_infra"
+    },
+    {
+      "key": "BYTE",
+      "type": "china_vendor"
+    },
+    {
+      "key": "ALI",
+      "type": "china_vendor"
+    },
+    {
+      "key": "TCE",
+      "type": "china_vendor"
+    },
+    {
+      "key": "BIDU",
+      "type": "china_vendor"
+    },
+    {
+      "key": "HUAWEI",
+      "type": "china_vendor"
+    },
+    {
+      "key": "DPSK",
+      "type": "china_vendor"
+    }
+  ],
+  "status_vocabulary": {
+    "assumed": "a value set by judgement, not by evidence and not by fitting (e.g. the A7 tier judgement)",
+    "fitted": "a value produced by fit.py from a trace; the fit block says which trace, window and method, and whether it is a smoke test",
+    "placeholder": "a value with no evidence behind it; the starting point before any fit"
+  },
+  "thresholds": {
+    "below_threshold": "opinion",
+    "horizon_default": 1,
+    "m5_tolerance": 10,
+    "margin_pp": 10
+  },
+  "utility_form": "u = w_hp * [(hp_after)^alpha - (hp_before)^alpha] + w_gold * dgold - c_lever * leverage_penalty - c_rule * compliance_cost + w_pos * position_term",
+  "version": 3,
+  "status": "fitted"
+}

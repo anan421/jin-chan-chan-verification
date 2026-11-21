@@ -1,0 +1,341 @@
+{
+ "converter": "convert_data_json.py (data.json -> schema v3 raw trace)",
+ "source": {
+  "file": "data.json",
+  "sha256": "07995677f405f030d66188e6ab910450bb50db96dbcc3549556f066d941f365d",
+  "bytes": 194222,
+  "note": "machine copy (cp) of page assets/data.json; no hand transcription, no rank back-computation"
+ },
+ "page_version": "v13 (per parent handoff 2026-11-21 19:48 CST)",
+ "counts": {
+  "moves": 558,
+  "rounds": 31,
+  "players": 18,
+  "seasons": 5,
+  "holdings": 12,
+  "key_cards": 10,
+  "key_cards_in_source": 15,
+  "reconciliation_checked": 137
+ },
+ "facts_cross_check": {
+  "ipo base 813.4亿美元": {
+   "needle": "813.4 亿美元",
+   "found_in_page_text": true
+  },
+  "ipo greenshoe total 935亿美元": {
+   "needle": "935 亿美元",
+   "found_in_page_text": true
+  },
+  "ipo private 260亿美元": {
+   "needle": "260 亿美元",
+   "found_in_page_text": true
+  },
+  "ipo combined 1195亿美元": {
+   "needle": "1195 亿美元",
+   "found_in_page_text": true
+  },
+  "ipo net 1170亿美元": {
+   "needle": "1170 亿美元",
+   "found_in_page_text": true
+  },
+  "ipo base+private 1073.4亿美元": {
+   "needle": "1073.4",
+   "found_in_page_text": true
+  },
+  "nvda close high $239.24": {
+   "needle": "239.24",
+   "found_in_page_text": true
+  },
+  "nvda intraday high $243.37": {
+   "needle": "243.37",
+   "found_in_page_text": true
+  },
+  "nvda close drop 47.5%": {
+   "needle": "47.5",
+   "found_in_page_text": true
+  },
+  "nvda intraday drop 48.4%": {
+   "needle": "48.4",
+   "found_in_page_text": true
+  },
+  "nvda low $125.53": {
+   "needle": "125.53",
+   "found_in_page_text": true
+  }
+ },
+ "roundRV_vs_resolved_rule_mismatches": [
+  {
+   "round": "S5:5-1",
+   "date": 20261118,
+   "recorded_roundRV": "RV-2026.2",
+   "resolved_base": "RV-2026.1",
+   "note": "round straddles a rule-change day; page records the later version"
+  }
+ ],
+ "gold_negative_mid_chain": [],
+ "excluded_holdings": [
+  {
+   "player": "NVDA",
+   "card": "黄仁勋辞职",
+   "reason": "null cost: event/policy card, not a pool card; excluded from holdings"
+  },
+  {
+   "player": "NVDA",
+   "card": "SEC 会计调查报道",
+   "reason": "null cost: event/policy card, not a pool card; excluded from holdings"
+  },
+  {
+   "player": "MUSK",
+   "card": "「他们根本没有这笔钱」",
+   "reason": "null cost: event/policy card, not a pool card; excluded from holdings"
+  }
+ ],
+ "excluded_key_cards": [
+  {
+   "card": "「他们根本没有这笔钱」",
+   "reason": "null cost: event/policy card, not a pool card; a null cost would emit 'None' into the Lean file and break the build"
+  },
+  {
+   "card": "昇腾加 Atlas 超节点",
+   "when": "持续出牌",
+   "reason": "no parseable date; min_date/first_date are required and must not be invented"
+  },
+  {
+   "card": "BIS 远程接入规则",
+   "reason": "null cost: event/policy card, not a pool card; a null cost would emit 'None' into the Lean file and break the build"
+  },
+  {
+   "card": "黄仁勋辞职",
+   "reason": "null cost: event/policy card, not a pool card; a null cost would emit 'None' into the Lean file and break the build"
+  },
+  {
+   "card": "SEC 会计调查报道",
+   "reason": "null cost: event/policy card, not a pool card; a null cost would emit 'None' into the Lean file and break the build"
+  }
+ ],
+ "event_kinds": [
+  {
+   "season": "S4",
+   "round": "1-1",
+   "player": "DPSK",
+   "kind": "r1",
+   "why": "move text: R1 发布。AIME 79.8% 对 o1 的 79.2%"
+  },
+  {
+   "season": "S5",
+   "round": "4-1",
+   "player": "NVDA",
+   "kind": "huang_resign",
+   "why": "move text: CEO 辞职。单轮重扣"
+  },
+  {
+   "season": "S5",
+   "round": "5-1",
+   "player": "ANTH",
+   "kind": "anthropic_ipo",
+   "why": "move text: 分阶段募资到手。绿鞋后合计口径见本轮说明"
+  },
+  {
+   "season": "S5",
+   "round": "6-1",
+   "player": "NVDA",
+   "kind": "sec_probe",
+   "why": "move text: SEC 调查报道。恐慌卖出"
+  }
+ ],
+ "semantic_kinds": {
+  "vocabulary": [
+   "chatgpt",
+   "generic",
+   "msft_invest",
+   "doubao_price_war",
+   "blackwell",
+   "v3",
+   "colossus",
+   "r1",
+   "stargate",
+   "musk_table",
+   "bis_rule",
+   "openai_mar26",
+   "anthropic_ipo",
+   "spacex_xai",
+   "huang_resign",
+   "sec_probe",
+   "overseas_rental",
+   "tongyi",
+   "hunyuan",
+   "ascend",
+   "doubao",
+   "wenxin",
+   "pangu",
+   "llama",
+   "claude",
+   "gemini",
+   "megaspeed",
+   "energy",
+   "financing",
+   "capex",
+   "open_source"
+  ],
+  "unknown_marker": "unknown",
+  "distribution": {
+   "anthropic_ipo": 8,
+   "ascend": 9,
+   "bis_rule": 4,
+   "blackwell": 6,
+   "capex": 15,
+   "chatgpt": 3,
+   "claude": 5,
+   "colossus": 4,
+   "doubao": 8,
+   "doubao_price_war": 4,
+   "energy": 10,
+   "financing": 19,
+   "gemini": 4,
+   "huang_resign": 1,
+   "hunyuan": 11,
+   "llama": 5,
+   "megaspeed": 1,
+   "msft_invest": 7,
+   "musk_table": 6,
+   "open_source": 24,
+   "overseas_rental": 2,
+   "pangu": 6,
+   "r1": 6,
+   "sec_probe": 1,
+   "spacex_xai": 4,
+   "stargate": 15,
+   "tongyi": 11,
+   "unknown": 346,
+   "v3": 2,
+   "wenxin": 11
+  },
+  "classified": 212,
+  "unknown": 346,
+  "note": "Per-move substantive action thread, classified from the move's own action text (see design/semantic-kinds.md). action_kind (round-type slug) is unchanged. generic and openai_mar26 have no instance in the real trace."
+ },
+ "rules": [
+  {
+   "rule_id": "RV-2022.1",
+   "version": "2022-01",
+   "effective_from": 20220101,
+   "effective_to": 20221007,
+   "applies_to_players": null,
+   "note": "page patch chapter: S1 pre-2022-10-07; not in rules.json"
+  },
+  {
+   "rule_id": "RV-2022.2",
+   "version": "2022-10",
+   "effective_from": 20221007,
+   "effective_to": 20231017,
+   "applies_to_players": null,
+   "note": "rules.json RV-2022-10"
+  },
+  {
+   "rule_id": "RV-2023.2",
+   "version": "2023-10",
+   "effective_from": 20231017,
+   "effective_to": 20240404,
+   "applies_to_players": null,
+   "note": "rules.json RV-2023-10"
+  },
+  {
+   "rule_id": "RV-2024.1",
+   "version": "2024-04",
+   "effective_from": 20240404,
+   "effective_to": 20241202,
+   "applies_to_players": null,
+   "note": "page patch chapter: S3 2024-04-04 BIS revision; not in rules.json"
+  },
+  {
+   "rule_id": "RV-2024-12",
+   "version": "2024-12",
+   "effective_from": 20241202,
+   "effective_to": 20250113,
+   "applies_to_players": null,
+   "note": "rules.json RV-2024-12 (Dec 2024 update; no page version name). No round falls in its window [20241202, 20250113), so it never becomes the base rule for any move."
+  },
+  {
+   "rule_id": "RV-2025.1",
+   "version": "2025-01",
+   "effective_from": 20250113,
+   "effective_to": 20250513,
+   "applies_to_players": null,
+   "note": "rules.json RV-2025-01"
+  },
+  {
+   "rule_id": "RV-2025.2",
+   "version": "2025-05",
+   "effective_from": 20250513,
+   "effective_to": 20260724,
+   "applies_to_players": null,
+   "note": "rules.json RV-2025-01 effective_to; page patch chapter: diffusion rule rescinded 2025-05; not in rules.json as a separate rule"
+  },
+  {
+   "rule_id": "RV-2026.1",
+   "version": "2026-07",
+   "effective_from": 20260724,
+   "effective_to": 20261119,
+   "applies_to_players": null,
+   "note": "INFERENCE: DHS exclusion 2026-07-24 is the only rule event in that window; the page gives no separate version date"
+  },
+  {
+   "rule_id": "RV-2026.2",
+   "version": "2026-11",
+   "effective_from": 20261119,
+   "effective_to": null,
+   "applies_to_players": null,
+   "note": "rules.json RV-2026-11; page: remote-access rule effective 2026-11-19"
+  },
+  {
+   "rule_id": "RV-2026-07",
+   "version": "2026-07",
+   "effective_from": 20260724,
+   "effective_to": null,
+   "applies_to_players": [
+    15
+   ],
+   "note": "rules.json RV-2026-07 (DHS overlay, applies to HUAWEI=15)"
+  }
+ ],
+ "defaults_and_gaps": [
+  "per-round population: data.json has only season-end pop (seasons[].meta); moves carry the season-end value",
+  "win streaks (settlement income input): no source; moves carry 0",
+  "roster stars (damage formula input): no source; moves carry 0",
+  "borrowed principal (leverage penalty input): no source; season_state.borrowed = 0, penalty = 0, liability = false; the leverage-penalty mechanism is NOT independently verified by this run",
+  "key-card coverage: 8 of 18 players have no card in playerCards; no source assigns them one",
+  "event/policy cards (4, cost null) and the dateless 昇腾 card are not in trace key_cards (not pool cards / no date); they remain in the source data.json",
+  "rule_actions / political_record / trigger_links / lobby_actions / goal_checks are empty: the page's rule chapter is prose, never structurally extracted; C10-C12 therefore check nothing (0 rows)",
+  "known real doc numbers not yet attached to any rule_action: 87 FR 62186, 2026-23529, 91 FR 66346 (for the future rule-action extraction task)",
+  "page in-page fnv1a (8d90a977 per MEMORY, v13) could not be reproduced from the raw data.json bytes (raw c56c2078, compact-utf8 9d393414, compact-ascii 54d497f3, sorted-keys c23e110f); the page hashes some other serialization. sha256 is the provenance anchor here"
+ ],
+ "season_rules_version": {
+  "S1": "RV-2022.2",
+  "S2": "RV-2023.2",
+  "S3": "RV-2024.1",
+  "S4": "RV-2025.2",
+  "S5": "RV-2026.2"
+ },
+ "season_dates": {
+  "S1": [
+   20220101,
+   20221201
+  ],
+  "S2": [
+   20230101,
+   20231201
+  ],
+  "S3": [
+   20240101,
+   20241201
+  ],
+  "S4": [
+   20250120,
+   20251201
+  ],
+  "S5": [
+   20260101,
+   20261121
+  ]
+ }
+}

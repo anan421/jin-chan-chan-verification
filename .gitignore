@@ -1,0 +1,13 @@
+# build
+.lake/
+__pycache__/
+*.pyc
+*.olean
+# generated runs, archives, daily outputs, traces
+runs/
+archive/
+daily/
+traces/
+# logs
+*.log
+.DS_Store

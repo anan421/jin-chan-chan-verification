@@ -1,0 +1,175 @@
+{
+  "$id": "agent-claim-schema",
+  "claim": {
+    "fields": {
+      "agent_id": {
+        "description": "Which agent produced it: coordinator, roleplay-<name>, verifier, or another named agent. Non-empty.",
+        "type": "string"
+      },
+      "claim_id": {
+        "pattern": "^CL-[A-Za-z0-9_-]+$",
+        "type": "string"
+      },
+      "evidence": {
+        "kinds": {
+          "doc_number": "ref is a political-record or rule-action doc number present in the trace (e.g. 2026-23529)",
+          "edgar": "ref matches an EDGAR accession number: 10 digits, dash, 2 digits, dash, 6 digits",
+          "trace": "ref is a subject string (same grammar as subject) that resolves in the trace",
+          "url": "ref is a well-formed https URL (format only; the gate does not fetch)"
+        },
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "type": "object"
+      },
+      "kind": {
+        "enum": [
+          "propose_action",
+          "fact_correction",
+          "refutation",
+          "evidence_downgrade"
+        ],
+        "type": "string"
+      },
+      "note": {
+        "description": "Free text, never used as evidence and never counted as verified.",
+        "type": "string"
+      },
+      "predicate": {
+        "ops": {
+          "contains": "subject is a list and contains value",
+          "eq": "subject value equals value (scalar)",
+          "exists": "subject location exists in the trace",
+          "gt": "subject value > value",
+          "gte": "subject value >= value",
+          "in_range": "args [lo, hi], subject value in [lo, hi]",
+          "lt": "subject value < value",
+          "lte": "subject value <= value",
+          "ne": "subject value differs from value (scalar)"
+        },
+        "optional": [
+          "value",
+          "args"
+        ],
+        "required": [
+          "op"
+        ],
+        "type": "object"
+      },
+      "refutes": {
+        "description": "Required for kind=refutation: the claim_id this claim refutes. Must name a claim present in the same batch or already in the trace.",
+        "type": "string"
+      },
+      "status": {
+        "description": "Agent-asserted status. The gate recomputes the effective status: a claim that passes R1-R3 with no conflict is verified; a conflicting pair is contested; a claim a passing refutation targets is refuted; a claim whose predicate is not decidable is opinion.",
+        "enum": [
+          "verified",
+          "contested",
+          "refuted",
+          "opinion"
+        ],
+        "type": "string"
+      },
+      "subject": {
+        "description": "Trace location. Grammar: S<season>/P<player>/<field> where player is a player id (int) or key (e.g. NVDA), field in hp_start, gold_start, hp_end, gold_end, borrowed, penalty, rank; or S<season>/P<player>/hp_series (the season's point, points[season-1]); or facts/ipo/<field>; or facts/nvda/<field>; or rules/<rule_id>/<param>; or meta/<rule_id>/doc_number. Examples: S5/P0/hp_end, S5/NVDA/rank, rules/RV-2026-11/banned_action_kinds.",
+        "type": "string"
+      },
+      "move": {
+        "type": "object",
+        "description": "Optional proposed Move (schema v2). Present only on propose_action claims. All 8 subfields required when present: player (int, player id), date (int, YYYYMMDD), season (int), actionKind (string, an action kind from the trace), hpDelta (int), goldDelta (int), liability (bool), rulesVersion (string, rule id e.g. RV-2026-11).",
+        "properties": {
+          "player": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "integer"
+          },
+          "season": {
+            "type": "integer"
+          },
+          "actionKind": {
+            "type": "string"
+          },
+          "hpDelta": {
+            "type": "integer"
+          },
+          "goldDelta": {
+            "type": "integer"
+          },
+          "liability": {
+            "type": "boolean"
+          },
+          "rulesVersion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "player",
+          "date",
+          "season",
+          "actionKind",
+          "hpDelta",
+          "goldDelta",
+          "liability",
+          "rulesVersion"
+        ]
+      }
+    },
+    "optional": [
+      "refutes",
+      "note",
+      "move"
+    ],
+    "required": [
+      "claim_id",
+      "kind",
+      "subject",
+      "predicate",
+      "evidence",
+      "status",
+      "agent_id"
+    ]
+  },
+  "description": "AgentClaim: the only legal shape for an Agent output that may enter the verification trace. An Agent output that does not pass the gate never enters the trace. Gate rules R1-R4 are data here; gate.py enforces them. Statuses: verified / contested / refuted / opinion. Only verified claims count toward a 'verified' page; opinion goes to notes only.",
+  "exit_codes": {
+    "0": "No rejects and no contested claims (opinion claims allowed through, listed).",
+    "1": "At least one reject or one contested claim: the run fails, no 'verified' delivery.",
+    "2": "Bad input: unreadable file, invalid JSON, missing trace, or schema file missing."
+  },
+  "gate_rules": [
+    {
+      "id": "R1",
+      "name": "schema",
+      "rule": "Missing field, wrong field type, unknown kind/status, or bad claim_id pattern: REJECT. Never silently dropped: the rejection is recorded in the gate report."
+    },
+    {
+      "id": "R2",
+      "name": "evidence_exists",
+      "rule": "The evidence pointer must resolve: doc_number in the trace's political_record or rule_actions; trace subject resolves in the trace; url is a well-formed https URL; edgar matches the accession pattern. Unresolvable: REJECT. The subject location itself must also resolve, else REJECT. A future subject (season = current max season + 1 and the player exists) resolves as a future location, not a rejection; its evidence must still resolve."
+    },
+    {
+      "id": "R3",
+      "name": "predicate_decidable",
+      "rule": "The predicate must be a known op from the ops table with well-typed args. An undecidable predicate (unknown op, free-text claim, wrong arg types) can only be recorded as opinion, never as verified."
+    },
+    {
+      "id": "R4",
+      "name": "conflict",
+      "rule": "Two claims on the same subject with the same op and different expected values conflict: both become contested, and the run fails until one is refuted or corrected. A refutation claim that passes R1-R3 marks its target refuted; a refutation that fails against the trace is itself rejected."
+    }
+  ],
+  "predicate_evaluation_by_kind": {
+    "evidence_downgrade": "Predicate is NOT evaluated against the trace (it speaks about evidence quality). The gate checks decidability (R3) and that the cited evidence exists (R2); the downgrade is recorded with its evidence.",
+    "fact_correction": "Predicate is evaluated against the current trace. True: pass (verified). False: REJECT (refuted by the trace).",
+    "propose_action": "Predicate is NOT evaluated against the current trace (it speaks about a future state). The gate checks decidability (R3) and evidence (R2) only; the pipeline re-verifies after applying the proposal.",
+    "refutation": "Predicate is evaluated against the current trace. True: the target claim becomes refuted and this claim passes. False: this claim is REJECTED."
+  },
+  "verdicts": [
+    "pass",
+    "reject",
+    "opinion",
+    "contested"
+  ],
+  "version": 2
+}
