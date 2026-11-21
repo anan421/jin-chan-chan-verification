@@ -95,7 +95,7 @@
 
 猜中次数没有上升。还有四项变差。血量方向、段位、最大种类占比、v3 次数。采用门要求猜中次数上升，且没有一项指标变差。所以不合并。
 
-实时预测的变化：5 名玩家从 claude 翻到 llama（GOOG、ANTH、AAPL、TSMC、SFTB）。实时众数是 claude 8 名。llama 8 名。r1 2 名。改前是 claude 12 名。llama 4 名。r1 2 名。实时熵从 1.224 比特升到 1.382 比特。退化率还是 0。
+实时预测的变化：5 名玩家从 claude 翻到 llama（GOOG、ANTH、AAPL、TSMC、SFTB）。实时众数是 claude 7 名。llama 9 名。r1 2 名。改前是 claude 12 名。llama 4 名。r1 2 名。实时熵从 1.224 比特升到 1.382 比特。退化率还是 0。
 
 ## 证伪条件
 
@@ -125,4 +125,4 @@ run.sh 全过。历史层全部通过。运行目录 runs/2026-11-21_142633/。�
 
 ## 提交
 
-分支 loop/round-8-multi-path。改了 predict.py 与 backtest.py 两个文件。没有合并到 main。
+分支 loop/round-8-multi-path。改了 predict.py、backtest.py、design/round-8-multi-path.md 三个文件。没有合并到 main。
