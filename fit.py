@@ -174,6 +174,133 @@ ETA = 0.1
 INIT_W = (1.0, 1.0, 5.0, 10.0, 1.0)
 WEIGHT_NAMES = ["w_hp", "w_gold", "c_lever", "c_rule", "w_pos"]
 
+# --- hold-out adoption gate (design/fitting-layer.md §6-§7) -------
+# A fitted model goes live ONLY when all three conditions hold on
+# the same S4-S5 hold-out window (same M1 denominator):
+#   (a) fitted beats the placeholder on at least 3 of M1-M5;
+#   (b) fitted M1 exceeds its random baseline by at least 10pp;
+#   (c) fitted M2 and M3 are both above 50%.
+# In-sample (fit-window) violation rate is diagnostic only and is
+# never an adoption criterion. Without a hold-out comparison table
+# (fitted vs placeholder, all five metrics side by side) the model
+# must not be adopted.
+GATE_MIN_WINS = 3
+GATE_M1_MARGIN_PP = 10.0
+GATE_M2_M3_FLOOR = 0.50
+GATE_METRICS = ("M1", "M2", "M3", "M4", "M5")
+ADOPTION_RULE = (
+    "Adopt the fitted model into rules/payoff-model.json ONLY if "
+    "all three hold-out gate conditions hold on the same S4-S5 "
+    "test window (same M1 denominator): (a) the fitted model beats "
+    "the placeholder on at least three of M1-M5; (b) fitted M1 "
+    "exceeds its random baseline by at least 10pp; (c) fitted M2 "
+    "and M3 are both above 50%. In-sample (fit-window) violation "
+    "rate is diagnostic only and is never an adoption criterion. "
+    "Without a hold-out comparison table (fitted vs placeholder, "
+    "all five metrics side by side) the model must not be adopted."
+)
+
+
+def _backtest_overall(path):
+    """Overall test-window table of a backtest-report.json, as
+    fractions. Prefers test_window.overall (the S4-S5 window);
+    falls back to tables.overall when a report has no test window.
+    Returns None when the file cannot be read or has no table."""
+    data = P.load_json(path, "backtest report")
+    if data is None:
+        return None
+    overall = (data.get("test_window") or {}).get("overall")
+    if overall is None:
+        overall = (data.get("tables") or {}).get("overall")
+    if overall is None:
+        return None
+    try:
+        return {
+            "n": overall["n"],
+            "m1_n": overall["m1_n"],
+            "M1": float(overall["m1_hit_rate"]),
+            "M2": float(overall["m2_hit_rate"]),
+            "M3": float(overall["m3_hit_rate"]),
+            "M4": float(overall["m4_hit_rate"]),
+            "M5": float(overall["m5_hit_rate"]),
+            "m1_baseline": float(overall["m1_baseline"]),
+        }
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def evaluate_holdout_gate(fitted_path, placeholder_path):
+    """Apply the hold-out adoption gate to two backtest reports
+    (fitted v1 projection vs placeholder, same S4-S5 window).
+    Returns a dict with the comparison table and one verdict per
+    condition, or raises ValueError when the inputs cannot be
+    read or are not comparable (different M1 denominators)."""
+    fitted = _backtest_overall(fitted_path)
+    placeholder = _backtest_overall(placeholder_path)
+    if fitted is None:
+        raise ValueError(f"cannot read hold-out table from "
+                         f"{fitted_path}")
+    if placeholder is None:
+        raise ValueError(f"cannot read hold-out table from "
+                         f"{placeholder_path}")
+    if fitted["m1_n"] != placeholder["m1_n"]:
+        raise ValueError(
+            f"hold-out M1 denominators differ: fitted m1_n="
+            f"{fitted['m1_n']} vs placeholder m1_n="
+            f"{placeholder['m1_n']}; same-window comparison "
+            f"required")
+    table = {}
+    wins = 0
+    for m in GATE_METRICS:
+        delta_pp = round((fitted[m] - placeholder[m]) * 100, 2)
+        if fitted[m] > placeholder[m]:
+            outcome = "fitted_better"
+            wins += 1
+        elif fitted[m] < placeholder[m]:
+            outcome = "fitted_worse"
+        else:
+            outcome = "tie"
+        table[m] = {
+            "fitted": round(fitted[m] * 100, 2),
+            "placeholder": round(placeholder[m] * 100, 2),
+            "delta_pp": delta_pp,
+            "outcome": outcome,
+        }
+    m1_margin_pp = round((fitted["M1"] - fitted["m1_baseline"])
+                         * 100, 2)
+    cond_a = wins >= GATE_MIN_WINS
+    cond_b = m1_margin_pp >= GATE_M1_MARGIN_PP
+    cond_c = (fitted["M2"] > GATE_M2_M3_FLOOR
+              and fitted["M3"] > GATE_M2_M3_FLOOR)
+    return {
+        "test_window": "S4-S5",
+        "n": fitted["n"],
+        "m1_n": fitted["m1_n"],
+        "m1_baseline_pct": round(fitted["m1_baseline"] * 100, 2),
+        "fitted_report": str(fitted_path),
+        "placeholder_report": str(placeholder_path),
+        "comparison": table,
+        "wins": wins,
+        "condition_a_wins_ge_3": {
+            "value": wins,
+            "required": GATE_MIN_WINS,
+            "pass": cond_a,
+        },
+        "condition_b_m1_above_baseline_pp": {
+            "value": m1_margin_pp,
+            "required": GATE_M1_MARGIN_PP,
+            "pass": cond_b,
+        },
+        "condition_c_m2_m3_above_50pct": {
+            "M2": round(fitted["M2"] * 100, 2),
+            "M3": round(fitted["M3"] * 100, 2),
+            "required": 50.0,
+            "pass": cond_c,
+        },
+        "meets_rule": bool(cond_a and cond_b and cond_c),
+    }
+
+
 
 def sha256_file(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -599,6 +726,15 @@ def main(argv=None):
     ap.add_argument("--fit-id", default=None,
                     help="e.g. fit-2026-11-21-01; recorded in the "
                          "fit block when given")
+    ap.add_argument("--holdout-fitted", default=None,
+                    help="backtest-report.json of the fitted v1 "
+                         "projection on the hold-out window (S4-S5); "
+                         "must be given together with "
+                         "--holdout-placeholder")
+    ap.add_argument("--holdout-placeholder", default=None,
+                    help="backtest-report.json of the placeholder "
+                         "on the same hold-out window; without both "
+                         "hold-out reports no adoption is possible")
     args = ap.parse_args(argv)
 
     try:
@@ -688,17 +824,32 @@ def main(argv=None):
     v1_shared["bootstrap"] = bootstrap(
         shared, 1.0, 1.0, r_max, args.bootstrap, args.seed)
 
-    # --- placeholder comparison (adoption rule input) -------------
-    # The fitted v2 model goes live only if its fit-window
-    # violation rate is no higher than the placeholder weights'
-    # rate on the same decisions. This file only records the
-    # comparison; it never writes into rules/.
+    # --- placeholder comparison (in-sample diagnostic only) ------
+    # The fit-window violation rate is diagnostic only. It is
+    # NEVER an adoption criterion: the first real fit passed it
+    # (22/31 vs 25/31) and failed out-of-sample on every metric.
+    # Adoption is decided solely by the hold-out gate
+    # (evaluate_holdout_gate); this file only records the
+    # comparison and never writes into rules/.
     placeholder_shared = placeholder_violation(shared, r_max)
     placeholder_groups = {
         t: placeholder_violation(sub, r_max)
         for t, sub in sorted(groups.items())}
-    adoption_meets = (shared_fit["violation_rate"]
-                      <= placeholder_shared["violation_rate"])
+    if ((args.holdout_fitted is None)
+            != (args.holdout_placeholder is None)):
+        print("fit: --holdout-fitted and --holdout-placeholder "
+              "must be given together", file=sys.stderr)
+        return 2
+    holdout_gate = None
+    if args.holdout_fitted is not None:
+        try:
+            holdout_gate = evaluate_holdout_gate(
+                args.holdout_fitted, args.holdout_placeholder)
+        except ValueError as e:
+            print(f"fit: {e}", file=sys.stderr)
+            return 2
+    adoption_meets = bool(holdout_gate
+                          and holdout_gate["meets_rule"])
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -775,20 +926,24 @@ def main(argv=None):
             "v1_projection_shared_violation_rate":
                 v1_shared["violation_rate"],
         },
-        "adoption_rule": ("Adopt the fitted v2 model into "
-                          "rules/payoff-model.json only if its "
-                          "fit-window violation rate is no higher "
-                          "than the placeholder weights' rate on "
-                          "the same decisions."),
+        "adoption_rule": ADOPTION_RULE,
         "adoption_recommendation": {
             "meets_rule": adoption_meets,
-            "fitted_shared_violation_rate":
-                shared_fit["violation_rate"],
-            "placeholder_violation_rate":
-                placeholder_shared["violation_rate"],
+            "holdout_gate": holdout_gate,
+            "in_sample_diagnostic": {
+                "fitted_shared_violation_rate":
+                    shared_fit["violation_rate"],
+                "placeholder_violation_rate":
+                    placeholder_shared["violation_rate"],
+                "note": ("Diagnostic only. In-sample violation "
+                         "rate is never an adoption criterion; "
+                         "see adoption_rule."),
+            },
             "note": ("Recommendation only. This file never writes "
                      "into rules/; the worker applies the rule and "
-                     "records the outcome separately."),
+                     "records the outcome separately. Without a "
+                     "hold-out comparison table (holdout_gate null) "
+                     "the model must not be adopted."),
         },
         "notes": [
             "Fit-window violation rate is an in-sample metric. "
@@ -953,6 +1108,21 @@ def main(argv=None):
             f"violation={gf['violation_rate']} "
             f"weights={gf['weights']}")
     lines.append(f"fit: {note_en}")
+    if holdout_gate is None:
+        lines.append("fit: hold-out gate: no comparison table "
+                     "supplied; adoption NOT possible "
+                     "(meets_rule=False)")
+    else:
+        g = holdout_gate
+        lines.append(
+            f"fit: hold-out gate: wins={g['wins']}/5 "
+            f"(need >=3): {'pass' if g['condition_a_wins_ge_3']['pass'] else 'FAIL'}; "
+            f"M1-baseline={g['condition_b_m1_above_baseline_pp']['value']}pp "
+            f"(need >=10): {'pass' if g['condition_b_m1_above_baseline_pp']['pass'] else 'FAIL'}; "
+            f"M2={g['condition_c_m2_m3_above_50pct']['M2']}% "
+            f"M3={g['condition_c_m2_m3_above_50pct']['M3']}% "
+            f"(need >50): {'pass' if g['condition_c_m2_m3_above_50pct']['pass'] else 'FAIL'}; "
+            f"adoption meets_rule={adoption_meets}")
     lines.append(f"fit: wrote {out_dir}/fit-report.json, "
                  f"payoff-model-fitted.json, "
                  f"payoff-model-fitted-v1.json")

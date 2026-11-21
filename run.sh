@@ -8,7 +8,7 @@
 #   otherwise it is recorded as not_run. A prediction failure never
 #   changes this script's exit code, which reflects the history
 #   layers only. A missing prediction tool or payoff file is
-#   recorded as a missing report (prediction chapter: fail), never
+#   recorded as a missing report (prediction chapter: opinion), never
 #   as a history failure.
 # Usage: ./run.sh [--claims FILE] [--modular] [--predict]
 #                 [--payoff FILE] [trace.json]
