@@ -14,10 +14,16 @@ placeholders and uncalibrated, so no pass/fail claim about
 predictive power is made here; the per-report verdicts, the
 below-threshold flag and the refuted flag are still recorded as
 diagnostics -- and "not_run" when prediction was not attempted.
-The overall verdict is still decided by the history layers only;
-prediction never enters the "verified" label, and the chapter
-states plainly that it is opinion, not a prediction and not
-verification.
+Round 3 adds the degeneracy guard (audit fix 3): when the
+forecast distribution is degenerate -- more than 50% of players
+with a modal probability of exactly 1.0 -- the chapter verdict
+is "fail" (guard fail: the prediction is unusable because its
+distribution collapsed, and M1-M5 are not consulted as a
+judgement). Priority: guard fail > opinion. The default is
+opinion; the guard overrides it. The overall verdict is still
+decided by the history layers only; prediction never enters the
+"verified" label, and the chapter states plainly that it is
+opinion (or a guard fail), not a prediction and not verification.
 """
 import argparse
 import json
@@ -125,6 +131,45 @@ def _metric_str(d, keys):
     return ", ".join(parts) if parts else None
 
 
+DEGENERACY_THRESHOLD = 0.5
+
+
+def _degeneracy(prediction):
+    """Degeneracy of the round-1 forecast (audit fix 3, round 3).
+    Reads predict.py's top-level "degeneracy" block; falls back to
+    computing it from the per-player modal probabilities so old
+    prediction reports still render. Returns (rate, degenerate,
+    entropy_bits, counts) with rate None when nothing is known."""
+    import math
+    degen = prediction.get("degeneracy") if isinstance(
+        prediction, dict) else None
+    if isinstance(degen, dict) and degen.get("degeneracy_rate") is not None:
+        return (degen.get("degeneracy_rate"),
+                bool(degen.get("degenerate")),
+                degen.get("modal_action_entropy_bits"),
+                degen.get("modal_action_counts"))
+    players = prediction.get("players") if isinstance(
+        prediction, dict) else None
+    if not isinstance(players, list) or not players:
+        return (None, False, None, None)
+    n = len(players)
+    deg = sum(1 for p in players
+              if isinstance(p, dict)
+              and p.get("modal_probability") == 1.0)
+    counts = {}
+    for p in players:
+        if isinstance(p, dict) and p.get("modal_action") is not None:
+            a = p["modal_action"]
+            counts[a] = counts.get(a, 0) + 1
+    entropy = 0.0
+    for c in counts.values():
+        q = c / n
+        entropy -= q * math.log2(q)
+    rate = deg / n if n else 0.0
+    return (round(rate, 6), rate > DEGENERACY_THRESHOLD,
+            round(entropy, 6), counts)
+
+
 def main():
     ap = argparse.ArgumentParser(description="Merge gate + check + Lean results.")
     ap.add_argument("--check-report", default=None,
@@ -201,6 +246,11 @@ def main():
     refuted_by_transition = bool(
         prediction is not None
         and _contains(prediction, "refuted_by_transition"))
+    # Degeneracy guard inputs (audit fix 3, round 3), computed
+    # whenever prediction was attempted; None rate when no forecast
+    # exists (then the guard cannot fire and the chapter is opinion).
+    degeneracy_rate, degenerate, entropy_bits, modal_counts = \
+        _degeneracy(prediction) if attempted else (None, False, None, None)
     if not attempted:
         prediction_verdict = "not_run"
     else:
@@ -210,7 +260,13 @@ def main():
         # predictive power is made here. The per-report verdicts,
         # below_threshold and refuted_by_transition stay in the
         # section as diagnostics.
-        prediction_verdict = "opinion"
+        # Round 3 degeneracy guard (audit fix 3): when the forecast
+        # distribution is degenerate (degeneracy_rate > 0.5), the
+        # guard overrides opinion and the chapter is fail: the
+        # prediction is unusable because its distribution collapsed,
+        # and M1-M5 are not consulted as a judgement.
+        # Priority: guard fail > opinion.
+        prediction_verdict = "fail" if degenerate else "opinion"
     prediction_section = {
         "verdict": prediction_verdict,
         "attempted": attempted,
@@ -222,6 +278,11 @@ def main():
         "protocol": _report_verdict(protocol, ("checks",)),
         "below_threshold": below_threshold,
         "refuted_by_transition": refuted_by_transition,
+        "degeneracy_rate": degeneracy_rate,
+        "degenerate": degenerate,
+        "guard_fail": degenerate,
+        "modal_action_entropy_bits": entropy_bits,
+        "modal_action_counts": modal_counts,
         "missing": [k for k, v in pred_reports.items() if v is None]
         if attempted else [],
     }
@@ -346,8 +407,21 @@ def main():
     # --- Prediction chapter -----------------------------------------
     md.append("## 预测")
     md.append("")
-    md.append("本章是意见（opinion），不是预测结论，更不是验证。参数是占位值，"
-              "未校准；回测数字只作参考。本章不进“已验证”标签，不改变总体结论。")
+    if prediction_verdict == "fail":
+        # Degeneracy guard (round 3, audit fix 3). Priority:
+        # guard fail > opinion: the chapter is opinion by default,
+        # but a degenerate forecast distribution overrides it to
+        # fail. The prediction is unusable; M1-M5 are not consulted
+        # as a judgement for this run.
+        md.append("本章结论为 fail（退化守卫），不是预测结论，更不是验证。"
+                  "预测分布退化：超过半数玩家的众数动作概率为 1.0，"
+                  "该预测不可用；M1–M5 不作为本次判断依据（下方仅作诊断列出）。"
+                  "优先级：守卫 fail 高于 opinion——默认是 opinion，"
+                  "退化率超过 50% 时守卫优先记 fail。"
+                  "本章不进“已验证”标签，不改变总体结论。")
+    else:
+        md.append("本章是意见（opinion），不是预测结论，更不是验证。参数是占位值，"
+                  "未校准；回测数字只作参考。本章不进“已验证”标签，不改变总体结论。")
     md.append("")
     md.append(f"预测章结论：**{prediction_verdict}**"
               f"（预测：{prediction_section['prediction']}，"
@@ -359,6 +433,25 @@ def main():
         md.append("预测未跑：历史层未全过，或未给 --predict。")
         md.append("")
     else:
+        # Degeneracy guard readout (round 3): rate, flag, entropy.
+        if degeneracy_rate is not None:
+            md.append("### 退化守卫")
+            md.append("")
+            md.append(f"- 退化率：{degeneracy_rate:.3f}"
+                      f"（众数动作概率 p = 1.0 的玩家占比；"
+                      f"阈值 > 0.5 即退化）")
+            md.append(f"- 退化标志：{'degenerate' if degenerate else 'ok'}"
+                      + ("（守卫失败：该预测因分布退化不可用）"
+                         if degenerate else ""))
+            md.append(f"- 众数动作分布熵：{entropy_bits} 比特"
+                      f"（0 表示所有玩家众数动作相同）")
+            if modal_counts:
+                md.append("- 众数动作计数："
+                          + "，".join(f"{k}×{v}"
+                                      for k, v in sorted(
+                                          modal_counts.items(),
+                                          key=lambda kv: -kv[1])))
+            md.append("")
         if prediction_section["missing"]:
             md.append("缺失的预测报告："
                       + ", ".join(prediction_section["missing"]) + "。")
@@ -448,6 +541,31 @@ def main():
                 thr = _metric_str(thresholds, ["m1", "m2", "m3", "m4", "m5"])
                 md.append("- 阈值：" + (thr if thr else json.dumps(
                     thresholds, ensure_ascii=False)))
+            # M6 calibration (round 3, audit fix 3): predicted modal
+            # probability vs realised M1 hit rate, by probability
+            # bucket. The top bucket [0.99, 1.0] holds the near-certain
+            # claims, including modal p = 1.0.
+            calib = backtest.get("calibration")
+            if isinstance(calib, dict) and calib.get("m6") is not None:
+                md.append(f"- M6 校准度：最大桶差距 {calib['m6']:.3f}"
+                          f"（阈值 < {calib.get('m6_threshold', 0.2)}；"
+                          f"{'通过' if calib.get('m6_pass') else '不通过'}）")
+                for b in calib.get("buckets", []):
+                    if isinstance(b, dict) and b.get("n"):
+                        md.append(f"  - 桶 {b['bucket']}：n={b['n']}，"
+                                  f"平均预测概率 {b['mean_predicted_p']:.3f}，"
+                                  f"实际命中率 {b['actual_hit_rate']:.3f}，"
+                                  f"差距 {b['gap']:.3f}")
+                # Forecast-anchored reading: the forecast asserts
+                # modal p = 1.0 (see the guard readout above) while
+                # the backtest M1 hit rate is the realised frequency
+                # of that kind of modal claim.
+                if degenerate and isinstance(overall_tbl, dict):
+                    m1 = overall_tbl.get("m1_hit_rate")
+                    if isinstance(m1, (int, float)):
+                        md.append(f"- 预测轮断言 p = 1.0，回测 M1 实际命中率 "
+                                  f"{m1:.3f}，差距 {abs(1.0 - m1):.3f}。"
+                                  f"模型断言确定、实际命中为零：校准完全失效。")
             if isinstance(tables, dict):
                 for scope in ("per_player", "per_season"):
                     tbl = tables.get(scope)

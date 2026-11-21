@@ -565,6 +565,50 @@ def confidence_tier(round_no):
     return "low"
 
 
+DEGENERACY_THRESHOLD = 0.5
+
+
+def degeneracy_metrics(first_players):
+    """Degeneracy of the round-1 forecast distribution (audit fix 3,
+    round 3). degeneracy_rate is the share of players whose modal
+    action probability is exactly 1.0; the run is degenerate when
+    that share exceeds DEGENERACY_THRESHOLD (0.5). Distribution
+    entropy is the Shannon entropy (bits) of the modal-action
+    distribution across players: 0.0 bits when every player shares
+    one modal action. Players with no modal action (no candidates)
+    are excluded from the action counts but still count in the
+    denominator (their modal probability is 0.0, never degenerate).
+    A degenerate forecast asserts certainty while the backtest
+    shows the same kind of modal claim hits ~0% of the time; see
+    backtest.py calibration (M6)."""
+    n = len(first_players)
+    if n == 0:
+        return {"degeneracy_rate": 0.0, "degenerate_players": 0,
+                "players_total": 0, "degenerate": False,
+                "threshold": DEGENERACY_THRESHOLD,
+                "modal_action_entropy_bits": 0.0,
+                "modal_action_counts": {}}
+    deg = sum(1 for r in first_players
+              if r.get("modal_probability") == 1.0)
+    counts = {}
+    for r in first_players:
+        a = r.get("modal_action")
+        if a is not None:
+            counts[a] = counts.get(a, 0) + 1
+    entropy = 0.0
+    for c in counts.values():
+        p = c / n
+        entropy -= p * math.log2(p)
+    rate = deg / n
+    return {"degeneracy_rate": round(rate, 6),
+            "degenerate_players": deg,
+            "players_total": n,
+            "degenerate": rate > DEGENERACY_THRESHOLD,
+            "threshold": DEGENERACY_THRESHOLD,
+            "modal_action_entropy_bits": round(entropy, 6),
+            "modal_action_counts": counts}
+
+
 # --- rule scenarios (rules/scenarios.json) --------------------------
 def load_scenarios(path):
     """Load and validate a scenarios file. Returns the doc or None
@@ -942,6 +986,10 @@ def main(argv=None):
     first = forecast[0]
     modal = {row["player"]: {"action": row["modal_action"]}
              for row in first["players"]}
+    # Degeneracy guard (audit fix 3, round 3): how much of the
+    # round-1 forecast collapses onto p = 1.0 modal actions, and how
+    # concentrated the modal actions are across players.
+    degeneracy = degeneracy_metrics(first["players"])
 
     # --- rule scenarios -----------------------------------------------
     scenarios_output = None
@@ -1119,6 +1167,7 @@ def main(argv=None):
             "expected_delta_modal": row["expected_delta"],
         } for row in first["players"]],
         "forecast_rounds": forecast,
+        "degeneracy": degeneracy,
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
                           "cycle": first["cycle"]},
@@ -1143,6 +1192,12 @@ def main(argv=None):
         f"predict: verdict={verdict} horizon={args.horizon} "
         f"effective={effective_horizon} rule={base_now['rule_id']} "
         f"converged={first['converged']} iterations={first['iterations']}",
+        f"predict: degeneracy_rate={degeneracy['degeneracy_rate']} "
+        f"({degeneracy['degenerate_players']}/"
+        f"{degeneracy['players_total']} players p=1.0) "
+        f"degenerate={degeneracy['degenerate']} "
+        f"modal_action_entropy_bits="
+        f"{degeneracy['modal_action_entropy_bits']}",
         f"predict: {SMOKE_NOTE}",
     ]
     for row in first["players"]:

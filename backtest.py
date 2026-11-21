@@ -20,6 +20,11 @@ Metrics (design section 5):
   expected increment, recorded segment from the clamped HP after the
   recorded increment); M5 |predicted dHP - recorded dHP| within
   the payoff model's m5_tolerance.
+  M6 calibration (audit fix 3, round 3): the largest gap between
+  the mean predicted modal probability and the actual M1 hit rate
+  over probability buckets, on the classifiable subset; threshold
+  M6 < 0.2. The top bucket [0.99, 1.0] holds the near-certain
+  claims, including modal p = 1.0.
 
 Kind layer (semantic kinds, added 2026-11-21): moves carry
 semantic_kind (the substantive action thread) beside action_kind
@@ -162,6 +167,62 @@ def add_thresholds(row, margin_pp):
     return row
 
 
+# --- M6 calibration (audit fix 3, round 3) --------------------------
+CALIBRATION_BUCKETS = [(0.0, 0.5), (0.5, 0.8), (0.8, 0.9),
+                       (0.9, 0.99), (0.99, 1.0)]
+M6_THRESHOLD = 0.2
+
+
+def calibration(records):
+    """M6: calibration of the modal probability against the realised
+    M1 hit rate, on the classifiable subset only (same denominator
+    as M1: records whose recorded semantic kind is known). Records
+    are bucketed by modal probability; per bucket: n, mean predicted
+    p, actual M1 hit rate, gap = |mean p - hit rate|. M6 is the
+    largest gap over non-empty buckets. Threshold: M6 < 0.2.
+    The top bucket [0.99, 1.0] is the near-certain bucket: it holds
+    the p = 1.0 modal claims (a modal probability of exactly 1.0
+    falls here). A model that asserts near-certainty there and hits
+    0% is maximally miscalibrated: gap ~1.0. M6 is reported as its
+    own pass/fail; it does not change threshold_verdict /
+    below_threshold (M1-M5 keep their existing semantics)."""
+    cls = [r for r in records if r.get("m1_classifiable")]
+    buckets = []
+    worst = 0.0
+    for lo, hi in CALIBRATION_BUCKETS:
+        b = [r for r in cls
+             if r.get("modal_probability") is not None
+             and lo <= r["modal_probability"]
+             and (r["modal_probability"] < hi or hi == 1.0)]
+        if not b:
+            buckets.append({"bucket": f"[{lo}, {hi}]" if hi == 1.0
+                            else f"[{lo}, {hi})",
+                            "n": 0, "mean_predicted_p": None,
+                            "actual_hit_rate": None, "gap": None})
+            continue
+        mean_p = sum(r["modal_probability"] for r in b) / len(b)
+        hit = sum(1 for r in b if r["m1"]) / len(b)
+        gap = abs(mean_p - hit)
+        worst = max(worst, gap)
+        buckets.append({"bucket": f"[{lo}, {hi}]" if hi == 1.0
+                        else f"[{lo}, {hi})",
+                        "n": len(b),
+                        "mean_predicted_p": round(mean_p, 6),
+                        "actual_hit_rate": round(hit, 4),
+                        "gap": round(gap, 4)})
+    m6 = round(worst, 4)
+    return {"m6": m6, "m6_threshold": M6_THRESHOLD,
+            "m6_pass": m6 < M6_THRESHOLD,
+            "buckets": buckets,
+            "n_classifiable": len(cls),
+            "note": ("M6 is the largest |mean predicted modal "
+                     "probability - actual M1 hit rate| over the "
+                     "probability buckets, on the classifiable "
+                     "subset (same denominator as M1). The top "
+                     "bucket [0.99, 1.0] holds the near-certain "
+                     "claims, including modal p = 1.0.")}
+
+
 def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
     """Predict every round in `seasons` from its prefix. Returns
     (records, per_round_meta)."""
@@ -244,6 +305,7 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                     "key": pmap[pid].get("key"),
                     "predicted_action": pred_kind,
                     "recorded_action": rec_kind,
+                    "modal_probability": res["modal"][pid]["probability"],
                     "predicted_dhp": round(pdhp, 4),
                     "recorded_dhp": m["hp_delta"],
                     "predicted_dgold": round(pdgold, 4),
@@ -315,6 +377,9 @@ def main(argv=None):
     test_tables = tables(test_records)
     full_tables = tables(full_records)
     below_any = bool(test_tables["overall"].get("below_threshold"))
+    calib = calibration(test_records)
+    test_tables["overall"]["m6_gap"] = calib["m6"]
+    test_tables["overall"]["m6_pass"] = calib["m6_pass"]
     report = {
         "trace": args.trace,
         "payoff_model": {"version": payoff.get("version"),
@@ -347,6 +412,7 @@ def main(argv=None):
         "below_threshold": test_tables["overall"].get("below_threshold",
                                                       []),
         "verdict": ("fail" if below_any else "pass"),
+        "calibration": calib,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
                       for i in (1, 2, 3, 4, 5)},
@@ -378,6 +444,15 @@ def main(argv=None):
             f"baseline={o.get(f'm{i}_baseline')} "
             f"margin_pp={o.get(f'm{i}_margin_pp')} "
             f"signal={o.get(f'm{i}_signal')}")
+    top = next((b for b in calib["buckets"] if b["bucket"] == "[0.99, 1.0]"),
+               None)
+    lines.append(
+        f"  M6: gap={calib['m6']} threshold=<{calib['m6_threshold']} "
+        f"pass={calib['m6_pass']}"
+        + (f" (top bucket [0.99, 1.0]: n={top['n']} "
+           f"mean_p={top['mean_predicted_p']} "
+           f"hit={top['actual_hit_rate']} gap={top['gap']})"
+           if top and top["n"] else ""))
     summary = "\n".join(lines)
     print(summary)
     if args.summary:
