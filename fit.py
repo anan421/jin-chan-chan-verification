@@ -27,17 +27,20 @@ Method (design/fitting-layer.md):
                      bounds in effect at the move date)
         f_gold     = dgold
         f_lever    = 1 when gold_after < 0, else 0
-        f_rule     = 0 (compliance cost is 0 for every legal kind
-                     in this version)
         f_pos      = rank_before - rank_after
+    (Round 6, 2026-11-21: the compliance-cost feature f_rule
+    was removed. It was 0 for every legal kind, so its gradient
+    was always 0 and c_rule was unidentified; it only moved
+    through normalisation. No priced legal action is evidenced.
+    If evidence appears, re-add it with an evidence pointer.)
     The utility is linear in phi = (f_hp, f_gold, -f_lever,
-    -f_rule, f_pos), so u = w . phi with
-    w = (w_hp, w_gold, c_lever, c_rule, w_pos). The minus signs
-    on the two penalty features are folded into phi: the
+    f_pos), so u = w . phi with
+    w = (w_hp, w_gold, c_lever, w_pos). The minus sign on the
+    penalty feature is folded into phi: the
     perceptron update w += eta * weight * (phi(k*) - phi(k_pred))
     is then the ordinary margin-ascent step. (A literal update on
     the raw f vector would push c_lever the wrong way.)
-  * Perceptron: init at the placeholder weights (1, 1, 5, 10, 1),
+  * Perceptron: init at the placeholder weights (1, 1, 5, 1),
     eta = 0.1, 30 epochs in time order. On a mistake the weights
     move by eta * decision_weight * (phi(k*) - phi(k_pred));
     negative components are clipped to 0 after each update; at
@@ -171,8 +174,8 @@ GAMMA_GRID = [0.90, 0.95, 0.98, 1.0]
 TAU_GRID = [0.25, 0.5, 1.0, 2.0, 4.0, 8.0]
 EPOCHS = 30
 ETA = 0.1
-INIT_W = (1.0, 1.0, 5.0, 10.0, 1.0)
-WEIGHT_NAMES = ["w_hp", "w_gold", "c_lever", "c_rule", "w_pos"]
+INIT_W = (1.0, 1.0, 5.0, 1.0)
+WEIGHT_NAMES = ["w_hp", "w_gold", "c_lever", "w_pos"]
 
 # --- hold-out adoption gate (design/fitting-layer.md §6-§7) -------
 # A fitted model goes live ONLY when all three conditions hold on
@@ -432,11 +435,10 @@ def build_decisions(trace, fit_seasons):
 
 
 def phi_of(feat, hp_before, alpha):
-    """phi = (f_hp, f_gold, -f_lever, -f_rule, f_pos)."""
+    """phi = (f_hp, f_gold, -f_lever, f_pos)."""
     return ((feat["hp_after"] ** alpha - hp_before ** alpha),
             feat["dgold"],
             -float(feat["lever"]),
-            0.0,
             float(feat["pos"]))
 
 
@@ -444,7 +446,7 @@ def argmax_kind(phis, kinds, w):
     best_k, best_u = None, None
     for k, phi in zip(kinds, phis):
         u = (w[0] * phi[0] + w[1] * phi[1] + w[2] * phi[2]
-             + w[3] * phi[3] + w[4] * phi[4])
+             + w[3] * phi[3])
         if best_u is None or u > best_u + 1e-12:
             best_k, best_u = k, u
     return best_k, best_u
@@ -452,7 +454,7 @@ def argmax_kind(phis, kinds, w):
 
 def utilities(phis, w):
     return [(w[0] * phi[0] + w[1] * phi[1] + w[2] * phi[2]
-             + w[3] * phi[3] + w[4] * phi[4]) for phi in phis]
+             + w[3] * phi[3]) for phi in phis]
 
 
 def normalise(w):
@@ -470,7 +472,7 @@ def perceptron(decisions, alpha, gamma, r_max, epochs=EPOCHS,
     phis = [[phi_of(f, d["hp_before"], alpha) for f in d["feats"]]
             for d in decisions]
     w = list(init)
-    avg = [0.0] * 5
+    avg = [0.0] * len(WEIGHT_NAMES)
     for _ in range(epochs):
         for d, phi_list in zip(decisions, phis):
             if not d["recorded_in_candidates"]:
@@ -485,13 +487,13 @@ def perceptron(decisions, alpha, gamma, r_max, epochs=EPOCHS,
             i_pred = kinds.index(pred)
             phi_star = phi_list[i_star]
             phi_pred = phi_list[i_pred]
-            for j in range(5):
+            for j in range(len(WEIGHT_NAMES)):
                 w[j] += step * (phi_star[j] - phi_pred[j])
-            for j in range(5):
+            for j in range(len(WEIGHT_NAMES)):
                 if w[j] < 0:
                     w[j] = 0.0
         w = normalise(w)
-        for j in range(5):
+        for j in range(len(WEIGHT_NAMES)):
             avg[j] += w[j]
     avg = [x / epochs for x in avg]
     return normalise(avg)
@@ -521,9 +523,59 @@ def violation_rate(decisions, alpha, w, gamma, r_max):
             bad / n if n else 0.0, n)
 
 
+def identification_diagnostics(decisions, alpha, w, gamma, r_max):
+    """Per-feature identification diagnostic (round 6, audit fix 6).
+
+    For each decision whose recorded kind is in the candidate set,
+    the perceptron gradient on a mistake is phi(k*) - phi(k_pred);
+    on a correct prediction the gradient is exactly 0 (no update).
+    gradient_nonzero_fraction[j] is the share of candidate
+    decisions where feature j would actually move the weights,
+    i.e. the recorded and predicted kinds differ on that feature
+    on a mistake (argmax under the fitted weights w). A feature
+    that is constant across candidates (the removed f_rule was 0
+    for every legal kind) scores 0 here: unidentified, and it
+    must not stay in the weight vector. n_mistakes counts
+    decisions where the recorded kind is not the argmax (the only
+    decisions that update the weights).
+    """
+    n_cand = 0
+    n_mistakes = 0
+    nonzero = [0] * len(WEIGHT_NAMES)
+    for d in decisions:
+        if not d["recorded_in_candidates"]:
+            continue
+        n_cand += 1
+        phi_list = [phi_of(f, d["hp_before"], alpha)
+                    for f in d["feats"]]
+        pred, _ = argmax_kind(phi_list, d["candidates"], w)
+        if pred == d["recorded"]:
+            continue
+        n_mistakes += 1
+        i_star = d["candidates"].index(d["recorded"])
+        i_pred = d["candidates"].index(pred)
+        for j in range(len(WEIGHT_NAMES)):
+            if phi_list[i_star][j] != phi_list[i_pred][j]:
+                nonzero[j] += 1
+    return {
+        "n_decisions": len(decisions),
+        "n_with_candidates": n_cand,
+        "n_mistakes": n_mistakes,
+        "gradient_nonzero_fraction": {
+            name: round(n / n_cand, 6) if n_cand else 0.0
+            for name, n in zip(WEIGHT_NAMES, nonzero)},
+        "note": ("Share of candidate decisions where the feature "
+                 "differs between the recorded and predicted kinds "
+                 "on a mistake (the only decisions that move the "
+                 "weights). 0 means the feature carries no "
+                 "identifying signal and must not be a fitted "
+                 "parameter."),
+    }
+
+
 def placeholder_violation(decisions, r_max):
-    """Violation rate of the placeholder init weights (1, 1, 5, 10,
-    1) at alpha = 1, gamma = 1 (their native v1 form). Argmax is
+    """Violation rate of the placeholder init weights (1, 1, 5, 1)
+    at alpha = 1, gamma = 1 (their native v1 form). Argmax is
     invariant to positive scaling, so the unnormalised init is
     comparable with the unit-L2 fitted weights."""
     vr, vr_u, n = violation_rate(decisions, 1.0, list(INIT_W), 1.0,
@@ -691,12 +743,6 @@ def weights_block(fit, status="fitted"):
                     "meaning": ("leverage penalty coefficient; "
                                 "penalty is 1 when the expected "
                                 "gold result is negative, else 0")},
-        "c_rule": {"value": w["c_rule"], "status": status,
-                   "assumption": "A4",
-                   "meaning": ("compliance cost coefficient; cost "
-                               "is 0 for every legal action kind "
-                               "in this version (no priced legal "
-                               "action is evidenced)")},
         "w_pos": {"value": w["w_pos"], "status": status,
                   "assumption": "A5",
                   "meaning": ("weight on ranking-position change "
@@ -824,6 +870,30 @@ def main(argv=None):
     v1_shared["bootstrap"] = bootstrap(
         shared, 1.0, 1.0, r_max, args.bootstrap, args.seed)
 
+    # --- identification diagnostics (round 6, audit fix 6) -------
+    # Shared fit only: per-feature gradient non-zero fraction plus
+    # bootstrap zero fraction per weight. If w_gold's bootstrap
+    # zero fraction is >= 0.5 the money term is unidentified and
+    # the report must say so (audit wording); the model must not
+    # be described as fitted.
+    _shared_w = [shared_fit["weights"][n] for n in WEIGHT_NAMES]
+    shared_ident = identification_diagnostics(
+        shared, shared_fit["alpha"], _shared_w,
+        shared_fit["gamma"], r_max)
+    _w_gold_zero = shared_fit["bootstrap"]["weights"]["w_gold"][
+        "zero_fraction"]
+    shared_ident["bootstrap_zero_fraction"] = {
+        name: shared_fit["bootstrap"]["weights"][name][
+            "zero_fraction"]
+        for name in WEIGHT_NAMES}
+    shared_ident["w_gold_zero_fraction"] = _w_gold_zero
+    shared_ident["money_term_identified"] = _w_gold_zero < 0.5
+    shared_ident["verdict"] = (
+        "money term identified" if _w_gold_zero < 0.5
+        else "金钱项未识别 (money term unidentified): w_gold is 0 "
+             "in %.2f of bootstrap refits (>= 0.5); the model must "
+             "not be described as fitted." % _w_gold_zero)
+
     # --- placeholder comparison (in-sample diagnostic only) ------
     # The fit-window violation rate is diagnostic only. It is
     # NEVER an adoption criterion: the first real fit passed it
@@ -899,6 +969,7 @@ def main(argv=None):
                            "gamma = 1"),
         "groups": group_fits,
         "shared": shared_fit,
+        "identification": shared_ident,
         "v1_projection": {
             "method": ("same perceptron flow with alpha = 1, "
                        "gamma = 1 fixed; usable directly by "
@@ -950,9 +1021,12 @@ def main(argv=None):
             "It is not calibration. The real check is backtest.py "
             "run with payoff-model-fitted-v1.json on the hold-out "
             "window (S4-S5): M1-M5 against the random baselines.",
-            "c_rule is not identified in this version: f_rule = 0 "
-            "for every legal kind, so its gradient is always 0 "
-            "and it only moves through normalisation.",
+            "c_rule was removed in round 6 (2026-11-21): "
+            "unidentified (f_rule = 0 for every legal kind, so "
+            "its gradient was always 0 and it only moved through "
+            "normalisation). It is no longer in the weight vector "
+            "or the L2 normalisation. See the identification "
+            "diagnostic in this report.",
             "v2 weights with alpha != 1 cannot be substituted "
             "into the v1 linear utility; the v1 projection is a "
             "separate fit, not a conversion.",
@@ -961,6 +1035,8 @@ def main(argv=None):
             "round-order values." % (args.bootstrap, args.seed),
         ],
     }
+    if not shared_ident["money_term_identified"]:
+        report["notes"].append(shared_ident["verdict"])
     (out_dir / "fit-report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2),
         encoding="utf-8")
@@ -991,6 +1067,7 @@ def main(argv=None):
                 "weights": {name: boot[name] for name in
                             WEIGHT_NAMES},
             },
+            "identification": shared_ident,
             "fit_date": fit_date,
             "note": note_en,
             "note_zh": note_zh,
@@ -1030,7 +1107,6 @@ def main(argv=None):
             "w_hp": gf["weights"]["w_hp"],
             "w_gold": gf["weights"]["w_gold"],
             "c_lever": gf["weights"]["c_lever"],
-            "c_rule": gf["weights"]["c_rule"],
             "w_pos": gf["weights"]["w_pos"],
             "temperature": gf["temperature"],
             "discount": gf["gamma"],
@@ -1051,8 +1127,7 @@ def main(argv=None):
     fitted_v1["status"] = run_status
     fitted_v1["utility_form"] = (
         "u = w_hp * dHP + w_gold * dgold - c_lever * "
-        "leverage_penalty - c_rule * compliance_cost + w_pos * "
-        "position_term")
+        "leverage_penalty + w_pos * position_term")
     fitted_v1["assumptions"] = [
         a for a in payoff.get("assumptions", [])
         if a.get("id") in ("A1", "A2", "A3", "A4", "A5", "A6", "A7")]
@@ -1072,7 +1147,6 @@ def main(argv=None):
             "w_hp": gf["weights"]["w_hp"],
             "w_gold": gf["weights"]["w_gold"],
             "c_lever": gf["weights"]["c_lever"],
-            "c_rule": gf["weights"]["c_rule"],
             "w_pos": gf["weights"]["w_pos"],
             "temperature": gf["temperature"],
         }
