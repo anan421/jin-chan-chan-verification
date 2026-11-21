@@ -23,7 +23,7 @@
 - 每一轮一个分支：loop/round-N-<短描述>。改完提交到分支。
 - 合并条件：形式化检验全过 + 测试集上比改前好。满足才合并到 main。不满足，分支废弃，不合并。
 - PR：GitHub 接通后，每轮一个 PR，合并即一轮完成。本地先用分支 + 合并提交走同一流程。
-- GitHub 远程待接（gh 未登录，需 Gu 登录一次才能推上去开 PR）。
+- GitHub 远程已接：https://github.com/anan421/jin-chan-chan-verification（private）。main 已推。PR 流程：每轮一个 PR，合并即一轮完成。
 
 ## 输入
 - 审计报告：~/workspace/verification/prediction-audit-2026-11-21.md（14 方审计员的改法清单）。
