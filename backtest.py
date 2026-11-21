@@ -33,6 +33,19 @@ Metrics (design section 5):
   M6 < 0.2. The top bucket [0.99, 1.0] holds the near-certain
   claims, including modal p = 1.0.
 
+  Post-hoc calibration (round 9, 2026-11-21): the modal
+  probabilities measured here are the calibrated ones. run_window
+  passes a calibration.load_calibration() dict into
+  predict.best_response(), which rescales every distribution
+  through calibration.apply_calibration() -- the same single
+  implementation the live forecast uses. The rescaling is
+  monotone, so no modal action and no M1-M5 hit count changes;
+  only the stated probabilities (and hence M6) move. The
+  parameters live in rules/calibration.json, fitted on the fit
+  window only (S1-S3) by fit_calibration.py; the test window is
+  never used for fitting. When the file is absent, calibration
+  is None and the raw probabilities are measured.
+
 Kind layer (semantic kinds, added 2026-11-21): moves carry
 semantic_kind (the substantive action thread) beside action_kind
 (the round-type slug). Candidates, expectations and M1 all use the
@@ -61,6 +74,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import calibration as CAL  # noqa: E402  (post-hoc rescaling, round 9)
 import check  # noqa: E402
 import predict as P  # noqa: E402  (shared best-response + helpers)
 
@@ -282,9 +296,16 @@ def expectation_diagnostics(records):
             "per_kind_n_at_prediction": per_kind}
 
 
-def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
+def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
+               calibration=None, include_distributions=False):
     """Predict every round in `seasons` from its prefix. Returns
-    (records, per_round_meta)."""
+    (records, per_round_meta). calibration is passed through to
+    predict.best_response() (round 9): the modal probabilities in
+    the records are the calibrated ones when a calibration dict is
+    given, the raw ones when it is None. include_distributions
+    attaches the full (calibrated) distribution to each record;
+    fit_calibration.py uses it to fit on the fit window, the
+    regular report leaves it off to stay lean."""
     rules = trace["rules"]
     moves = trace["moves"]
     pmap = {p["id"]: p for p in trace["players"]}
@@ -346,7 +367,8 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                 hp_bounds = (base0["params"]["hp_floor"],
                              base0["params"]["hp_cap"])
             res = P.best_response(state, payoff_params, tau, candidates,
-                                  exp, start, acting, hp_bounds)
+                                  exp, start, acting, hp_bounds,
+                                  calibration=calibration)
             dhp_obs = defaultdict(list)
             for m in prefix:
                 dhp_obs[m["player"]].append(m["hp_delta"])
@@ -364,7 +386,7 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                 rec_hp = P.clamp(cur_hp + m["hp_delta"], lo_b, hi_b)
                 obs = dhp_obs.get(pid, [m["hp_delta"]])
                 rec_kind = kind_of(m)
-                records.append({
+                rec = {
                     "season": season, "round": rnd, "player": pid,
                     "key": pmap[pid].get("key"),
                     "predicted_action": pred_kind,
@@ -387,7 +409,10 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                     "b2": 0.5, "b3": 0.5, "b4": 1.0 / 8,
                     "b5": m5_baseline(min(obs), max(obs),
                                       m["hp_delta"], tol),
-                })
+                }
+                if include_distributions:
+                    rec["distribution"] = res["distributions"][pid]
+                records.append(rec)
     return records
 
 
@@ -411,6 +436,11 @@ def main(argv=None):
     thresholds = payoff.get("thresholds", {})
     margin_pp = thresholds.get("margin_pp", 10)
     tol = thresholds.get("m5_tolerance", 10)
+    # Post-hoc calibration (round 9): fitted on the fit window
+    # only (S1-S3) by fit_calibration.py; parameters live in
+    # rules/calibration.json. Absent file -> None -> the raw
+    # probabilities are measured.
+    calibration_params = CAL.load_calibration()
 
     seasons = sorted(s["season"] for s in trace["seasons"])
     fit_seasons = seasons[:3]
@@ -421,9 +451,11 @@ def main(argv=None):
         return 2
 
     test_records = run_window(trace, params, tau, test_seasons,
-                              margin_pp, tol)
+                              margin_pp, tol,
+                              calibration=calibration_params)
     full_records = run_window(trace, params, tau, seasons,
-                              margin_pp, tol)
+                              margin_pp, tol,
+                              calibration=calibration_params)
 
     def tables(records):
         overall = add_thresholds(aggregate(records), margin_pp)
@@ -481,6 +513,29 @@ def main(argv=None):
                                                       []),
         "verdict": ("fail" if below_any else "pass"),
         "calibration": calib,
+        "calibration_applied": {
+            "applied": calibration_params is not None,
+            "method": (calibration_params["method"]
+                       if calibration_params else None),
+            "temperature": (calibration_params["temperature"]
+                            if calibration_params else None),
+            "cap": (calibration_params["cap"]
+                    if calibration_params else None),
+            "fit_window": (calibration_params.get("fit_window")
+                           if calibration_params else None),
+            "fit_date": (calibration_params.get("fit_date")
+                         if calibration_params else None),
+            "source_file": (calibration_params.get("source_file")
+                            if calibration_params else None),
+            "note": ("Post-hoc rescaling (round 9): the modal "
+                     "probabilities measured here are the calibrated "
+                     "ones when a calibration file is present. The "
+                     "rescaling is monotone, so no modal action and "
+                     "no M1-M5 hit count changes; only the stated "
+                     "probabilities (and hence M6) move. Parameters "
+                     "were fitted on the fit window only (S1-S3); "
+                     "the test window was never used for fitting."),
+        },
         "expectation_diagnostics": exp_diag,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
@@ -521,7 +576,12 @@ def main(argv=None):
         + (f" (top bucket [0.99, 1.0]: n={top['n']} "
            f"mean_p={top['mean_predicted_p']} "
            f"hit={top['actual_hit_rate']} gap={top['gap']})"
-           if top and top["n"] else ""))
+           if top and top["n"] else "")
+        + (" calibration=applied "
+           f"(temperature={calibration_params['temperature']} "
+           f"cap={calibration_params['cap']})"
+           if calibration_params else
+           " calibration=none (raw probabilities)"))
     dist = exp_diag["prediction_distribution"]
     lines.append(
         f"  expectation: shrunk={exp_diag['shrunk_predictions']}/"
