@@ -8,14 +8,16 @@ Lean layers are not run; they are recorded as not_run, not pass.
 
 Prediction chapter (optional, --prediction-run): the prediction
 reports (predict, backtest, symbolic, agent_claims protocol) are
-merged as a separate "## 预测" chapter. Its verdict is computed
-from the prediction reports only: fail if any prediction report is
-missing, any verdict is fail, backtest is below threshold, or a
-claim was refuted by the transition relation; pass otherwise;
-not_run when prediction was not attempted. The overall verdict is
-still decided by the history layers only; prediction never enters
-the "verified" label, and the chapter states plainly that
-prediction is not verification.
+merged as a separate "## 预测" chapter. Its verdict is "opinion"
+whenever prediction was attempted -- the parameters are
+placeholders and uncalibrated, so no pass/fail claim about
+predictive power is made here; the per-report verdicts, the
+below-threshold flag and the refuted flag are still recorded as
+diagnostics -- and "not_run" when prediction was not attempted.
+The overall verdict is still decided by the history layers only;
+prediction never enters the "verified" label, and the chapter
+states plainly that it is opinion, not a prediction and not
+verification.
 """
 import argparse
 import json
@@ -201,19 +203,14 @@ def main():
         and _contains(prediction, "refuted_by_transition"))
     if not attempted:
         prediction_verdict = "not_run"
-    elif any(v is None for v in pred_reports.values()):
-        prediction_verdict = "fail"
-    elif any(rv == "fail" or rv == "not_run" for rv in (
-            _report_verdict(prediction, ("players",)),
-            _report_verdict(backtest, (("tables",), ("test_window",))),
-            _report_verdict(symbolic, ("cells", "edges", "sccs",
-                                       "attractors", "pruning")),
-            _report_verdict(protocol, ("checks",)))):
-        prediction_verdict = "fail"
-    elif below_threshold or refuted_by_transition:
-        prediction_verdict = "fail"
     else:
-        prediction_verdict = "pass"
+        # Round-1 rollback (2026-11-21): the prediction chapter is
+        # opinion, not a pass/fail verdict. The live parameters are
+        # placeholders and uncalibrated, so no pass/fail claim about
+        # predictive power is made here. The per-report verdicts,
+        # below_threshold and refuted_by_transition stay in the
+        # section as diagnostics.
+        prediction_verdict = "opinion"
     prediction_section = {
         "verdict": prediction_verdict,
         "attempted": attempted,
@@ -349,7 +346,8 @@ def main():
     # --- Prediction chapter -----------------------------------------
     md.append("## 预测")
     md.append("")
-    md.append("预测不是验证。预测结果不进“已验证”标签，不改变总体结论。")
+    md.append("本章是意见（opinion），不是预测结论，更不是验证。参数是占位值，"
+              "未校准；回测数字只作参考。本章不进“已验证”标签，不改变总体结论。")
     md.append("")
     md.append(f"预测章结论：**{prediction_verdict}**"
               f"（预测：{prediction_section['prediction']}，"
