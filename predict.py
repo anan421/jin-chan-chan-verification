@@ -65,6 +65,25 @@ Calibration (round 9, 2026-11-21; design/round-9-calibration.md):
   gamma**(R-r)); it does not discount future rewards in
   single-step prediction. Multi-step continuation discounting is
   a future extension, not this version.
+
+Decomposition (round 12, 2026-11-21; design/round-12-decompose.md):
+  the question "what next?" is split into three questions --
+  Q1 new kind or repeat kind, Q2 which kind, Q3 how big
+  (magnitude class zero / mid 1-4 / big >= 5 on |dHP|) -- and Q2
+  is scored against-first-then-for: each candidate kind carries
+  0-3 objections (player never used it, thin kind support n < 5,
+  negative expected dHP); the FOR side is the utility softmax
+  times the resolved per-player reference-class prior (round 10);
+  the aggregate is for * exp(-lambda * objections), lambda = 1.0
+  (a fixed assumption, not fitted), renormalised, then calibrated
+  as before. The re-scoring touches only the reported
+  distribution and the modal action read off it; the
+  best-response iteration still argmaxes raw utility, so
+  iterations / convergence are unchanged (the known convergence
+  regression is untouched). Q1 is scored in backtest.py only.
+  The candidate set is unchanged (prefix kinds, sorted, one
+  shared candidate_kinds() helper now); round 11's
+  full-vocabulary expansion is not adopted here.
   hp_after is the HP after the expected increment, clamped to the
   rule bounds; hp_before is the round-start HP. Gold stays linear.
   leverage_penalty = 1 when the expected gold result is negative,
@@ -311,6 +330,287 @@ def support_lookup(support, pid, kind):
     return n_kind, n_cell, bool(kinfo["shrunk"])
 
 
+# --- reference-class priors (round 10, research fruit 4) -----------
+# Copied verbatim from branch loop/round-10-per-player (unmerged):
+# per-player kind distributions with a player / type / global
+# fallback hierarchy. Round 12 reuses them as the FOR evidence
+# (the support side of the decompose-then-aggregate step).
+PER_PLAYER_PSEUDOCOUNT = 1.0
+
+
+def _rates_table(counts):
+    """One Laplace-smoothed kind distribution from kind counts
+    ('unknown' already excluded). p(kind) = (count + 1) / (N + K),
+    N = known-kind moves in the pool, K = distinct known kinds in
+    the pool; a kind with no history in the pool gets the floor
+    1 / (N + K), never 0. mode is the most frequent kind (ties:
+    highest count, then kind name ascending, deterministic) --
+    the same mode rule as round 7's base_rates(), so the global
+    table here reproduces round 7's base-only guess exactly.
+    The common denominator (N + K) cancels when this table is
+    used as a multiplier in combine_with_prior, so only the
+    counts shape the combined distribution."""
+    n = sum(counts.values())
+    k = len(counts)
+    denom = n + PER_PLAYER_PSEUDOCOUNT * k if k else 1.0
+    floor = PER_PLAYER_PSEUDOCOUNT / denom if k else 1.0
+    probs = {kind: (c + PER_PLAYER_PSEUDOCOUNT) / denom
+             for kind, c in counts.items()}
+    mode = None
+    if counts:
+        mode = sorted(counts, key=lambda kk: (-counts[kk], kk))[0]
+    return {"counts": dict(counts), "n": n, "kinds": k,
+            "pseudocount": PER_PLAYER_PSEUDOCOUNT, "floor": floor,
+            "probabilities": probs, "mode": mode}
+
+
+def per_player_rates(moves, player_types=None):
+    """Reference-class prior tables (round 10, research fruit 4):
+    one smoothed kind distribution per player, per player type,
+    and one global table. Single implementation shared by
+    predict.py (live forecast, full trace) and backtest.py
+    (walk-forward prefix); both call it on exactly the prefix
+    their expected deltas come from, so the two prefixes agree.
+    player_types: pid -> type key (chip_supplier,
+    cloud_hyperscaler, model_lab, leveraged_infra, china_vendor,
+    from rules/payoff-model.json 'players'); a player with no
+    type entry has no type table and falls from own history
+    straight to global. 'unknown' moves are excluded from every
+    count and denominator: unknown is a classification gap, not
+    an action a player can take. The tables are priors, not
+    parameters: nothing here is stored in payoff-model.json,
+    whose version does not change."""
+    per = defaultdict(dict)
+    typ = defaultdict(dict)
+    glob = {}
+    for m in moves:
+        kind = kind_of(m)
+        if kind == "unknown":
+            continue
+        pid = m["player"]
+        cell = per[pid]
+        cell[kind] = cell.get(kind, 0) + 1
+        t = (player_types or {}).get(pid)
+        if t is not None:
+            tcell = typ[t]
+            tcell[kind] = tcell.get(kind, 0) + 1
+        glob[kind] = glob.get(kind, 0) + 1
+    return {"min_support": MIN_SUPPORT,
+            "pseudocount": PER_PLAYER_PSEUDOCOUNT,
+            "global": _rates_table(glob),
+            "types": {t: _rates_table(c) for t, c in typ.items()},
+            "players": {pid: _rates_table(c)
+                        for pid, c in per.items()}}
+
+
+def resolve_prior(priors, pid, player_types=None):
+    """Resolve one prior for a player from a per_player_rates()
+    table. Returns {"table": table, "level": level}. Resolution:
+    the player's own history when its known-kind count
+    n >= MIN_SUPPORT (5, round 4's minimum-support rule: too
+    little history is not used hard as the player's own mean);
+    else the same-type average when its n >= MIN_SUPPORT; else
+    the global average. A player with no type entry skips the
+    type level. The level is returned beside the table so
+    callers can report how many predictions actually rested on
+    a player's own history."""
+    ptab = priors["players"].get(pid)
+    if ptab is not None and ptab["n"] >= priors["min_support"]:
+        return {"table": ptab, "level": "player"}
+    t = (player_types or {}).get(pid)
+    if t is not None:
+        ttab = priors["types"].get(t)
+        if ttab is not None and ttab["n"] >= priors["min_support"]:
+            return {"table": ttab, "level": "type"}
+    return {"table": priors["global"], "level": "global"}
+
+
+def combine_with_prior(dist, table):
+    """Multiply a model distribution by a reference-class prior
+    and renormalise: combined(kind) ~ model_p(kind) *
+    prior_p(kind). Same shape as round 7's
+    combine_with_base_rates, but the prior is the resolved
+    per-player table (own / type / global), not one global
+    table. A kind with no history at the resolved level gets
+    that level's floor value. Returns full-precision
+    probabilities; the caller rounds for storage."""
+    probs = table["probabilities"]
+    floor = table["floor"]
+    weighted = {k: v * probs.get(k, floor) for k, v in dist.items()}
+    total = sum(weighted.values()) or 1.0
+    return {k: v / total for k, v in weighted.items()}
+
+
+# --- candidate kinds: one shared helper, one order (round 12) -----
+def candidate_kinds(prefix_moves):
+    """The kind set a player may be predicted to take, before the
+    per-round banned-kind exclusion: the kinds that occur in the
+    prefix, minus "unknown", sorted. This is main's candidate-set
+    definition, unchanged; it is one function now so predict.py
+    (live forecast, full trace as prefix) and backtest.py
+    (walk-forward prefix) build the set the same way, in the same
+    order. It is NOT round 11's full-vocabulary expansion (that
+    branch is unmerged): first-appearance kinds still cannot be
+    predicted as a modal kind here, and the ceiling stays 59/83;
+    round 12 measures that limit instead of removing it."""
+    return sorted({kind_of(m) for m in prefix_moves} - {"unknown"})
+
+
+# --- decompose the question (round 12, research fruit 5) -----------
+# "What next?" is split into three questions, answered in order:
+#   Q1 move-or-not (here: a NEW kind or a REPEAT kind),
+#   Q2 which kind,
+#   Q3 how big (magnitude class of the expected dHP).
+# For Q2 each candidate kind is scored against-first, then for,
+# then aggregated. The against evidence is computed first, the
+# for evidence second, and the two are combined last, in log
+# space. Everything below is prefix-only: no information from
+# the predicted round or later enters any score.
+DECOMPOSE_LAMBDA = 1.0
+
+
+def against_evidence(pid, kind, support, exp):
+    """The AGAINST case for one (player, kind): reasons NOT to
+    pick this kind, each 0/1, counted. Sources (all prefix-only):
+      player_never_used: the player has never taken this kind in
+        the prefix (n_cell == 0, from expectation_support).
+      thin_kind: the kind has fewer than MIN_SUPPORT (5) prefix
+        instances, so its expected delta is a shrunk mean, not a
+        raw mean (round 4's minimum-support rule).
+      negative_expected_dhp: the kind's shrunk expected dHP is
+        negative -- the kind historically loses blood.
+    Returns (count, [objection names]). A kind never seen in the
+    prefix scores 2 (never used + thin); it cannot be a
+    candidate under candidate_kinds(), so that case never fires
+    here -- it is listed only so the rule stays total."""
+    n_kind, n_cell, _shrunk = support_lookup(support, pid, kind)
+    dhp, _dgold = exp(pid, kind)
+    objections = []
+    if n_cell == 0:
+        objections.append("player_never_used")
+    if n_kind < MIN_SUPPORT:
+        objections.append("thin_kind")
+    if dhp < 0:
+        objections.append("negative_expected_dhp")
+    return len(objections), objections
+
+
+def combine_decomposed(dist, prior_table, against,
+                       lam=DECOMPOSE_LAMBDA):
+    """Aggregate: FOR minus AGAINST, in log space. The FOR side is
+    the model distribution multiplied by the resolved per-player
+    reference-class prior (combine_with_prior: the utility
+    softmax is the model's belief, the prior is the player's own
+    history). The AGAINST side is one multiplicative penalty per
+    objection: combined(kind) ~ for(kind) * exp(-lam * A(kind)),
+    renormalised. lam = 1.0 is a fixed assumption, not fitted:
+    one objection costs a factor e^-1 (~0.368), two cost e^-2
+    (~0.135). A kind with no objections is untouched by the
+    against side. Returns full-precision probabilities."""
+    base = (combine_with_prior(dist, prior_table)
+            if prior_table is not None else dict(dist))
+    weighted = {k: v * math.exp(-lam * against.get(k, {}).get("count", 0))
+                for k, v in base.items()}
+    total = sum(weighted.values()) or 1.0
+    return {k: v / total for k, v in weighted.items()}
+
+
+def build_decomposition(prefix_moves, player_types, support, exp, acting):
+    """Build the per-player decomposition tables for one
+    prediction point, from the same prefix the expectations come
+    from. Returns {pid: {"prior_table", "prior_level",
+    "against": {kind: {"count", "objections"}}}}. The prior is
+    resolved per player (own / type / global, round 10); the
+    against table is scored for every prefix kind, so a
+    per-player banned-kind subset always finds its entries.
+    player_types None means no prior (the raw model is used as
+    the FOR side alone); fit_calibration.py relies on that."""
+    priors_table = (per_player_rates(prefix_moves, player_types)
+                    if player_types is not None else None)
+    kinds = candidate_kinds(prefix_moves)
+    out = {}
+    for pid in acting:
+        resolved = (resolve_prior(priors_table, pid, player_types)
+                    if priors_table is not None else None)
+        against = {}
+        for kind in kinds:
+            n, obs = against_evidence(pid, kind, support, exp)
+            against[kind] = {"count": n, "objections": obs}
+        out[pid] = {
+            "prior_table": resolved["table"] if resolved else None,
+            "prior_level": resolved["level"] if resolved else None,
+            "against": against}
+    return out
+
+
+def novelty_rates(moves):
+    """First-appearance counts, walked in round order. A move is
+    novel when its semantic kind has not appeared in any earlier
+    round of `moves` (same per-round-prefix definition as round
+    11's first_appearance). 'unknown' moves are excluded from
+    both counts: unknown is not a kind, so it is neither novel
+    nor repeat. Returns {"players": {pid: [novel, total]},
+    "global": [novel, total]}. Prefix-only by construction: the
+    caller passes the prefix."""
+    seen = set()
+    players = defaultdict(lambda: [0, 0])
+    glob = [0, 0]
+    ordered = sorted(moves, key=lambda m: (m["season"],
+                                           m["round_index"]))
+    for m in ordered:
+        kind = kind_of(m)
+        if kind == "unknown":
+            continue
+        is_new = kind not in seen
+        cell = players[m["player"]]
+        cell[0] += 1 if is_new else 0
+        cell[1] += 1
+        glob[0] += 1 if is_new else 0
+        glob[1] += 1
+        seen.add(kind)
+    return {"players": dict(players), "global": glob}
+
+
+def novelty_prediction(nov_stats, pid):
+    """Q1's prediction rule: will this player's next move be a NEW
+    kind or a REPEAT kind? The player's novel rate is shrunk
+    toward the global novel rate with k = SHRINKAGE_K (5, round
+    4's rule): r_p = (nov_p + k * r_g) / (n_p + k). Predict "new"
+    iff r_p > 0.5 (more likely than not), else "repeat". The 0.5
+    threshold is fixed, not tuned on the test window. Returns
+    {"prediction", "shrunk_rate", "raw_rate", "n", "global_rate"}.
+    A player with no classifiable prefix moves has no rate and
+    predicts "repeat" (the majority answer)."""
+    glob_nov, glob_n = nov_stats["global"]
+    r_g = glob_nov / glob_n if glob_n else 0.0
+    cell = nov_stats["players"].get(pid)
+    if cell is None or cell[1] == 0:
+        return {"prediction": "repeat", "shrunk_rate": round(r_g, 4),
+                "raw_rate": None, "n": 0, "global_rate": round(r_g, 4)}
+    nov_p, n_p = cell
+    raw = nov_p / n_p
+    shrunk = (nov_p + SHRINKAGE_K * r_g) / (n_p + SHRINKAGE_K)
+    return {"prediction": "new" if shrunk > 0.5 else "repeat",
+            "shrunk_rate": round(shrunk, 4), "raw_rate": round(raw, 4),
+            "n": n_p, "global_rate": round(r_g, 4)}
+
+
+def magnitude_class(dhp, is_prediction=False):
+    """Q3's magnitude class of a dHP value. Recorded (integer)
+    dHP: 0 -> "zero", |dHP| 1-4 -> "mid", |dHP| >= 5 -> "big".
+    Predicted dHP is a float expected value, so the zero boundary
+    is |x| < 0.5 (the value rounds to 0); the mid/big boundary
+    stays |x| = 5. The classes are unsigned on purpose: direction
+    is M2's question, magnitude is Q3's."""
+    a = abs(dhp)
+    if is_prediction:
+        if a < 0.5:
+            return "zero"
+    elif dhp == 0:
+        return "zero"
+    return "mid" if a < 5 else "big"
+
+
 def make_expectation(per_mean, glob_mean, global_mean=None):
     """exp(pid, kind) -> (dHP, dgold). per (player, kind) first, then
     per kind, then the fallback. global_mean, when given, is the
@@ -371,7 +671,7 @@ def utility(params, hp_before, hp_after, dhp, dgold, lever, compliance,
 
 
 def best_response(state, params, tau, candidates, exp, start_actions,
-                  acting, hp_bounds, calibration=None):
+                  acting, hp_bounds, calibration=None, decomp=None):
     """Best-response dynamics. state: pid -> (hp, gold).
     candidates: pid -> sorted list of kinds. exp: (pid, kind) ->
     (dHP, dgold). acting: players who move this round. calibration:
@@ -381,7 +681,26 @@ def best_response(state, params, tau, candidates, exp, start_actions,
     scaling, monotone: the modal action never changes, only the
     stated probabilities); utilities and the dynamics are
     untouched, so iterations / convergence are unaffected.
+    decomp: a dict pid -> {"prior_table", "prior_level",
+    "against"} as built by build_decomposition (round 12), or
+    None for no decomposition. When given, each player's softmax
+    distribution is re-scored against-first-then-for
+    (combine_decomposed: model distribution x per-player prior
+    x exp(-lambda * objections), renormalised) before
+    calibration; the modal action is then read off the combined
+    distribution. When None the distribution is the plain
+    softmax, exactly as before (so ensemble.py, which does not
+    pass decomp, is unchanged). The best-response dynamics
+    themselves are untouched: the iteration still argmaxes raw
+    utility, and only the reported distribution (and the modal
+    action derived from it) carries the decomposition. The
+    multi-round state advance in forecast_rounds follows the
+    modal action, so it follows the decomposed modal -- same
+    boundary as rounds 7/10/11's priors.
     Returns a dict with actions, distributions, utilities,
+    modal, utility_modal (the argmax of the raw utility softmax
+    before any decomposition, so callers can count flips),
+    decomposition (pid -> prior level, modal objections, flipped),
     iterations, converged and cycle."""
     floor, cap = hp_bounds
     actions = {}
@@ -425,6 +744,7 @@ def best_response(state, params, tau, candidates, exp, start_actions,
             break
     # Final-iteration utilities -> softmax distribution per player.
     distributions, utilities, modal = {}, {}, {}
+    utility_modal, decomposition = {}, {}
     for pid in acting:
         others_post = {}
         for q, (hp, gold) in state.items():
@@ -449,10 +769,28 @@ def best_response(state, params, tau, candidates, exp, start_actions,
                    (1.0 if v == mx else 0.0) for k, v in utils.items()}
         total = sum(weights.values()) or 1.0
         raw_dist = {k: w / total for k, w in weights.items()}
+        # The utility-only modal, before any decomposition: the
+        # reference the decomposed modal is compared against.
+        util_modal_kind = (max(raw_dist, key=lambda k: (raw_dist[k], k))
+                           if raw_dist else None)
+        utility_modal[pid] = util_modal_kind
+        # Round 12 (fruit 5): re-score against-first-then-for
+        # (combine_decomposed), before calibration. The
+        # decomposition can move the modal action; the
+        # best-response iteration above still argmaxes raw
+        # utility, so the dynamics (actions, iterations,
+        # convergence) are untouched -- only the reported
+        # distribution and the modal action read off it carry the
+        # decomposition.
+        d = decomp.get(pid) if decomp else None
+        final_dist = (combine_decomposed(
+            raw_dist, d.get("prior_table") if d else None,
+            d.get("against", {}) if d else {})
+            if d is not None else raw_dist)
         # Post-hoc calibration (round 9): one shared rescaling,
         # applied here so live forecast and backtest measure the
         # same distributions. Monotone: argmax never changes.
-        dist = CAL.apply_calibration(raw_dist, calibration)
+        dist = CAL.apply_calibration(final_dist, calibration)
         dist = {k: round(v, 6) for k, v in dist.items()}
         modal_kind = max(dist, key=lambda k: (dist[k], k)) if dist else None
         top3 = round(sum(sorted(dist.values(), reverse=True)[:3]), 6)
@@ -462,8 +800,18 @@ def best_response(state, params, tau, candidates, exp, start_actions,
                       "probability": dist.get(modal_kind, 0.0) if modal_kind
                       else 0.0,
                       "top3_mass": top3}
+        if d is not None:
+            against_here = d.get("against", {}).get(modal_kind, {})
+            decomposition[pid] = {
+                "prior_level": d.get("prior_level"),
+                "modal_against": against_here.get("count", 0),
+                "modal_objections": against_here.get("objections", []),
+                "utility_modal_action": util_modal_kind,
+                "flipped": modal_kind != util_modal_kind}
     return {"actions": actions, "distributions": distributions,
             "utilities": utilities, "modal": modal,
+            "utility_modal": utility_modal,
+            "decomposition": decomposition,
             "iterations": iterations, "converged": converged,
             "cycle": not converged}
 
@@ -895,13 +1243,18 @@ def apply_scenario_rules(rules, scenario, base_rule_id, current_date,
 
 def forecast_rounds(state, params, tau, candidates, exp, start_actions,
                     acting, hp_bounds, horizon, cap_rounds, pmap,
-                    calibration=None):
+                    calibration=None, decomp=None):
     """Best-response dynamics, round by round. Shared by the
     baseline run and the per-scenario runs. calibration is passed
     through to best_response (round 9): the same rescaling for
-    every forecast, baseline and scenarios alike. Returns (forecast,
-    effective_horizon). Forecast rows carry the round, the
-    round-tiered confidence, convergence, and per-player
+    every forecast, baseline and scenarios alike. decomp is
+    passed through the same way (round 12): the same
+    against-first-then-for re-scoring for every forecast round.
+    For horizon > 1 the decomp table is the round-1 table (built
+    from the full-trace prefix); it is not rebuilt per round --
+    same staleness boundary as round 10's priors. Returns
+    (forecast, effective_horizon). Forecast rows carry the round,
+    the round-tiered confidence, convergence, and per-player
     distributions / modal actions / expected deltas."""
     effective_horizon = min(horizon, cap_rounds)
     forecast = []
@@ -911,7 +1264,7 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
     for rnd in range(1, effective_horizon + 1):
         res = best_response(round_state, params, tau, candidates, exp,
                             round_start, acting_now, hp_bounds,
-                            calibration=calibration)
+                            calibration=calibration, decomp=decomp)
         forecast.append({
             "round": rnd, "confidence": confidence_tier(rnd),
             "iterations": res["iterations"],
@@ -923,6 +1276,8 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
                 "modal_action": res["modal"][pid]["action"],
                 "modal_probability": res["modal"][pid]["probability"],
                 "top3_mass": res["modal"][pid]["top3_mass"],
+                "utility_modal_action": res["utility_modal"].get(pid),
+                "decomposition": res["decomposition"].get(pid, {}),
                 "expected_delta": list(exp(pid, res["modal"][pid]["action"]))
                 if res["modal"][pid]["action"] else [0.0, 0.0],
             } for pid in acting_now]})
@@ -945,18 +1300,20 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
 def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                   start_actions, acting, cap_rounds, horizon, pmap,
                   players_by_key, rules, max_date, base_rule_id,
-                  base_first, calibration=None):
+                  base_first, calibration=None, decomp=None):
     """Best-response dynamics under each rule scenario. Returns
     {"scenarios": [...], "comparison": {...}}. Shared inputs (state,
     expectations, start actions) come from the baseline run; only
     the candidate sets and HP bounds change per scenario. No trigger
     probability is assigned anywhere: scenarios are conditional
-    branches, not a distribution."""
+    branches, not a distribution. decomp is passed through to
+    forecast_rounds (round 12): every scenario branch uses the
+    same decomposed re-scoring as the baseline run."""
     # "unknown" is a classification gap, not an action a player can
     # take; it is excluded from the candidate set (same rule as
     # backtest.py: candidates = prefix kinds - {"unknown"}), so it
     # cannot absorb softmax probability mass.
-    all_kinds = sorted({kind_of(m) for m in trace["moves"]} - {"unknown"})
+    all_kinds = candidate_kinds(trace["moves"])
     base_modal = {row["player"]: row["modal_action"]
                   for row in base_first}
     base_dist = {row["player"]: row["distribution"]
@@ -980,7 +1337,7 @@ def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
         forecast, effective = forecast_rounds(
             state, params, tau, candidates, exp, s_start, acting,
             hp_bounds, horizon, cap_rounds, pmap,
-            calibration=calibration)
+            calibration=calibration, decomp=decomp)
         changed, max_shift = [], 0.0
         if forecast:
             for row in forecast[0]["players"]:
@@ -1119,8 +1476,10 @@ def main(argv=None):
     # "unknown" excluded: classification gap, not a playable kind
     # (same rule as backtest.py). Candidates below derive from this
     # set, so start_actions (filtered by candidates membership)
-    # can never hold an "unknown" start either.
-    all_kinds = sorted({kind_of(m) for m in moves} - {"unknown"})
+    # can never hold an "unknown" start either. The set is built
+    # by the shared candidate_kinds() helper (round 12): one
+    # function, one (sorted) order, same definition as before.
+    all_kinds = candidate_kinds(moves)
     candidates = {}
     for p in players:
         pid = p["id"]
@@ -1138,6 +1497,19 @@ def main(argv=None):
                      in candidates.get(pid, [])}
     acting = sorted(pid for pid in pmap if current.get(pid, (0, 0))[0] > 0)
     state = {pid: current[pid] for pid in pmap}
+    # Round 12 (fruit 5): the decomposition tables for the live
+    # forecast, built from the full trace as prefix. player_types
+    # comes from the payoff model's five tiers (same source as
+    # round 10's backtest wiring).
+    player_types = {p["id"]: type_of.get(p["key"]) for p in players}
+    decomp = build_decomposition(moves, player_types, support, exp,
+                                 acting)
+    # Round 12, Q1 (live, unscored): each acting player's
+    # novelty prediction from the full-trace prefix -- new kind
+    # or repeat kind next, with the shrunk novel rate.
+    nov_stats = novelty_rates(moves)
+    q1_live = {pid: novelty_prediction(nov_stats, pid)
+               for pid in acting}
 
     # --- best-response dynamics, round by round ----------------------
     cap_rounds = max(s["rounds"] for s in trace["seasons"])
@@ -1157,7 +1529,7 @@ def main(argv=None):
     forecast, effective_horizon = forecast_rounds(
         state, params, tau, candidates, exp, start_actions, acting,
         hp_bounds, args.horizon, cap_rounds, pmap,
-        calibration=calibration)
+        calibration=calibration, decomp=decomp)
     first = forecast[0]
     modal = {row["player"]: {"action": row["modal_action"]}
              for row in first["players"]}
@@ -1219,7 +1591,7 @@ def main(argv=None):
             scenarios_doc, trace, params, tau, state, exp, start_actions,
             acting, cap_rounds, args.horizon, pmap, players_by_key,
             rules, max_date, base_now["rule_id"], first["players"],
-            calibration=calibration)
+            calibration=calibration, decomp=decomp)
         scenarios_output = {
             "version": 1,
             "trace": args.trace,
@@ -1395,6 +1767,43 @@ def main(argv=None):
                      "uncalibrated."),
         },
         "expectation": expectation_diag,
+        "decomposition": {
+            "method": (
+                "Round 12 (research fruit 5): the question is split "
+                "into Q1 new-vs-repeat kind, Q2 which kind, Q3 "
+                "magnitude class (zero / mid 1-4 / big >= 5 on "
+                "|dHP|). Q2 is scored against-first-then-for: each "
+                "candidate kind carries 0-3 objections "
+                "(player_never_used, thin_kind n < 5, "
+                "negative_expected_dhp); the FOR side is the utility "
+                "softmax times the resolved per-player prior (round "
+                "10); the aggregate is for * exp(-lambda * "
+                "objections), lambda = 1.0 (fixed assumption, not "
+                "fitted), renormalised, then calibrated as before. "
+                "Q1 is scored only in the backtest (the live round "
+                "has no recorded answer): the per-player shrunk "
+                "novel rate, threshold 0.5."),
+            "lambda": DECOMPOSE_LAMBDA,
+            "flipped_modals": sum(
+                1 for row in first["players"]
+                if row.get("decomposition", {}).get("flipped")),
+            "players": [{
+                "player": row["player"], "key": row["key"],
+                "modal_action": row["modal_action"],
+                "utility_modal_action": row.get("utility_modal_action"),
+                "flipped": row.get("decomposition", {}).get("flipped"),
+                "prior_level": row.get("decomposition", {}).get(
+                    "prior_level"),
+                "modal_against": row.get("decomposition", {}).get(
+                    "modal_against"),
+                "modal_objections": row.get("decomposition", {}).get(
+                    "modal_objections", []),
+                "q1_prediction": q1_live.get(row["player"], {}).get(
+                    "prediction"),
+                "q1_novelty_rate": q1_live.get(row["player"], {}).get(
+                    "shrunk_rate"),
+            } for row in first["players"]],
+        },
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
                           "cycle": first["cycle"]},

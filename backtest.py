@@ -46,6 +46,19 @@ Metrics (design section 5):
   never used for fitting. When the file is absent, calibration
   is None and the raw probabilities are measured.
 
+  Decomposition (round 12, 2026-11-21): the question is split
+  into Q1 new-vs-repeat kind, Q2 which kind (= M1), Q3 magnitude
+  class (zero / mid 1-4 / big >= 5 on |dHP|). Each round's
+  predictions use the decomposed re-scoring from that round's
+  walk-forward prefix (predict.build_decomposition):
+  against-first (0-3 objections per kind), then for (utility
+  softmax x resolved per-player prior), then aggregate
+  (for * exp(-lambda * objections), lambda = 1.0 fixed).
+  The report's "decomposition" section scores each question
+  against its own prefix-only baseline rule (Q1 always-repeat,
+  Q3 prefix-majority class) and states the fruit-5
+  falsification legs.
+
 Kind layer (semantic kinds, added 2026-11-21): moves carry
 semantic_kind (the substantive action thread) beside action_kind
 (the round-type slug). Candidates, expectations and M1 all use the
@@ -296,8 +309,136 @@ def expectation_diagnostics(records):
             "per_kind_n_at_prediction": per_kind}
 
 
+def decomposition_diagnostics(records):
+    """Round-12 diagnostics over test records: the three
+    sub-questions, each with its own denominator, accuracy and
+    baseline rule, plus the aggregate-vs-single-number comparison
+    and the fruit-5 falsification legs. Q1 (new vs repeat kind)
+    is measured on the classifiable subset only (n = 83 here):
+    an "unknown" recorded kind is neither novel nor repeat.
+    Q2 (which kind) IS M1 on the same 83, split by branch:
+    repeat-branch records (recorded kind seen in the prefix) and
+    new-branch records (first-appearance); a prefix-only
+    candidate set cannot predict a new kind, so the new branch
+    is 0 by construction and is reported as such, not hidden.
+    Q3 (magnitude class zero / mid 1-4 / big >= 5 on |dHP|) is
+    measured on all records (n = 234 here): magnitude is defined
+    for every move, classifiable or not. Each question's baseline
+    is a real prefix-only rule, not a post-hoc majority share:
+    Q1 always-"repeat", Q3 the prefix-majority class. The
+    falsification legs are computed here and judged in the round
+    report: the fruit is falsified on this window when the
+    aggregate M1 does not beat the single-number M1 AND neither
+    Q1 nor Q3 beats its baseline rule."""
+    cls = [r for r in records if r.get("m1_classifiable")]
+    n_cls = len(cls)
+    q1_hits = sum(1 for r in cls if r.get("q1_hit"))
+    q1_base_hits = sum(1 for r in cls if r.get("q1_baseline_hit"))
+    q1_fired_new = sum(1 for r in cls
+                       if r.get("q1_prediction") == "new")
+    q1 = {
+        "question": "Q1 new kind or repeat kind",
+        "n": n_cls,
+        "hits": q1_hits,
+        "accuracy": round(q1_hits / n_cls, 4) if n_cls else None,
+        "baseline_rule": "always predict repeat (majority answer)",
+        "baseline_hits": q1_base_hits,
+        "baseline_accuracy": (round(q1_base_hits / n_cls, 4)
+                              if n_cls else None),
+        "fired_new_n": q1_fired_new,
+        "beats_baseline": q1_hits > q1_base_hits,
+    }
+    rep = [r for r in cls if r.get("q1_recorded") == "repeat"]
+    new = [r for r in cls if r.get("q1_recorded") == "new"]
+    rep_hits = sum(1 for r in rep if r.get("m1"))
+    new_hits = sum(1 for r in new if r.get("m1"))
+    q2 = {
+        "question": "Q2 which kind (= M1)",
+        "n": n_cls,
+        "hits": sum(1 for r in cls if r.get("m1")),
+        "accuracy": (round(sum(1 for r in cls if r.get("m1")) / n_cls, 4)
+                     if n_cls else None),
+        "repeat_branch": {
+            "n": len(rep), "hits": rep_hits,
+            "accuracy": round(rep_hits / len(rep), 4) if rep else None},
+        "new_branch": {
+            "n": len(new), "hits": new_hits,
+            "accuracy": round(new_hits / len(new), 4) if new else None,
+            "note": ("A prefix-only candidate set cannot predict a "
+                     "new kind, so this branch is 0 by construction; "
+                     "it is the ceiling round 11 opened and this "
+                     "round did not take.")},
+    }
+    n_all = len(records)
+    q3_hits = sum(1 for r in records if r.get("q3_hit"))
+    q3_base_hits = sum(1 for r in records if r.get("q3_baseline_hit"))
+    q3_by_class = {}
+    for c in ("zero", "mid", "big"):
+        sub = [r for r in records if r.get("q3_recorded") == c]
+        q3_by_class[c] = {
+            "n": len(sub),
+            "hits": sum(1 for r in sub if r.get("q3_hit")),
+            "accuracy": (round(sum(1 for r in sub if r.get("q3_hit"))
+                              / len(sub), 4) if sub else None)}
+    q3_pred_counts = {}
+    for r in records:
+        q3_pred_counts[r.get("q3_predicted")] = \
+            q3_pred_counts.get(r.get("q3_predicted"), 0) + 1
+    q3 = {
+        "question": "Q3 magnitude class zero / mid 1-4 / big >= 5",
+        "n": n_all,
+        "hits": q3_hits,
+        "accuracy": round(q3_hits / n_all, 4) if n_all else None,
+        "baseline_rule": "prefix-majority magnitude class",
+        "baseline_hits": q3_base_hits,
+        "baseline_accuracy": (round(q3_base_hits / n_all, 4)
+                              if n_all else None),
+        "beats_baseline": q3_hits > q3_base_hits,
+        "by_recorded_class": q3_by_class,
+        "predicted_counts": q3_pred_counts,
+    }
+    flipped = sum(1 for r in records if r.get("decomposed_flipped"))
+    flipped_hits = sum(1 for r in records
+                       if r.get("decomposed_flipped") and r.get("m1"))
+    against_counts = {}
+    for r in records:
+        a = r.get("predicted_against", 0)
+        against_counts[a] = against_counts.get(a, 0) + 1
+    return {
+        "method": (
+            "Round 12 (research fruit 5): Q1 new-vs-repeat kind "
+            "(shrunk per-player novel rate, threshold 0.5), Q2 "
+            "which kind (the decomposed modal, = M1), Q3 magnitude "
+            "class (zero / mid 1-4 / big >= 5 on |dHP|). "
+            "Against-first-then-for: objections "
+            "(player_never_used, thin_kind n < 5, "
+            "negative_expected_dhp) penalise the FOR side "
+            "(utility softmax x per-player prior) by exp(-lambda * "
+            "objections), lambda = 1.0, fixed, not fitted."),
+        "lambda": P.DECOMPOSE_LAMBDA,
+        "q1": q1,
+        "q2": q2,
+        "q3": q3,
+        "aggregate": {
+            "flipped_modals_n": flipped,
+            "flipped_modals_hits": flipped_hits,
+            "predicted_against_counts": {
+                str(k): v for k, v in sorted(against_counts.items())},
+        },
+        "falsification": {
+            "condition": ("Fruit 5 is falsified on this window when "
+                          "the aggregate M1 does not beat the "
+                          "single-number M1 AND neither Q1 nor Q3 "
+                          "beats its baseline rule."),
+            "q1_beats_baseline": q1["beats_baseline"],
+            "q3_beats_baseline": q3["beats_baseline"],
+        },
+    }
+
+
 def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
-               calibration=None, include_distributions=False):
+               calibration=None, include_distributions=False,
+               player_types=None):
     """Predict every round in `seasons` from its prefix. Returns
     (records, per_round_meta). calibration is passed through to
     predict.best_response() (round 9): the modal probabilities in
@@ -305,7 +446,13 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
     given, the raw ones when it is None. include_distributions
     attaches the full (calibrated) distribution to each record;
     fit_calibration.py uses it to fit on the fit window, the
-    regular report leaves it off to stay lean."""
+    regular report leaves it off to stay lean. player_types is a
+    pid -> type map (round 12): when given, each round's
+    predictions use the decomposed re-scoring from that round's
+    walk-forward prefix (P.build_decomposition: against-first,
+    then for, then aggregate); when None (fit_calibration.py,
+    which needs the raw model distributions) no decomposition
+    is applied."""
     rules = trace["rules"]
     moves = trace["moves"]
     pmap = {p["id"]: p for p in trace["players"]}
@@ -326,6 +473,21 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
             exp = P.make_expectation(
                 per_mean, glob_mean,
                 global_mean=tuple(support["global_mean"]))
+            # Round 12 (fruit 5): the decomposition tables for
+            # this round, from the same prefix the expectations
+            # come from; and the Q1 novelty statistics, walked in
+            # round order over the prefix.
+            prefix_kinds = P.candidate_kinds(prefix)
+            nov_stats = P.novelty_rates(prefix)
+            # Q3's baseline rule: the majority magnitude class in
+            # this round's prefix (ties: highest count, then class
+            # name ascending, deterministic).
+            q3_base_counts = defaultdict(int)
+            for m in prefix:
+                q3_base_counts[P.magnitude_class(m["hp_delta"])] += 1
+            q3_baseline = (sorted(q3_base_counts,
+                                  key=lambda c: (-q3_base_counts[c], c))[0]
+                           if q3_base_counts else "mid")
             last = {}
             for m in prefix:
                 pid = m["player"]
@@ -345,15 +507,12 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
                 for ov in overlays:
                     banned |= set(ov["params"].get(
                         "banned_action_kinds", []))
-                kinds_here = [k for k in
-                              sorted({kind_of(x) for x in prefix}
-                                     - {"unknown"})
+                kinds_here = [k for k in prefix_kinds
                               if k not in banned]
                 if not kinds_here:
                     rec = kind_of(m)
                     kinds_here = ([rec] if rec != "unknown" else
-                                  sorted({kind_of(x) for x in prefix}
-                                         - {"unknown"}))
+                                  list(prefix_kinds))
                 candidates[pid] = kinds_here
             start = {pid: kind_of(last[pid])
                      for pid in last
@@ -366,9 +525,12 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
             if base0 is not None:
                 hp_bounds = (base0["params"]["hp_floor"],
                              base0["params"]["hp_cap"])
+            decomp = (P.build_decomposition(prefix, player_types,
+                                            support, exp, acting)
+                      if player_types is not None else None)
             res = P.best_response(state, payoff_params, tau, candidates,
                                   exp, start, acting, hp_bounds,
-                                  calibration=calibration)
+                                  calibration=calibration, decomp=decomp)
             dhp_obs = defaultdict(list)
             for m in prefix:
                 dhp_obs[m["player"]].append(m["hp_delta"])
@@ -386,11 +548,52 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol,
                 rec_hp = P.clamp(cur_hp + m["hp_delta"], lo_b, hi_b)
                 obs = dhp_obs.get(pid, [m["hp_delta"]])
                 rec_kind = kind_of(m)
+                # Round 12 diagnostics, per record. Q1: the
+                # novelty prediction for this player (from the
+                # prefix) against the recorded kind's novelty
+                # (first-appearance in this round's prefix, the
+                # round-11 definition). Q1 is defined only on
+                # classifiable records: an "unknown" recorded kind
+                # is neither novel nor repeat. The Q1 baseline
+                # rule is always-"repeat" (the majority answer).
+                # Q2 is M1 itself, split by branch below in
+                # decomposition_diagnostics(). Q3: the magnitude
+                # class of the predicted expected dHP against the
+                # recorded dHP's class, with the prefix-majority
+                # class as the baseline rule.
+                q1_pred = P.novelty_prediction(nov_stats, pid)
+                q1_recorded = ("new" if rec_kind != "unknown"
+                               and rec_kind not in prefix_kinds
+                               else "repeat" if rec_kind != "unknown"
+                               else None)
+                q3_pred = P.magnitude_class(pdhp, is_prediction=True)
+                q3_rec = P.magnitude_class(m["hp_delta"])
+                d_here = (decomp or {}).get(pid, {})
+                against_here = d_here.get("against", {}).get(
+                    pred_kind, {})
                 rec = {
                     "season": season, "round": rnd, "player": pid,
                     "key": pmap[pid].get("key"),
                     "predicted_action": pred_kind,
                     "recorded_action": rec_kind,
+                    "utility_modal_action": res["utility_modal"].get(pid),
+                    "decomposed_flipped": (
+                        pred_kind != res["utility_modal"].get(pid)),
+                    "prior_level": d_here.get("prior_level"),
+                    "predicted_against": against_here.get("count", 0),
+                    "predicted_objections": against_here.get(
+                        "objections", []),
+                    "q1_prediction": q1_pred["prediction"],
+                    "q1_novelty_rate": q1_pred["shrunk_rate"],
+                    "q1_recorded": q1_recorded,
+                    "q1_hit": (q1_recorded is not None
+                               and q1_pred["prediction"] == q1_recorded),
+                    "q1_baseline_hit": q1_recorded == "repeat",
+                    "q3_predicted": q3_pred,
+                    "q3_recorded": q3_rec,
+                    "q3_hit": q3_pred == q3_rec,
+                    "q3_baseline": q3_baseline,
+                    "q3_baseline_hit": q3_baseline == q3_rec,
                     "modal_probability": res["modal"][pid]["probability"],
                     "predicted_kind_n": n_kind,
                     "predicted_kind_n_player": n_cell,
@@ -450,12 +653,22 @@ def main(argv=None):
               "walk-forward test window", file=sys.stderr)
         return 2
 
+    # Round 12 (fruit 5): pid -> player type, from the payoff
+    # model's five tiers; threaded into run_window so each round's
+    # decomposition resolves its per-player prior from that
+    # round's prefix (same source as round 10's wiring).
+    type_of = {p["key"]: p["type"] for p in payoff.get("players", [])}
+    player_types = {p["id"]: type_of.get(p["key"])
+                    for p in trace["players"]}
+
     test_records = run_window(trace, params, tau, test_seasons,
                               margin_pp, tol,
-                              calibration=calibration_params)
+                              calibration=calibration_params,
+                              player_types=player_types)
     full_records = run_window(trace, params, tau, seasons,
                               margin_pp, tol,
-                              calibration=calibration_params)
+                              calibration=calibration_params,
+                              player_types=player_types)
 
     def tables(records):
         overall = add_thresholds(aggregate(records), margin_pp)
@@ -480,6 +693,7 @@ def main(argv=None):
     test_tables["overall"]["m6_gap"] = calib["m6"]
     test_tables["overall"]["m6_pass"] = calib["m6_pass"]
     exp_diag = expectation_diagnostics(test_records)
+    decomp_diag = decomposition_diagnostics(test_records)
     report = {
         "trace": args.trace,
         "payoff_model": {"version": payoff.get("version"),
@@ -537,6 +751,7 @@ def main(argv=None):
                      "the test window was never used for fitting."),
         },
         "expectation_diagnostics": exp_diag,
+        "decomposition": decomp_diag,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
                       for i in (1, 2, 3, 4, 5)},
@@ -590,6 +805,33 @@ def main(argv=None):
         f"pred_dist={dist['counts']} entropy={dist['entropy_bits']} "
         f"bits max_share={dist['max_share']} ({dist['max_kind']}) "
         f"v3={dist['v3_count']}")
+    q1 = decomp_diag["q1"]
+    q2 = decomp_diag["q2"]
+    q3 = decomp_diag["q3"]
+    lines.append(
+        f"  decompose Q1 new-vs-repeat: {q1['hits']}/{q1['n']} "
+        f"({q1['accuracy']}) baseline always-repeat "
+        f"{q1['baseline_hits']}/{q1['n']} ({q1['baseline_accuracy']}) "
+        f"fired_new={q1['fired_new_n']}")
+    lines.append(
+        f"  decompose Q2 which kind (=M1): {q2['hits']}/{q2['n']} "
+        f"({q2['accuracy']}) repeat-branch "
+        f"{q2['repeat_branch']['hits']}/{q2['repeat_branch']['n']} "
+        f"({q2['repeat_branch']['accuracy']}) new-branch "
+        f"{q2['new_branch']['hits']}/{q2['new_branch']['n']} "
+        f"({q2['new_branch']['accuracy']})")
+    lines.append(
+        f"  decompose Q3 magnitude: {q3['hits']}/{q3['n']} "
+        f"({q3['accuracy']}) baseline prefix-majority "
+        f"{q3['baseline_hits']}/{q3['n']} ({q3['baseline_accuracy']}) "
+        f"pred_counts={q3['predicted_counts']}")
+    lines.append(
+        f"  decompose aggregate: flipped_modals="
+        f"{decomp_diag['aggregate']['flipped_modals_n']} "
+        f"flipped_hits="
+        f"{decomp_diag['aggregate']['flipped_modals_hits']} "
+        f"predicted_against_counts="
+        f"{decomp_diag['aggregate']['predicted_against_counts']}")
     summary = "\n".join(lines)
     print(summary)
     if args.summary:
