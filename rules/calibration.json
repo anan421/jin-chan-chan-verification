@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "method": "temperature",
+  "temperature": 11.554101995154637,
+  "cap": 0.99,
+  "fit_window": [
+    "S1",
+    "S2",
+    "S3"
+  ],
+  "fit_date": "2026-11-21",
+  "fit_trace": "/home/hatch/workspace/verification/traces/trace-latest.json",
+  "fit_trace_sha256": "f4bcebd971bb563440705cd056ef54553895086497fa81438ed0ec457a8a2608",
+  "fit_records_n": 306,
+  "fit_records_classifiable_n": 126,
+  "fit_items_n": 92,
+  "fit_excluded_n": 34,
+  "fit_excluded_reason": "recorded kind not in the predicted distribution (banned that round, or never seen in the prefix): no NLL signal, counted not dropped",
+  "nll_before": 4.2088,
+  "nll_after": 2.6634,
+  "m6_fit_window_before": 0.6947,
+  "m6_fit_window_after": 0.0236,
+  "m6_threshold": 0.2,
+  "fit_at_boundary": false,
+  "fit_grid": [
+    0.5,
+    500.0
+  ],
+  "fitted_by": "fit_calibration.py: walk-forward over the fit window (S1-S3), each round predicted from its prefix only; temperature fitted by minimising mean NLL of the recorded kind",
+  "argmax_flips_on_fit_window": 0,
+  "note": "Post-hoc temperature scaling. It never changes a modal action or a hit count, only the stated probabilities, and no calibrated probability exceeds the cap. The test window (S4-S5) was never used for fitting. Re-fitting when new data arrives is future work, not built in this round."
+}

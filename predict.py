@@ -45,6 +45,21 @@ Utility (per payoff-model.json v2, design/fitting-layer.md §3-4):
   At alpha = 1 the HP term uses the caller's expected dHP verbatim
   (not re-derived from clamped HPs, which would round), so v1 is
   restored bit-exactly.
+
+Calibration (round 9, 2026-11-21; design/round-9-calibration.md):
+  the distributions best_response() returns are rescaled after
+  the fact by calibration.apply_calibration() (temperature scaling
+  fitted on the S1-S3 fit window only, parameters in
+  rules/calibration.json, never hard-coded). The rescaling is
+  monotone, so it never changes any modal action, any hit count,
+  or the best-response dynamics themselves (utilities are
+  untouched); it only changes how confident the stated
+  probabilities look, and no calibrated probability ever exceeds
+  the 0.99 cap. backtest.py measures the same rescaled
+  distributions through this same function, so live forecast and
+  test measurement share one implementation. When
+  rules/calibration.json is absent, calibration is None and the
+  raw distributions pass through unchanged.
   gamma = discount (A8) is read but NOT applied here: per design
   §3 it weights fitting evidence by recency (decision weight
   gamma**(R-r)); it does not discount future rewards in
@@ -97,6 +112,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import calibration as CAL  # noqa: E402  (post-hoc rescaling, round 9)
 import check  # noqa: E402  (resolve_rules, penalty_value, run)
 
 HP_SEGMENTS = [
@@ -355,12 +371,18 @@ def utility(params, hp_before, hp_after, dhp, dgold, lever, compliance,
 
 
 def best_response(state, params, tau, candidates, exp, start_actions,
-                  acting, hp_bounds):
+                  acting, hp_bounds, calibration=None):
     """Best-response dynamics. state: pid -> (hp, gold).
     candidates: pid -> sorted list of kinds. exp: (pid, kind) ->
-    (dHP, dgold). acting: players who move this round. Returns a
-    dict with actions, distributions, utilities, iterations,
-    converged and cycle."""
+    (dHP, dgold). acting: players who move this round. calibration:
+    a calibration.load_calibration() dict, or None for raw
+    distributions. When given, every player's distribution is
+    rescaled by calibration.apply_calibration() (temperature
+    scaling, monotone: the modal action never changes, only the
+    stated probabilities); utilities and the dynamics are
+    untouched, so iterations / convergence are unaffected.
+    Returns a dict with actions, distributions, utilities,
+    iterations, converged and cycle."""
     floor, cap = hp_bounds
     actions = {}
     for pid in acting:
@@ -427,9 +449,13 @@ def best_response(state, params, tau, candidates, exp, start_actions,
                    (1.0 if v == mx else 0.0) for k, v in utils.items()}
         total = sum(weights.values()) or 1.0
         raw_dist = {k: w / total for k, w in weights.items()}
-        dist = {k: round(v, 6) for k, v in raw_dist.items()}
+        # Post-hoc calibration (round 9): one shared rescaling,
+        # applied here so live forecast and backtest measure the
+        # same distributions. Monotone: argmax never changes.
+        dist = CAL.apply_calibration(raw_dist, calibration)
+        dist = {k: round(v, 6) for k, v in dist.items()}
         modal_kind = max(dist, key=lambda k: (dist[k], k)) if dist else None
-        top3 = round(sum(sorted(raw_dist.values(), reverse=True)[:3]), 6)
+        top3 = round(sum(sorted(dist.values(), reverse=True)[:3]), 6)
         distributions[pid] = dist
         utilities[pid] = {k: round(v, 6) for k, v in utils.items()}
         modal[pid] = {"action": modal_kind,
@@ -868,9 +894,12 @@ def apply_scenario_rules(rules, scenario, base_rule_id, current_date,
 
 
 def forecast_rounds(state, params, tau, candidates, exp, start_actions,
-                    acting, hp_bounds, horizon, cap_rounds, pmap):
+                    acting, hp_bounds, horizon, cap_rounds, pmap,
+                    calibration=None):
     """Best-response dynamics, round by round. Shared by the
-    baseline run and the per-scenario runs. Returns (forecast,
+    baseline run and the per-scenario runs. calibration is passed
+    through to best_response (round 9): the same rescaling for
+    every forecast, baseline and scenarios alike. Returns (forecast,
     effective_horizon). Forecast rows carry the round, the
     round-tiered confidence, convergence, and per-player
     distributions / modal actions / expected deltas."""
@@ -881,7 +910,8 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
     acting_now = list(acting)
     for rnd in range(1, effective_horizon + 1):
         res = best_response(round_state, params, tau, candidates, exp,
-                            round_start, acting_now, hp_bounds)
+                            round_start, acting_now, hp_bounds,
+                            calibration=calibration)
         forecast.append({
             "round": rnd, "confidence": confidence_tier(rnd),
             "iterations": res["iterations"],
@@ -915,7 +945,7 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
 def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                   start_actions, acting, cap_rounds, horizon, pmap,
                   players_by_key, rules, max_date, base_rule_id,
-                  base_first):
+                  base_first, calibration=None):
     """Best-response dynamics under each rule scenario. Returns
     {"scenarios": [...], "comparison": {...}}. Shared inputs (state,
     expectations, start actions) come from the baseline run; only
@@ -949,7 +979,8 @@ def run_scenarios(scenarios_doc, trace, params, tau, state, exp,
                    if a in candidates.get(pid, [])}
         forecast, effective = forecast_rounds(
             state, params, tau, candidates, exp, s_start, acting,
-            hp_bounds, horizon, cap_rounds, pmap)
+            hp_bounds, horizon, cap_rounds, pmap,
+            calibration=calibration)
         changed, max_shift = [], 0.0
         if forecast:
             for row in forecast[0]["players"]:
@@ -1060,6 +1091,11 @@ def main(argv=None):
         return 2
     params = {k: v["value"] for k, v in payoff["parameters"].items()}
     tau = params.get("temperature", 1.0)
+    # Post-hoc calibration (round 9): temperature scaling fitted on
+    # the S1-S3 fit window only; parameters live in
+    # rules/calibration.json. Absent file -> None -> raw
+    # distributions pass through unchanged.
+    calibration = CAL.load_calibration()
     type_of = {p["key"]: p["type"] for p in payoff.get("players", [])}
     players = trace["players"]
     pmap = {p["id"]: p for p in players}
@@ -1120,7 +1156,8 @@ def main(argv=None):
             "confidence": "low"}
     forecast, effective_horizon = forecast_rounds(
         state, params, tau, candidates, exp, start_actions, acting,
-        hp_bounds, args.horizon, cap_rounds, pmap)
+        hp_bounds, args.horizon, cap_rounds, pmap,
+        calibration=calibration)
     first = forecast[0]
     modal = {row["player"]: {"action": row["modal_action"]}
              for row in first["players"]}
@@ -1181,7 +1218,8 @@ def main(argv=None):
         body = run_scenarios(
             scenarios_doc, trace, params, tau, state, exp, start_actions,
             acting, cap_rounds, args.horizon, pmap, players_by_key,
-            rules, max_date, base_now["rule_id"], first["players"])
+            rules, max_date, base_now["rule_id"], first["players"],
+            calibration=calibration)
         scenarios_output = {
             "version": 1,
             "trace": args.trace,
@@ -1336,6 +1374,26 @@ def main(argv=None):
         } for row in first["players"]],
         "forecast_rounds": forecast,
         "degeneracy": degeneracy,
+        "calibration": {
+            "applied": calibration is not None,
+            "method": calibration["method"] if calibration else None,
+            "temperature": (calibration["temperature"]
+                            if calibration else None),
+            "cap": calibration["cap"] if calibration else None,
+            "fit_window": (calibration.get("fit_window")
+                           if calibration else None),
+            "fit_date": (calibration.get("fit_date")
+                         if calibration else None),
+            "source_file": (calibration.get("source_file")
+                            if calibration else None),
+            "note": ("Post-hoc temperature scaling fitted on the "
+                     "fit window only (S1-S3); it never changes a "
+                     "modal action or a hit count, only the stated "
+                     "probabilities, and no calibrated probability "
+                     "exceeds the cap. When no calibration file is "
+                     "present the raw distributions are reported, "
+                     "uncalibrated."),
+        },
         "expectation": expectation_diag,
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
@@ -1367,6 +1425,13 @@ def main(argv=None):
         f"degenerate={degeneracy['degenerate']} "
         f"modal_action_entropy_bits="
         f"{degeneracy['modal_action_entropy_bits']}",
+        ("predict: calibration applied "
+         f"(temperature={calibration['temperature']} "
+         f"cap={calibration['cap']} "
+         f"fit_window={calibration.get('fit_window')})"
+         if calibration else
+         "predict: calibration none (raw probabilities, "
+         "rules/calibration.json absent)"),
         f"predict: expectation min_support={MIN_SUPPORT} k="
         f"{SHRINKAGE_K} shrunk_predictions="
         f"{exp_round1['shrunk_predictions']}/"
