@@ -282,6 +282,71 @@ def expectation_diagnostics(records):
             "per_kind_n_at_prediction": per_kind}
 
 
+def round_setup(trace, prefix, test):
+    """Per-round prediction setup, shared by run_window(),
+    run_window_paths() and predict.fit_multipath(): chained state,
+    shrunk expectations, semantic-kind candidates (prefix kinds
+    minus "unknown" minus banned kinds), start actions, acting
+    players, HP bounds, and the base-rate table for this prefix.
+    One implementation, so the backtest and the live forecast use
+    the same prefix (walk-forward prefix in a backtest, the full
+    trace for a live forecast). Returns None when the round has no
+    test moves or an empty prefix (nothing to predict from)."""
+    if not test or not prefix:
+        return None
+    rules = trace["rules"]
+    state = chain_state(trace, prefix)
+    per_mean, glob_mean = semantic_expected_deltas(prefix)
+    support = P.expectation_support(prefix)
+    exp = P.make_expectation(
+        per_mean, glob_mean,
+        global_mean=tuple(support["global_mean"]))
+    base = P.base_rates(prefix)
+    last = {}
+    for m in prefix:
+        pid = m["player"]
+        key = (m["season"], m["round_index"])
+        if pid not in last or key > (last[pid]["season"],
+                                    last[pid]["round_index"]):
+            last[pid] = m
+    candidates = {}
+    for m in test:
+        pid = m["player"]
+        base_r, overlays = check.resolve_rules(rules, m["date"], pid)
+        banned = set()
+        if base_r is not None:
+            banned |= set(base_r["params"].get(
+                "banned_action_kinds", []))
+        for ov in overlays:
+            banned |= set(ov["params"].get(
+                "banned_action_kinds", []))
+        kinds_here = [k for k in
+                      sorted({kind_of(x) for x in prefix}
+                             - {"unknown"})
+                      if k not in banned]
+        if not kinds_here:
+            rec = kind_of(m)
+            kinds_here = ([rec] if rec != "unknown" else
+                          sorted({kind_of(x) for x in prefix}
+                                 - {"unknown"}))
+        candidates[pid] = kinds_here
+    start = {pid: kind_of(last[pid])
+             for pid in last
+             if pid in candidates
+             and kind_of(last[pid]) in candidates[pid]}
+    acting = sorted(m["player"] for m in test)
+    hp_bounds = (100, 0)
+    base0, _ = check.resolve_rules(rules, test[0]["date"],
+                                   test[0]["player"])
+    if base0 is not None:
+        hp_bounds = (base0["params"]["hp_floor"],
+                     base0["params"]["hp_cap"])
+    return {"state": state, "per_mean": per_mean,
+            "glob_mean": glob_mean, "support": support, "exp": exp,
+            "base": base, "last": last, "candidates": candidates,
+            "start": start, "acting": acting, "hp_bounds": hp_bounds}
+
+
 def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
     """Predict every round in `seasons` from its prefix. Returns
     (records, per_round_meta)."""
@@ -297,56 +362,16 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
                       if (m["season"], m["round_index"]) < (season, rnd)]
             test = [m for m in moves
                     if m["season"] == season and m["round_index"] == rnd]
-            if not test or not prefix:
+            setup = round_setup(trace, prefix, test)
+            if setup is None:
                 continue
-            state = chain_state(trace, prefix)
-            per_mean, glob_mean = semantic_expected_deltas(prefix)
-            support = P.expectation_support(prefix)
-            exp = P.make_expectation(
-                per_mean, glob_mean,
-                global_mean=tuple(support["global_mean"]))
-            last = {}
-            for m in prefix:
-                pid = m["player"]
-                key = (m["season"], m["round_index"])
-                if pid not in last or key > (last[pid]["season"],
-                                            last[pid]["round_index"]):
-                    last[pid] = m
-            candidates = {}
-            for m in test:
-                pid = m["player"]
-                base, overlays = check.resolve_rules(
-                    rules, m["date"], pid)
-                banned = set()
-                if base is not None:
-                    banned |= set(base["params"].get(
-                        "banned_action_kinds", []))
-                for ov in overlays:
-                    banned |= set(ov["params"].get(
-                        "banned_action_kinds", []))
-                kinds_here = [k for k in
-                              sorted({kind_of(x) for x in prefix}
-                                     - {"unknown"})
-                              if k not in banned]
-                if not kinds_here:
-                    rec = kind_of(m)
-                    kinds_here = ([rec] if rec != "unknown" else
-                                  sorted({kind_of(x) for x in prefix}
-                                         - {"unknown"}))
-                candidates[pid] = kinds_here
-            start = {pid: kind_of(last[pid])
-                     for pid in last
-                     if pid in candidates
-                     and kind_of(last[pid]) in candidates[pid]}
-            acting = sorted(m["player"] for m in test)
-            hp_bounds = (100, 0)
-            base0, _ = check.resolve_rules(rules, test[0]["date"],
-                                           test[0]["player"])
-            if base0 is not None:
-                hp_bounds = (base0["params"]["hp_floor"],
-                             base0["params"]["hp_cap"])
+            state = setup["state"]
+            support = setup["support"]
+            exp = setup["exp"]
+            candidates = setup["candidates"]
             res = P.best_response(state, payoff_params, tau, candidates,
-                                  exp, start, acting, hp_bounds)
+                                  exp, setup["start"], setup["acting"],
+                                  setup["hp_bounds"])
             dhp_obs = defaultdict(list)
             for m in prefix:
                 dhp_obs[m["player"]].append(m["hp_delta"])
@@ -391,6 +416,150 @@ def run_window(trace, payoff_params, tau, seasons, margin_pp, tol):
     return records
 
 
+# --- multi-path measurement (round 8, research fruit 2) ------------
+def run_window_paths(trace, payoff_params, tau, seasons, margin_pp, tol):
+    """Walk-forward over `seasons`, one path-distribution set per
+    round (predict.path_distributions, the single merger
+    implementation). Returns (path_records, convergence_rows):
+    per test record the full per-path distributions, the mixture
+    centre kind, the expected deltas per candidate kind, and the
+    M1-M5 inputs; per round the best-response convergence of every
+    member path. Scoring (weights, lambda, merged modal) is done
+    by score_merged(); nothing here depends on the merger weights,
+    so the same records serve the fit window (weights + lambda)
+    and the test window (merged scoring)."""
+    rules = trace["rules"]
+    moves = trace["moves"]
+    pmap = {p["id"]: p for p in trace["players"]}
+    records = []
+    convergence_rows = []
+    for season in sorted(seasons):
+        season_row = next(s for s in trace["seasons"]
+                          if s["season"] == season)
+        for rnd in range(1, season_row["rounds"] + 1):
+            prefix = [m for m in moves
+                      if (m["season"], m["round_index"]) < (season, rnd)]
+            test = [m for m in moves
+                    if m["season"] == season and m["round_index"] == rnd]
+            setup = round_setup(trace, prefix, test)
+            if setup is None:
+                continue
+            pd = P.path_distributions(
+                setup["state"], setup["candidates"], setup["exp"],
+                setup["start"], setup["acting"], setup["hp_bounds"],
+                setup["base"])
+            convergence_rows.append({
+                "season": season, "round": rnd,
+                "convergence": pd["convergence"]})
+            dhp_obs = defaultdict(list)
+            for m in prefix:
+                dhp_obs[m["player"]].append(m["hp_delta"])
+            for m in test:
+                pid = m["player"]
+                cands = setup["candidates"][pid]
+                rec_kind = kind_of(m)
+                base_m, _ = check.resolve_rules(rules, m["date"], pid)
+                lo_b = base_m["params"]["hp_floor"] if base_m else 0
+                hi_b = base_m["params"]["hp_cap"] if base_m else 100
+                records.append({
+                    "season": season, "round": rnd, "player": pid,
+                    "key": pmap[pid].get("key"),
+                    "recorded_action": rec_kind,
+                    "m1_classifiable": rec_kind != "unknown",
+                    "recorded_kind_novel": (
+                        rec_kind != "unknown"
+                        and rec_kind not in setup["base"]["counts"]),
+                    "paths": pd["paths"].get(pid, {}),
+                    "center": P.mixture_center(
+                        setup["base"], cands),
+                    "exp_by_kind": {
+                        k: [round(v, 4) for v in
+                            setup["exp"](pid, k)] for k in cands},
+                    "support": setup["support"],
+                    "cur_hp": setup["state"][pid][0],
+                    "hp_lo": lo_b, "hp_hi": hi_b,
+                    "recorded_dhp": m["hp_delta"],
+                    "recorded_dgold": m["gold_delta"],
+                    "candidates_n": len(cands),
+                    "dhp_obs": list(dhp_obs.get(pid, [m["hp_delta"]]))})
+    return records, convergence_rows
+
+
+def count_path_hits(path_records):
+    """Per-path M1 hit counts on the classifiable subset of
+    path_records (each path's own modal action vs the recorded
+    kind). Same denominator as M1, so the counts compare
+    directly with the merged M1 hits."""
+    hits = {}
+    n_cls = 0
+    for r in path_records:
+        if not r["m1_classifiable"]:
+            continue
+        n_cls += 1
+        for pid, dist in r["paths"].items():
+            modal, _ = P.merged_modal(dist)
+            if modal is not None and modal == r["recorded_action"]:
+                hits[pid] = hits.get(pid, 0) + 1
+    return hits, n_cls
+
+
+def score_merged(path_records, weights, lam, tol):
+    """Score path_records under the merger: merged distribution
+    per record (predict.merge_distributions), modal action and
+    modal probability from it, M1-M5 from the merged modal's
+    expected deltas. Returns standard records (same fields as
+    run_window records, plus path_modals), so aggregate(),
+    calibration() and expectation_diagnostics() apply unchanged."""
+    records = []
+    for r in path_records:
+        merged = P.merge_distributions(r["paths"], weights, lam,
+                                       r["center"])
+        dist = {k: round(v, 6) for k, v in merged.items()}
+        pred_kind, modal_prob = P.merged_modal(dist)
+        if pred_kind is None:
+            pdhp, pdgold = 0.0, 0.0
+        else:
+            pdhp, pdgold = r["exp_by_kind"].get(
+                pred_kind, [0.0, 0.0])
+        n_kind, n_cell, shrunk = P.support_lookup(
+            r["support"], r["player"], pred_kind)
+        pred_hp = P.clamp(r["cur_hp"] + pdhp, r["hp_lo"], r["hp_hi"])
+        rec_hp = P.clamp(r["cur_hp"] + r["recorded_dhp"],
+                         r["hp_lo"], r["hp_hi"])
+        obs = r["dhp_obs"]
+        rec_kind = r["recorded_action"]
+        path_modals = {}
+        for pid, d in r["paths"].items():
+            mk, _ = P.merged_modal(d)
+            path_modals[pid] = mk
+        records.append({
+            "season": r["season"], "round": r["round"],
+            "player": r["player"], "key": r["key"],
+            "predicted_action": pred_kind,
+            "recorded_action": rec_kind,
+            "modal_probability": modal_prob,
+            "path_modals": path_modals,
+            "predicted_kind_n": n_kind,
+            "predicted_kind_n_player": n_cell,
+            "predicted_kind_shrunk": shrunk,
+            "predicted_dhp": round(pdhp, 4),
+            "recorded_dhp": r["recorded_dhp"],
+            "predicted_dgold": round(pdgold, 4),
+            "recorded_dgold": r["recorded_dgold"],
+            "m1": pred_kind == rec_kind and rec_kind != "unknown",
+            "m1_classifiable": rec_kind != "unknown",
+            "m2": P.sign(pdhp) == P.sign(r["recorded_dhp"]),
+            "m3": P.sign(pdgold) == P.sign(r["recorded_dgold"]),
+            "m4": P.hp_segment(pred_hp) == P.hp_segment(rec_hp),
+            "m5": abs(pdhp - r["recorded_dhp"]) <= tol,
+            "b1": 1.0 / r["candidates_n"] if r["candidates_n"] else 1.0,
+            "b2": 0.5, "b3": 0.5, "b4": 1.0 / 8,
+            "b5": m5_baseline(min(obs), max(obs),
+                              r["recorded_dhp"], tol),
+        })
+    return records
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Walk-forward backtest.")
     ap.add_argument("trace")
@@ -420,8 +589,29 @@ def main(argv=None):
               "walk-forward test window", file=sys.stderr)
         return 2
 
-    test_records = run_window(trace, params, tau, test_seasons,
-                              margin_pp, tol)
+    # Round 8 (fruit 2): the merged model is measured on the test
+    # window; the single model is kept beside it as the baseline
+    # comparison (and as the check that the round_setup refactor
+    # did not change single-model behaviour). Weights and lambda
+    # are fitted on the fit window only (walk-forward, no test
+    # information), then applied to the test window.
+    path_ids = ([p[0] for p in P.member_profiles()]
+                + [P.BASE_RATE_PATH_ID])
+    fit_path_records, _fit_conv = run_window_paths(
+        trace, params, tau, fit_seasons, margin_pp, tol)
+    fit_hits_raw, fit_n_cls = count_path_hits(fit_path_records)
+    fit_hits = {pid: fit_hits_raw.get(pid, 0) for pid in path_ids}
+    weights = P.merge_path_weights(fit_hits)
+    lam, grid = P.grid_search_lambda(fit_path_records, weights)
+    test_path_records, test_conv = run_window_paths(
+        trace, params, tau, test_seasons, margin_pp, tol)
+    test_records = score_merged(test_path_records, weights, lam, tol)
+    test_hits_raw, test_n_cls = count_path_hits(test_path_records)
+    test_hits = {pid: test_hits_raw.get(pid, 0) for pid in path_ids}
+    merged_hits = sum(1 for r in test_records
+                      if r["m1"] and r["m1_classifiable"])
+    baseline_records = run_window(trace, params, tau, test_seasons,
+                                  margin_pp, tol)
     full_records = run_window(trace, params, tau, seasons,
                               margin_pp, tol)
 
@@ -442,12 +632,72 @@ def main(argv=None):
                 "by_player": by_player}
 
     test_tables = tables(test_records)
+    baseline_tables = tables(baseline_records)
     full_tables = tables(full_records)
     below_any = bool(test_tables["overall"].get("below_threshold"))
     calib = calibration(test_records)
     test_tables["overall"]["m6_gap"] = calib["m6"]
     test_tables["overall"]["m6_pass"] = calib["m6_pass"]
     exp_diag = expectation_diagnostics(test_records)
+    # Per-path best-response convergence on the test window (rounds
+    # converged / cycled, per path; the base-rate path runs no
+    # dynamics). Best path on test, and the novel-kind bound on M1.
+    conv_summary = {}
+    for pid in path_ids:
+        conv = [row["convergence"].get(pid, {}) for row in test_conv]
+        conv_summary[pid] = {
+            "rounds": len(conv),
+            "converged": sum(1 for c in conv if c.get("converged")),
+            "cycled": sum(1 for c in conv if c.get("cycle")),
+            "iterations": sorted({c.get("iterations") for c in conv
+                                  if c.get("iterations") is not None})}
+    best_test_hits = max(test_hits.values()) if test_hits else 0
+    best_test_paths = sorted(pid for pid, h in test_hits.items()
+                             if h == best_test_hits)
+    novel_test = [r for r in test_path_records
+                  if r.get("recorded_kind_novel")]
+    novel_test_cls = [r for r in novel_test if r["m1_classifiable"]]
+    multipath = {
+        "method": ("Multi-path merger (round 8, research fruit 2): "
+                   "16 paths (15 ensemble members + base-rate "
+                   "path); weights w_i = (fit hits_i + 1) / sum_j "
+                   "(fit hits_j + 1); merged = (1 - lam) * weighted "
+                   "pool + lam * onehot(prefix mode); lambda "
+                   "grid-searched on the fit window (0.00-1.00, "
+                   "step 0.05; ties -> smallest lambda). The "
+                   "base-rate path is predict.base_rates(), reused "
+                   "verbatim from round 7; the merger itself is the "
+                   "round-8 change. Weights and lambda are computed "
+                   "from the trace, not stored in payoff-model.json "
+                   "(version stays 2)."),
+        "paths": path_ids,
+        "fit_window": {"seasons": [f"S{s}" for s in fit_seasons],
+                       "n_records": len(fit_path_records),
+                       "n_classifiable": fit_n_cls,
+                       "path_hits": fit_hits},
+        "weights": {k: round(v, 6) for k, v in
+                    sorted(weights.items(), key=lambda kv: -kv[1])},
+        "lambda": lam,
+        "lambda_grid": grid,
+        "test_window": {"n_records": len(test_path_records),
+                        "n_classifiable": test_n_cls,
+                        "path_hits": test_hits,
+                        "merged_hits": merged_hits,
+                        "best_path_hits": best_test_hits,
+                        "best_paths": best_test_paths,
+                        "novel_records": len(novel_test),
+                        "novel_classifiable": len(novel_test_cls),
+                        "novel_kinds": sorted(
+                            {r["recorded_action"]
+                             for r in novel_test})},
+        "convergence_test_window": conv_summary,
+        "note": ("Per-path test hits use each path's own modal "
+                 "action on the same classifiable denominator as "
+                 "M1. The falsification check for fruit 2 is "
+                 "merged_hits vs best_path_hits: if the merged "
+                 "model does not beat the best single path, the "
+                 "fruit is falsified on this window."),
+    }
     report = {
         "trace": args.trace,
         "payoff_model": {"version": payoff.get("version"),
@@ -482,6 +732,9 @@ def main(argv=None):
         "verdict": ("fail" if below_any else "pass"),
         "calibration": calib,
         "expectation_diagnostics": exp_diag,
+        "multipath": multipath,
+        "baseline_tables": baseline_tables,
+        "baseline_test_records": baseline_records,
         "tables": test_tables,
         "baselines": {f"M{i}": test_tables["overall"].get(f"m{i}_baseline")
                       for i in (1, 2, 3, 4, 5)},
@@ -530,6 +783,23 @@ def main(argv=None):
         f"pred_dist={dist['counts']} entropy={dist['entropy_bits']} "
         f"bits max_share={dist['max_share']} ({dist['max_kind']}) "
         f"v3={dist['v3_count']}")
+    bo = baseline_tables["overall"]
+    base_hits = round(bo.get("m1_hit_rate", 0) * bo.get("m1_n", 0))
+    lines.append(
+        f"  multipath: lambda={lam} fit_hits={fit_hits} "
+        f"weights_top="
+        f"{sorted(weights.items(), key=lambda kv: -kv[1])[:3]} "
+        f"test_path_hits={test_hits} merged_hits={merged_hits}/"
+        f"{test_n_cls} best_path_hits={best_test_hits} "
+        f"best_paths={best_test_paths} "
+        f"novel={len(novel_test)} records "
+        f"({len(novel_test_cls)} classifiable)")
+    lines.append(
+        f"  baseline(single model): M1 hits={base_hits}/"
+        f"{bo.get('m1_n')} M2={bo.get('m2_hit_rate')} "
+        f"M3={bo.get('m3_hit_rate')} M4={bo.get('m4_hit_rate')} "
+        f"M5={bo.get('m5_hit_rate')} vs merged M1 hits="
+        f"{merged_hits}/{test_n_cls}")
     summary = "\n".join(lines)
     print(summary)
     if args.summary:

@@ -295,6 +295,284 @@ def support_lookup(support, pid, kind):
     return n_kind, n_cell, bool(kinfo["shrunk"])
 
 
+BASE_RATE_PSEUDOCOUNT = 1.0
+
+
+def base_rates(moves):
+    """Base rates: how often each action kind actually occurred in
+    `moves`, the prefix available at prediction time (round 7,
+    research fruit 1: start from the base rate, then adjust with
+    the scoring rule). This is the single implementation shared by
+    predict.py (live forecast, full trace) and backtest.py
+    (walk-forward prefix); both call it on exactly the prefix
+    their expected deltas come from, so the two prefixes agree.
+
+    Counts are global, over all players: fruit 1 is the overall
+    frequency of each kind, not a per-player reference class
+    (per-player classes are fruit 4, a later round). "unknown"
+    moves are excluded from both the counts and the denominator:
+    unknown is a classification gap, not an action a player can
+    take. Smoothing is one pseudocount per kind (Laplace,
+    alpha = 1.0): p(kind) = (count + 1) / (N + K), N = known-kind
+    moves in the prefix, K = distinct known kinds. No probability
+    is ever 0. A kind with no prefix history gets the floor value
+    1 / (N + K): the smoothed probability of a zero-count kind.
+    The mode is the most frequent kind (ties: highest count, then
+    kind name ascending, deterministic); it is the base-rate-only
+    guess used by the backtest diagnostic. A kind is "novel" at
+    prediction time when it has no count in the prefix: it is
+    flagged, never hard-guessed, and can only enter through the
+    floor value.
+
+    Round 8 note: this function is reused verbatim from round 7
+    (branch loop/round-7-base-rates, commit 1ae740f). Round 8
+    does not re-decide the prior: base_rates() is one of the
+    merged paths below, not the merger itself."""
+    counts = {}
+    n = 0
+    for m in moves:
+        kind = kind_of(m)
+        if kind == "unknown":
+            continue
+        counts[kind] = counts.get(kind, 0) + 1
+        n += 1
+    k = len(counts)
+    denom = n + BASE_RATE_PSEUDOCOUNT * k if k else 1.0
+    floor = BASE_RATE_PSEUDOCOUNT / denom if k else 1.0
+    probs = {kind: (c + BASE_RATE_PSEUDOCOUNT) / denom
+             for kind, c in counts.items()}
+    mode = None
+    if counts:
+        mode = sorted(counts, key=lambda kk: (-counts[kk], kk))[0]
+    return {"counts": counts, "n": n, "kinds": k,
+            "pseudocount": BASE_RATE_PSEUDOCOUNT, "floor": floor,
+            "probabilities": probs, "mode": mode}
+
+
+# --- multi-path merger (round 8, research fruit 2) ------------------
+# Paths: the 15 ensemble members (14 auditor stances + baseline;
+# weights read from ensemble.py MEMBER_PROFILES, run here through
+# predict.py's semantic-kind machinery, NOT ensemble.py's own
+# runner) plus one base-rate path (base_rates() above, reused from
+# round 7). The merger itself is the round-8 change: path weights
+# from fit-window walk-forward hits, a mixture toward the prefix
+# mode with a grid-searched weight lambda. Weights and lambda are
+# computed from the trace, not stored in payoff-model.json (its
+# version stays 2). The ensemble semantic-alignment gap (ensemble.py
+# builds its candidate set from action_kind slugs, not semantic
+# kinds) is out of scope here and stays open; only the weight dicts
+# are read from ensemble.py.
+BASE_RATE_PATH_ID = "base_rate"
+MULTIPATH_FLOOR_HITS = 1.0
+MULTIPATH_LAMBDA_GRID = [round(i * 0.05, 2) for i in range(21)]
+
+
+def member_profiles():
+    """(member_id, weights, tau) for the 15 ensemble members, read
+    from ensemble.py MEMBER_PROFILES (read-only: only the weight
+    dicts are used). The import is lazy: ensemble.py imports
+    predict, so importing it at module load would be circular.
+    Each member is one path: its weights run through
+    predict.best_response with semantic-kind candidates (the same
+    machinery backtest.py uses), not through ensemble.py's own
+    runner, whose candidate set is built from action_kind slugs
+    (the ensemble semantic-alignment gap, out of scope here)."""
+    import ensemble  # noqa: E402  (lazy: breaks the import cycle)
+    return [(p["member_id"], dict(p["weights"]), p["tau"])
+            for p in ensemble.MEMBER_PROFILES]
+
+
+def path_distributions(state, candidates, exp, start_actions, acting,
+                       hp_bounds, base):
+    """One distribution per path per acting player, all from the
+    same prefix: each ensemble member runs best_response with its
+    own weights/tau over the semantic-kind candidates; the
+    base-rate path is the prefix kind frequencies restricted to
+    each player's candidates and renormalised. Returns
+    {"paths": {pid: {path_id: {kind: prob}}}, "convergence":
+    {path_id: {"iterations", "converged", "cycle"}}}.
+    The base-rate path runs no dynamics (no iterations)."""
+    profiles = member_profiles()
+    paths = {pid: {} for pid in acting}
+    convergence = {}
+    for member_id, weights, tau in profiles:
+        res = best_response(state, weights, tau, candidates, exp,
+                            start_actions, acting, hp_bounds)
+        convergence[member_id] = {"iterations": res["iterations"],
+                                  "converged": res["converged"],
+                                  "cycle": res["cycle"]}
+        for pid in acting:
+            paths[pid][member_id] = res["distributions"].get(pid, {})
+    probs = base["probabilities"]
+    floor = base["floor"]
+    for pid in acting:
+        cands = candidates.get(pid, [])
+        raw = {k: probs.get(k, floor) for k in cands}
+        total = sum(raw.values()) or 1.0
+        paths[pid][BASE_RATE_PATH_ID] = {k: v / total
+                                         for k, v in raw.items()}
+    convergence[BASE_RATE_PATH_ID] = {"iterations": None,
+                                      "converged": None, "cycle": None}
+    return {"paths": paths, "convergence": convergence}
+
+
+def merge_path_weights(path_hits):
+    """Path weights from fit-window walk-forward hit counts:
+    w_i = (hits_i + 1) / sum_j (hits_j + 1). The +1 is a floor of
+    one pseudocount hit per path: no path ever gets weight 0, so a
+    path that hit nothing on the fit window can still contribute
+    on the test window. Weights are proportional to past hits."""
+    floor = MULTIPATH_FLOOR_HITS
+    total = sum(h + floor for h in path_hits.values()) or 1.0
+    return {pid: (h + floor) / total for pid, h in path_hits.items()}
+
+
+def mixture_center(base, candidates_pid):
+    """The kind the merged distribution is mixed toward: the
+    prefix's most frequent kind (base mode) when it is one of this
+    player's candidates; otherwise the most frequent kind among
+    the player's candidates, by prefix counts. A banned kind can
+    never receive mixture mass."""
+    mode = base["mode"]
+    if mode is not None and mode in candidates_pid:
+        return mode
+    counts = base["counts"]
+    if not candidates_pid:
+        return None
+    return sorted(candidates_pid,
+                  key=lambda k: (-counts.get(k, 0), k))[0]
+
+
+def merge_distributions(path_dists, weights, lam, center_kind):
+    """Weighted pool of the path distributions, then mixed toward
+    the prefix mode: merged = (1 - lam) * sum_i w_i * d_i
+    + lam * onehot(center_kind). Renormalised. A path with an
+    empty distribution contributes nothing."""
+    merged = {}
+    for path_id, dist in path_dists.items():
+        w = weights.get(path_id, 0.0)
+        if not w or not dist:
+            continue
+        for k, v in dist.items():
+            merged[k] = merged.get(k, 0.0) + w * v
+    total = sum(merged.values())
+    if total > 0:
+        merged = {k: v * (1.0 - lam) / total for k, v in merged.items()}
+    if center_kind is not None and lam > 0:
+        merged[center_kind] = merged.get(center_kind, 0.0) + lam
+    total = sum(merged.values()) or 1.0
+    return {k: v / total for k, v in merged.items()}
+
+
+def merged_modal(dist):
+    """Modal action of a merged distribution: highest probability,
+    ties broken by kind name ascending (same rule as
+    best_response's modal). Returns (kind, probability)."""
+    if not dist:
+        return None, 0.0
+    kind = max(dist, key=lambda k: (dist[k], k))
+    return kind, dist[kind]
+
+
+def grid_search_lambda(fit_records, weights):
+    """Lambda grid search on fit-window records: for each lambda
+    in MULTIPATH_LAMBDA_GRID (0.00-1.00, step 0.05), the merged
+    modal hit count on the classifiable fit records. fit_records
+    are dicts with "paths" ({path_id: dist}), "center", "recorded"
+    and "classifiable" (backtest path records carry the same two
+    fields as "recorded_action" and "m1_classifiable"; both
+    spellings are accepted). Returns (lambda, grid): lambda is the
+    smallest value reaching the highest hit count (least
+    intervention on ties). One implementation, shared by
+    fit_multipath() below and backtest.py."""
+    def _cls(r):
+        return r.get("classifiable", r.get("m1_classifiable"))
+    def _rec(r):
+        return r.get("recorded", r.get("recorded_action"))
+    grid = []
+    for lam in MULTIPATH_LAMBDA_GRID:
+        h = 0
+        for r in fit_records:
+            if not _cls(r):
+                continue
+            merged = merge_distributions(r["paths"], weights, lam,
+                                         r["center"])
+            modal, _ = merged_modal(merged)
+            if modal == _rec(r):
+                h += 1
+        grid.append({"lambda": lam, "hits": h,
+                     "n_classifiable": sum(
+                         1 for r in fit_records if _cls(r))})
+    best_hits = max(g["hits"] for g in grid)
+    lam = min(g["lambda"] for g in grid if g["hits"] == best_hits)
+    return lam, grid
+
+
+def fit_multipath(trace, params, tau, fit_seasons):
+    """Fit the merger on the fit window (S1-S3): walk-forward over
+    the fit rounds, one path-distribution set per round (via
+    backtest.round_setup, the single walk-forward setup), then
+    (a) per-path hit counts -> merge_path_weights, (b) lambda grid
+    search on the same window (grid_search_lambda). Returns the
+    weights, lambda, per-path hits and the grid table. The weights
+    and lambda are computed from the trace, not stored in
+    payoff-model.json (its version does not change). The import of
+    backtest is lazy: backtest imports predict, so importing it at
+    module load would be circular."""
+    import backtest  # noqa: E402  (lazy: breaks the import cycle)
+    moves = trace["moves"]
+    fit_records = []
+    for season in sorted(fit_seasons):
+        season_row = next(s for s in trace["seasons"]
+                          if s["season"] == season)
+        for rnd in range(1, season_row["rounds"] + 1):
+            prefix = [m for m in moves
+                      if (m["season"], m["round_index"]) < (season, rnd)]
+            test = [m for m in moves
+                    if m["season"] == season and m["round_index"] == rnd]
+            setup = backtest.round_setup(trace, prefix, test)
+            if setup is None:
+                continue
+            pd = path_distributions(
+                setup["state"], setup["candidates"], setup["exp"],
+                setup["start"], setup["acting"], setup["hp_bounds"],
+                setup["base"])
+            for m in test:
+                pid = m["player"]
+                center = mixture_center(
+                    setup["base"], setup["candidates"].get(pid, []))
+                fit_records.append({
+                    "recorded": kind_of(m),
+                    "classifiable": kind_of(m) != "unknown",
+                    "paths": pd["paths"].get(pid, {}),
+                    "center": center})
+    path_ids = [p[0] for p in member_profiles()] + [BASE_RATE_PATH_ID]
+    hits = {pid: 0 for pid in path_ids}
+    n_cls = 0
+    for r in fit_records:
+        if not r["classifiable"]:
+            continue
+        n_cls += 1
+        for pid in path_ids:
+            modal, _ = merged_modal(r["paths"].get(pid, {}))
+            if modal is not None and modal == r["recorded"]:
+                hits[pid] += 1
+    weights = merge_path_weights(hits)
+    lam, grid = grid_search_lambda(fit_records, weights)
+    return {"weights": weights, "lambda": lam, "path_hits": hits,
+            "n_classifiable": n_cls, "n_records": len(fit_records),
+            "fit_seasons": [f"S{s}" for s in sorted(fit_seasons)],
+            "grid": grid,
+            "method": ("Multi-path merger (round 8, research fruit 2): "
+                       "16 paths (15 ensemble members + base-rate "
+                       "path); weights w_i = (fit hits_i + 1) / "
+                       "sum_j (fit hits_j + 1); merged = (1 - lam) * "
+                       "weighted pool + lam * onehot(prefix mode); "
+                       "lambda grid-searched on the fit window "
+                       "(0.00-1.00, step 0.05; ties -> smallest "
+                       "lambda).")}
+
+
 def make_expectation(per_mean, glob_mean, global_mean=None):
     """exp(pid, kind) -> (dHP, dgold). per (player, kind) first, then
     per kind, then the fallback. global_mean, when given, is the
@@ -868,11 +1146,20 @@ def apply_scenario_rules(rules, scenario, base_rule_id, current_date,
 
 
 def forecast_rounds(state, params, tau, candidates, exp, start_actions,
-                    acting, hp_bounds, horizon, cap_rounds, pmap):
+                    acting, hp_bounds, horizon, cap_rounds, pmap,
+                    merge=None):
     """Best-response dynamics, round by round. Shared by the
-    baseline run and the per-scenario runs. Returns (forecast,
-    effective_horizon). Forecast rows carry the round, the
-    round-tiered confidence, convergence, and per-player
+    baseline run and the per-scenario runs. merge is None (single
+    model, as before) or a dict {"weights", "lambda", "base"}
+    (round 8): each round runs all paths and merges them
+    (path_distributions + merge_distributions). The base rates
+    stay the full-trace table for every round: predictions are not
+    real moves, so the prefix never grows. The round's
+    iterations/converged/cycle are the baseline member's
+    best-response run (documented in the row's "multipath"
+    convergence table, which also carries every other path).
+    Returns (forecast, effective_horizon). Forecast rows carry the
+    round, the round-tiered confidence, convergence, and per-player
     distributions / modal actions / expected deltas."""
     effective_horizon = min(horizon, cap_rounds)
     forecast = []
@@ -880,12 +1167,43 @@ def forecast_rounds(state, params, tau, candidates, exp, start_actions,
     round_start = dict(start_actions)
     acting_now = list(acting)
     for rnd in range(1, effective_horizon + 1):
-        res = best_response(round_state, params, tau, candidates, exp,
-                            round_start, acting_now, hp_bounds)
+        multipath = None
+        if merge is None:
+            res = best_response(round_state, params, tau, candidates,
+                                exp, round_start, acting_now, hp_bounds)
+        else:
+            pd = path_distributions(round_state, candidates, exp,
+                                    round_start, acting_now, hp_bounds,
+                                    merge["base"])
+            merged_dists, merged_modals = {}, {}
+            for pid in acting_now:
+                center = mixture_center(
+                    merge["base"], candidates.get(pid, []))
+                md = merge_distributions(
+                    pd["paths"].get(pid, {}), merge["weights"],
+                    merge["lambda"], center)
+                dist = {k: round(v, 6) for k, v in md.items()}
+                kind, prob = merged_modal(dist)
+                merged_dists[pid] = dist
+                top3 = round(sum(sorted(dist.values(), reverse=True)[:3]),
+                             6)
+                merged_modals[pid] = {"action": kind,
+                                      "probability": prob,
+                                      "top3_mass": top3}
+            base_conv = pd["convergence"].get("baseline", {})
+            res = {"actions": {pid: merged_modals[pid]["action"]
+                               for pid in acting_now},
+                   "distributions": merged_dists,
+                   "modal": merged_modals,
+                   "iterations": base_conv.get("iterations"),
+                   "converged": base_conv.get("converged"),
+                   "cycle": base_conv.get("cycle")}
+            multipath = {"convergence": pd["convergence"]}
         forecast.append({
             "round": rnd, "confidence": confidence_tier(rnd),
             "iterations": res["iterations"],
             "converged": res["converged"], "cycle": res["cycle"],
+            "multipath": multipath,
             "players": [{
                 "player": pid, "key": pmap[pid].get("key"),
                 "name": pmap[pid].get("name"),
@@ -1097,6 +1415,17 @@ def main(argv=None):
     support = expectation_support(moves)
     exp = make_expectation(per_mean, glob_mean,
                            global_mean=tuple(support["global_mean"]))
+    # Round 8 (fruit 2): base rates from the full trace, the same
+    # prefix the expectations above come from; the merger weights
+    # and lambda are fitted on the fit window (S1-S3) of this same
+    # trace, walk-forward, so no future information enters the
+    # live forecast. Not parameters: nothing is stored in
+    # payoff-model.json.
+    base = base_rates(moves)
+    fit_seasons = sorted(s["season"] for s in trace["seasons"])[:3]
+    multi = fit_multipath(trace, params, tau, fit_seasons)
+    merge_spec = {"weights": multi["weights"], "lambda": multi["lambda"],
+                  "base": base}
     start_actions = {pid: kind_of(lasts[pid])
                      for pid in lasts if kind_of(lasts[pid])
                      in candidates.get(pid, [])}
@@ -1120,7 +1449,7 @@ def main(argv=None):
             "confidence": "low"}
     forecast, effective_horizon = forecast_rounds(
         state, params, tau, candidates, exp, start_actions, acting,
-        hp_bounds, args.horizon, cap_rounds, pmap)
+        hp_bounds, args.horizon, cap_rounds, pmap, merge=merge_spec)
     first = forecast[0]
     modal = {row["player"]: {"action": row["modal_action"]}
              for row in first["players"]}
@@ -1337,6 +1666,38 @@ def main(argv=None):
         "forecast_rounds": forecast,
         "degeneracy": degeneracy,
         "expectation": expectation_diag,
+        "multipath": {
+            "method": multi["method"],
+            "fit_window": multi["fit_seasons"],
+            "fit_records": multi["n_records"],
+            "fit_classifiable": multi["n_classifiable"],
+            "lambda": multi["lambda"],
+            "lambda_grid": multi["grid"],
+            "weights": {k: round(v, 6) for k, v in
+                        sorted(multi["weights"].items(),
+                               key=lambda kv: -kv[1])},
+            "path_fit_hits": multi["path_hits"],
+            "base_rates": {
+                "n_known_moves": base["n"],
+                "distinct_kinds": base["kinds"],
+                "pseudocount": base["pseudocount"],
+                "floor": round(base["floor"], 6),
+                "mode_kind": base["mode"],
+                "probabilities": {k: round(v, 6) for k, v in
+                                  sorted(base["probabilities"].items(),
+                                         key=lambda kv: -kv[1])},
+                "counts": base["counts"]},
+            "round1_convergence": first.get("multipath", {}).get(
+                "convergence"),
+            "note": ("Round 8 (fruit 2): the live forecast is the "
+                     "merged distribution of 16 paths (15 ensemble "
+                     "members + base-rate path), mixed toward the "
+                     "prefix mode with the fitted lambda. The "
+                     "round's iterations/converged/cycle are the "
+                     "baseline member's best-response run. Rule "
+                     "scenarios still run the single model "
+                     "(merge=None): the merger is not applied to "
+                     "scenario branches in this round.")},
         "best_response": {"iterations": first["iterations"],
                           "converged": first["converged"],
                           "cycle": first["cycle"]},
@@ -1373,6 +1734,12 @@ def main(argv=None):
         f"{exp_round1['n_players']} "
         f"(share={exp_round1['shrunk_share']}) per_kind_n="
         f"{exp_round1['per_kind_n']}",
+        f"predict: multipath lambda={multi['lambda']} "
+        f"fit_hits={multi['path_hits']} "
+        f"fit_n_classifiable={multi['n_classifiable']} "
+        f"base_mode={base['mode']} "
+        f"weights_top="
+        f"{sorted(multi['weights'].items(), key=lambda kv: -kv[1])[:3]}",
         f"predict: {SMOKE_NOTE}",
     ]
     for row in first["players"]:
