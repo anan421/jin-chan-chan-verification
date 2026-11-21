@@ -504,3 +504,10 @@
 - ensemble.py 仍从 action_kind 建候选集（真实 trace 上集成未重跑）。
 - C5 与语义层词汇不一致（overseas_rental 语义层有 2 个实例，C5 只查 action_kind）。
 - live v3 的 alpha_gamma_note 过期句、backtest.py/predict.py 的 smoke 备注硬编码，待下次写相关文件时一并改；收敛处理是独立任务。
+
+## 改进循环第一批（3 轮，2026-11-21 晚；审计 P0 全部落地）
+- 第 1 轮（a18018d/57d6685）：live v3 回退占位 v2（version 2，fit null，参数 1.0/5.0/10.0）；预测章标 opinion；alpha_gamma_note 过期句已改；A1–A9 与占位值一致；v3 保留在 runs/fit-real-2026-11-21/。run.sh 历史层全过。
+- 第 2 轮（18db859/d6d24e9）：采用规则改成 hold-out 门控（fit.py 新增 ADOPTION_RULE 与 evaluate_holdout_gate()；design/fitting-layer.md 第六、七节；每次拟合附 hold-out 对照表）。v3 三条全不满足（优于占位 0 项；M1 0.0% 低于基线 9.55%；M2/M3 34.62%/25.21% 低于 50%），应不被采用；fit02 也过不了门。run.sh 全过。run.sh 头部注释已改（opinion 口径）。
+- 第 3 轮（d632a8d/cec2ec3）：退化分布守卫（predict.py 新增 degeneracy_metrics() 与 degeneracy 块；merge_report.py 预测章加退化守卫小节，guard fail > opinion；backtest.py 新增 M6 校准度）。当前运行退化率 0.000（0/18，熵 1.275 比特），守卫未触发；守卫已验证会触发（旧退化报告与合成退化报告都记 fail，总体仍 pass）。M6 = 0.9971（阈值 < 0.2，不通过；顶桶 [0.99, 1.0] n=28，均值 0.997141，实际命中率 0.0）。run.sh 全过（runs/2026-11-21_133910/ 总体 pass，预测章 opinion）。
+- 批结论：预测本身没有变好（M1 仍 0/83，M2/M3 低于抛硬币）；变好的是诚实度与安全性（坏模型下线、门控防再犯、退化自动标 fail、校准度可量）。详见 design/batch-1-report.md。下一批按审计 P1：期望增量收缩、可行表、删 c_rule。
+- GitHub 远程已接：https://github.com/anan421/jin-chan-chan-verification（private）。本地 main 在 cec2ec3，未推 GitHub（按任务要求只用本地 git；推不推由 parent 定夺）。
