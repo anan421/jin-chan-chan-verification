@@ -2,105 +2,14 @@
  "meta": {
   "s6_start_date": 20261122,
   "last_run_date": "2026-11-22",
-  "testset_n": 90,
-  "gap_to_140": 50,
+  "testset_n": 99,
+  "gap_to_140": 41,
   "created": "2026-11-22",
   "updated": "2026-11-22",
-  "note": "2 missed_s5 events patched into S5 on 2026-11-22 (Baidu Q3 capex, NYT Alibaba-Megaspeed); testset-v4.json 90 questions. 2026-11-22 11:35 run: +9 missed_s5, +2 kind_gap, +16 rejected; candidates still 0; new missed_s5 are S5-era gaps found by directed search (trial run window was only 11-16 to 11-22); patching S5 again is Gu's decision."
+  "note": "Round-6 S5 patch 2026-11-22: S5 re-opened by Gu's decision and re-verified (./run.sh exit 0, runs/2026-11-22_054658/). All 9 missed_s5 events patched into S5 (GPT-6.2, Gemini 4 Neon, FT Aivres-Megaspeed, Zhenwu Guangzhou cluster, TSMC halt, Oracle financing secured, Amazon Q3 capex, SoftBank loan, Grok 4.8 soft launch); testset-v5.json 99 questions (A 50 / B 49). Previous note: 2 missed_s5 events patched into S5 on 2026-11-22 (Baidu Q3 capex, NYT Alibaba-Megaspeed); testset-v4.json 90 questions. 2026-11-22 11:35 run: +9 missed_s5, +2 kind_gap, +16 rejected; candidates still 0; new missed_s5 are S5-era gaps found by directed search (trial run window was only 11-16 to 11-22); patching S5 again is Gu's decision."
  },
  "candidates": [],
- "missed_s5": [
-  {
-   "event_name": "OpenAI 发布 GPT-6.2 Astra 与 Sol",
-   "player": "OAI",
-   "kind": "chatgpt",
-   "event_real_date": 20261117,
-   "source": "OpenAI 官方博客 11-17（openai.com/index/introducing-gpt-6-2-astra-sol/）",
-   "action": "OpenAI 发布 GPT-6.2 Astra 与 Sol（旗舰模型更新）",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
-  },
-  {
-   "event_name": "Google 发布 Gemini 4 Neon",
-   "player": "GOOG",
-   "kind": "gemini",
-   "event_real_date": 20261118,
-   "source": "Google 官方博客 11-18",
-   "action": "Google 发布 Gemini 4 Neon（中端编码/分析模型，介于 Carbon 与 Hydrogen 之间）",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
-  },
-  {
-   "event_name": "FT 调查：Aivres–Megaspeed 46 亿美元芯片通道",
-   "player": "NVDA",
-   "kind": "megaspeed",
-   "event_real_date": 20261120,
-   "source": "FT 调查 11-20",
-   "action": "FT 画出 46 亿美元芯片通道：浪潮未列清单的美国子公司 Aivres 持续与英伟达交易，Megaspeed 马来西亚子公司 Speedmatrix 申报自 Aivres 进口约 46 亿美元货物",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；与 S5 3-2 HUAWEI megaspeed（纽约时报阿里故事）是不同事件"
-  },
-  {
-   "event_name": "广州首个真武国产万卡智算集群投产运营",
-   "player": "ALI",
-   "kind": "datacenter",
-   "event_real_date": 20261116,
-   "source": "中国电信广东公司与阿里云智能联合主办 11-16；SCMP、21财经",
-   "action": "广州首个真武国产万卡智算集群正式投产运营，计划扩至 10 万卡，TokenHub 平台同步发布",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；位置口径不一致（21财经称广州，SCMP 称韶关数据中心），合题时须核定"
-  },
-  {
-   "event_name": "台积电叫停 16nm 及以下中国客户订单（BIS 规则执行）",
-   "player": "TSMC",
-   "kind": "bis_rule",
-   "event_real_date": 20261120,
-   "source": "Nikkei Asia 11-20（TrendForce 跟进）",
-   "action": "台积电通知受影响的中国芯片设计客户：无许可证暂停 16nm 及以下订单，改用 28nm/40nm、无 HBM 或先进封装，并结束自查验证",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；与 S5 3-2 bis_rule（11-16 规则发布本身）是不同动作"
-  },
-  {
-   "event_name": "甲骨文宣布 OpenAI 基建合同融资已全部落实",
-   "player": "ORCL",
-   "kind": "financing",
-   "event_real_date": 20261120,
-   "source": "Oracle 官方声明 11-20（@oracle；Reuters 11-21 转述）",
-   "action": "甲骨文宣布约 3000 亿美元、4.5GW 的 OpenAI 基建合同融资已全部落实（11 月最后一次融资约 100 亿美元股票 + 100 亿美元债务）",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；与 S5 5-1/6-1/6-2 债务包叙事动作（市场反应类 gloss）不同，这是融资完成的官方宣布"
-  },
-  {
-   "event_name": "亚马逊 Q3 财报：Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元",
-   "player": "AMZN",
-   "kind": "capex",
-   "event_real_date": 20261029,
-   "source": "亚马逊 Q3 2026 财报电话会 10-29（Nasdaq、TechCrunch、Fool）",
-   "action": "亚马逊 Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元（多数投向 AWS），2027 年将显著增加",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
-  },
-  {
-   "event_name": "软银 118.7 亿美元定期贷款（为 OpenAI 投资融资）",
-   "player": "SFTB",
-   "kind": "financing",
-   "event_real_date": 20260914,
-   "source": "Bloomberg 9-14（经 TechFastForward）",
-   "action": "软银落实 118.7 亿美元两年期定期贷款（约 20 家银行承诺，原目标 100 亿美元，超额认购），以 OpenAI 持股作抵押，用于 OpenAI 投资",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
-  },
-  {
-   "event_name": "xAI Grok 4.8 软发布",
-   "player": "MUSK",
-   "kind": "spacex_xai",
-   "event_real_date": 20261118,
-   "source": "AI Morning Brief 11-22（转述）",
-   "action": "xAI Grok 4.8 开始软发布",
-   "found_date": "2026-11-22",
-   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
-  }
- ],
+ "missed_s5": [],
  "kind_gap": [
   {
    "event_name": "Ricketts 参议员提出《MEGA 法案》",
