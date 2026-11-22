@@ -1,106 +1,377 @@
 {
-  "meta": {
-    "s6_start_date": 20261122,
-    "last_run_date": "2026-11-22",
-    "testset_n": 90,
-    "gap_to_140": 50,
-    "created": "2026-11-22",
-    "updated": "2026-11-22",
-    "note": "2 missed_s5 events patched into S5 on 2026-11-22 (Baidu Q3 capex, NYT Alibaba-Megaspeed); testset-v4.json 90 questions"
+ "meta": {
+  "s6_start_date": 20261122,
+  "last_run_date": "2026-11-22",
+  "testset_n": 90,
+  "gap_to_140": 50,
+  "created": "2026-11-22",
+  "updated": "2026-11-22",
+  "note": "2 missed_s5 events patched into S5 on 2026-11-22 (Baidu Q3 capex, NYT Alibaba-Megaspeed); testset-v4.json 90 questions. 2026-11-22 11:35 run: +9 missed_s5, +2 kind_gap, +16 rejected; candidates still 0; new missed_s5 are S5-era gaps found by directed search (trial run window was only 11-16 to 11-22); patching S5 again is Gu's decision."
+ },
+ "candidates": [],
+ "missed_s5": [
+  {
+   "event_name": "OpenAI 发布 GPT-6.2 Astra 与 Sol",
+   "player": "OAI",
+   "kind": "chatgpt",
+   "event_real_date": 20261117,
+   "source": "OpenAI 官方博客 11-17（openai.com/index/introducing-gpt-6-2-astra-sol/）",
+   "action": "OpenAI 发布 GPT-6.2 Astra 与 Sol（旗舰模型更新）",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
   },
-  "candidates": [],
-  "missed_s5": [],
-  "kind_gap": [
-    {
-      "event_name": "Ricketts 参议员提出《MEGA 法案》",
-      "player": null,
-      "kind": null,
-      "event_real_date": 20261117,
-      "source": "参议员办公室新闻稿 11-17",
-      "action": "《MEGA 法案》提出，要求商务部 30 天内决定是否将 Megaspeed 列入实体清单",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "35 个种类里无对应种类"
-    },
-    {
-      "event_name": "加州总检察长 Bonta 向英伟达发出调查传票",
-      "player": "NVDA",
-      "kind": null,
-      "event_real_date": 20261119,
-      "source": "加州司法部官网新闻稿 11-19",
-      "action": "Bonta 向英伟达发调查传票，查芯片或机密是否流向中国",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "35 个种类里无对应种类"
-    }
-  ],
-  "new_player": [],
-  "rejected": [
-    {
-      "event_name": "腾讯 Q3 财报：资本开支 814.33 亿元（+527%）",
-      "player": "TCE",
-      "kind": "capex",
-      "event_real_date": 20261118,
-      "source": "腾讯官方财报",
-      "action": "腾讯 Q3 资本开支 814.33 亿元，增 527%",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "已在testset里，不重复收"
-    },
-    {
-      "event_name": "Anthropic IPO 交割：超额配售权全额行使，募资约 935 亿美元",
-      "player": "ANTH",
-      "kind": "anthropic_ipo",
-      "event_real_date": 20261120,
-      "source": "Anthropic 官方公告 11-20",
-      "action": "IPO 交割，承销商全额行使超额配售权，合计发行 11.27 亿股",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "已在testset里，不重复收"
-    },
-    {
-      "event_name": "加州候任州长 Becerra 支持对失控智能体刑事指控",
-      "player": null,
-      "kind": null,
-      "event_real_date": 20261119,
-      "source": "POLITICO 首报 11-19",
-      "action": "Becerra 表态：智能体发起网络攻击时刑事指控应成为选项",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "政策表态，未点名公司，无玩家动作"
-    },
-    {
-      "event_name": "黄仁勋同意在参议院银行委员会公开作证",
-      "player": "NVDA",
-      "kind": null,
-      "event_real_date": 20261119,
-      "source": "参议院银行委员会主席 Scott 11-19 确认",
-      "action": "黄仁勋同意圣诞节前公开作证，日期未定",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "未来事件，还没发生"
-    },
-    {
-      "event_name": "众议院三委员会 12-01 闭门访谈黄仁勋",
-      "player": "NVDA",
-      "kind": null,
-      "event_real_date": 20261201,
-      "source": "众议院 11-18 确认",
-      "action": "众议院 12-01 闭门访谈黄仁勋（未来事件）",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "未来事件，还没发生"
-    },
-    {
-      "event_name": "马斯克 TomorrowX：SpaceX 每月带上线约 0.5GW AI 算力",
-      "player": "MUSK",
-      "kind": "datacenter",
-      "event_real_date": 20261118,
-      "source": "TomorrowX 11-18（马斯克本人表述，未独立核验）",
-      "action": "马斯克称 SpaceX 每月带上线约 0.5GW AI 算力",
-      "found_date": "2026-11-22",
-      "status": null,
-      "reason": "只是主张/目标，不是已发生的公开动作；且日期在 S5 时期内"
-    }
-  ]
+  {
+   "event_name": "Google 发布 Gemini 4 Neon",
+   "player": "GOOG",
+   "kind": "gemini",
+   "event_real_date": 20261118,
+   "source": "Google 官方博客 11-18",
+   "action": "Google 发布 Gemini 4 Neon（中端编码/分析模型，介于 Carbon 与 Hydrogen 之间）",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
+  },
+  {
+   "event_name": "FT 调查：Aivres–Megaspeed 46 亿美元芯片通道",
+   "player": "NVDA",
+   "kind": "megaspeed",
+   "event_real_date": 20261120,
+   "source": "FT 调查 11-20",
+   "action": "FT 画出 46 亿美元芯片通道：浪潮未列清单的美国子公司 Aivres 持续与英伟达交易，Megaspeed 马来西亚子公司 Speedmatrix 申报自 Aivres 进口约 46 亿美元货物",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；与 S5 3-2 HUAWEI megaspeed（纽约时报阿里故事）是不同事件"
+  },
+  {
+   "event_name": "广州首个真武国产万卡智算集群投产运营",
+   "player": "ALI",
+   "kind": "datacenter",
+   "event_real_date": 20261116,
+   "source": "中国电信广东公司与阿里云智能联合主办 11-16；SCMP、21财经",
+   "action": "广州首个真武国产万卡智算集群正式投产运营，计划扩至 10 万卡，TokenHub 平台同步发布",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；位置口径不一致（21财经称广州，SCMP 称韶关数据中心），合题时须核定"
+  },
+  {
+   "event_name": "台积电叫停 16nm 及以下中国客户订单（BIS 规则执行）",
+   "player": "TSMC",
+   "kind": "bis_rule",
+   "event_real_date": 20261120,
+   "source": "Nikkei Asia 11-20（TrendForce 跟进）",
+   "action": "台积电通知受影响的中国芯片设计客户：无许可证暂停 16nm 及以下订单，改用 28nm/40nm、无 HBM 或先进封装，并结束自查验证",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；与 S5 3-2 bis_rule（11-16 规则发布本身）是不同动作"
+  },
+  {
+   "event_name": "甲骨文宣布 OpenAI 基建合同融资已全部落实",
+   "player": "ORCL",
+   "kind": "financing",
+   "event_real_date": 20261120,
+   "source": "Oracle 官方声明 11-20（@oracle；Reuters 11-21 转述）",
+   "action": "甲骨文宣布约 3000 亿美元、4.5GW 的 OpenAI 基建合同融资已全部落实（11 月最后一次融资约 100 亿美元股票 + 100 亿美元债务）",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里；与 S5 5-1/6-1/6-2 债务包叙事动作（市场反应类 gloss）不同，这是融资完成的官方宣布"
+  },
+  {
+   "event_name": "亚马逊 Q3 财报：Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元",
+   "player": "AMZN",
+   "kind": "capex",
+   "event_real_date": 20261029,
+   "source": "亚马逊 Q3 2026 财报电话会 10-29（Nasdaq、TechCrunch、Fool）",
+   "action": "亚马逊 Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元（多数投向 AWS），2027 年将显著增加",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
+  },
+  {
+   "event_name": "软银 118.7 亿美元定期贷款（为 OpenAI 投资融资）",
+   "player": "SFTB",
+   "kind": "financing",
+   "event_real_date": 20260914,
+   "source": "Bloomberg 9-14（经 TechFastForward）",
+   "action": "软银落实 118.7 亿美元两年期定期贷款（约 20 家银行承诺，原目标 100 亿美元，超额认购），以 OpenAI 持股作抵押，用于 OpenAI 投资",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
+  },
+  {
+   "event_name": "xAI Grok 4.8 软发布",
+   "player": "MUSK",
+   "kind": "spacex_xai",
+   "event_real_date": 20261118,
+   "source": "AI Morning Brief 11-22（转述）",
+   "action": "xAI Grok 4.8 开始软发布",
+   "found_date": "2026-11-22",
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace/testset 里"
+  }
+ ],
+ "kind_gap": [
+  {
+   "event_name": "Ricketts 参议员提出《MEGA 法案》",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261117,
+   "source": "参议员办公室新闻稿 11-17",
+   "action": "《MEGA 法案》提出，要求商务部 30 天内决定是否将 Megaspeed 列入实体清单",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "35 个种类里无对应种类"
+  },
+  {
+   "event_name": "加州总检察长 Bonta 向英伟达发出调查传票",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "加州司法部官网新闻稿 11-19",
+   "action": "Bonta 向英伟达发调查传票，查芯片或机密是否流向中国",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "35 个种类里无对应种类"
+  },
+  {
+   "event_name": "加州总检察长 Bonta 起诉 OpenAI",
+   "player": "OAI",
+   "kind": null,
+   "event_real_date": 20261116,
+   "source": "Yahoo News 11-16（加州司法部起诉状，旧金山高等法院）",
+   "action": "Bonta 在旧金山高等法院起诉 OpenAI",
+   "found_date": "2026-11-22",
+   "reason": "35 个种类里无对应种类（州检察长诉讼；sec_probe 只认 SEC 调查）"
+  },
+  {
+   "event_name": "针对 xAI 的 deepfake 相关诉讼立案",
+   "player": "MUSK",
+   "kind": null,
+   "event_real_date": 20261118,
+   "source": "AI Morning Brief 11-22（转述，单源）",
+   "action": "针对 xAI 的 deepfake 相关诉讼于 11-18 立案",
+   "found_date": "2026-11-22",
+   "reason": "35 个种类里无对应种类（诉讼）；单源转述，需一手来源确认后才可合题"
+  }
+ ],
+ "new_player": [],
+ "rejected": [
+  {
+   "event_name": "腾讯 Q3 财报：资本开支 814.33 亿元（+527%）",
+   "player": "TCE",
+   "kind": "capex",
+   "event_real_date": 20261118,
+   "source": "腾讯官方财报",
+   "action": "腾讯 Q3 资本开支 814.33 亿元，增 527%",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "已在testset里，不重复收"
+  },
+  {
+   "event_name": "Anthropic IPO 交割：超额配售权全额行使，募资约 935 亿美元",
+   "player": "ANTH",
+   "kind": "anthropic_ipo",
+   "event_real_date": 20261120,
+   "source": "Anthropic 官方公告 11-20",
+   "action": "IPO 交割，承销商全额行使超额配售权，合计发行 11.27 亿股",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "已在testset里，不重复收"
+  },
+  {
+   "event_name": "加州候任州长 Becerra 支持对失控智能体刑事指控",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "POLITICO 首报 11-19",
+   "action": "Becerra 表态：智能体发起网络攻击时刑事指控应成为选项",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "政策表态，未点名公司，无玩家动作"
+  },
+  {
+   "event_name": "黄仁勋同意在参议院银行委员会公开作证",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "参议院银行委员会主席 Scott 11-19 确认",
+   "action": "黄仁勋同意圣诞节前公开作证，日期未定",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "未来事件，还没发生"
+  },
+  {
+   "event_name": "众议院三委员会 12-01 闭门访谈黄仁勋",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261201,
+   "source": "众议院 11-18 确认",
+   "action": "众议院 12-01 闭门访谈黄仁勋（未来事件）",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "未来事件，还没发生"
+  },
+  {
+   "event_name": "马斯克 TomorrowX：SpaceX 每月带上线约 0.5GW AI 算力",
+   "player": "MUSK",
+   "kind": "datacenter",
+   "event_real_date": 20261118,
+   "source": "TomorrowX 11-18（马斯克本人表述，未独立核验）",
+   "action": "马斯克称 SpaceX 每月带上线约 0.5GW AI 算力",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "只是主张/目标，不是已发生的公开动作；且日期在 S5 时期内"
+  },
+  {
+   "event_name": "众议院外委会披露：美方批准 879,868 颗 AI 芯片出口许可",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "众议院外委会文件 11-19（FT 11-21 报道）",
+   "action": "美方批准 879,868 颗英伟达/AMD AI 芯片出口许可，受益方含阿里、腾讯、百度、字节",
+   "found_date": "2026-11-22",
+   "reason": "政府披露，非玩家动作；批准发生在 2025-12 至 2026-05"
+  },
+  {
+   "event_name": "亚马逊接近以 75 亿美元收购 AI 创业公司 Decart",
+   "player": "AMZN",
+   "kind": null,
+   "event_real_date": 20261121,
+   "source": "FT 11-21",
+   "action": "亚马逊接近以 75 亿美元收购 Decart，谈判已到后期阶段，最快下周达成",
+   "found_date": "2026-11-22",
+   "reason": "只是谈判，未达成"
+  },
+  {
+   "event_name": "字节跳动与微软洽谈追加约 5 亿美元 Azure 支出",
+   "player": "BYTE",
+   "kind": null,
+   "event_real_date": 20261120,
+   "source": "The Information 11-20",
+   "action": "字节跳动与微软洽谈追加约 5 亿美元 Azure 支出，主要用于访问 OpenAI 模型",
+   "found_date": "2026-11-22",
+   "reason": "只是谈判，未达成"
+  },
+  {
+   "event_name": "软银孙正义探讨约 1 万亿美元收购 SK 海力士",
+   "player": "SFTB",
+   "kind": null,
+   "event_real_date": 20261120,
+   "source": "The Information 经 Reuters 11-20",
+   "action": "孙正义向华尔街银行探讨为约 1 万亿美元收购 SK 海力士融资，软银称已不再积极考虑",
+   "found_date": "2026-11-22",
+   "reason": "只是探讨、已搁置，非已发生的公开动作；SK 海力士不在 18 人名单里"
+  },
+  {
+   "event_name": "微软逐步结束向甲骨文租用 AI 算力协议",
+   "player": "MSFT",
+   "kind": null,
+   "event_real_date": 20261113,
+   "source": "Mastodon 转述 11-16（单源）",
+   "action": "微软逐步结束 2023 年与甲骨文达成的租用 AI 算力协议",
+   "found_date": "2026-11-22",
+   "reason": "单源未证实；且无对应种类（非海外租赁）"
+  },
+  {
+   "event_name": "甲骨文取消向腾讯出租芯片的五年协议",
+   "player": "ORCL",
+   "kind": null,
+   "event_real_date": null,
+   "source": "Mastodon 转述 11-16（单源）",
+   "action": "甲骨文取消向腾讯出租先进 AI 芯片的五年协议",
+   "found_date": "2026-11-22",
+   "reason": "日期不清、单源未证实"
+  },
+  {
+   "event_name": "GMI Cloud 3 亿美元贷款涉腾讯提前还款条款",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261120,
+   "source": "彭博经 TrendForce 11-20（单源）",
+   "action": "GMI Cloud 3 亿美元贷款拟议条款要求：若腾讯被列入美国受限方名单，须提前全额还款",
+   "found_date": "2026-11-22",
+   "reason": "拟议条款未落地；GMI Cloud 不在 18 人名单里；腾讯只是被提及方，无腾讯动作"
+  },
+  {
+   "event_name": "Anthropic 数学家称 Claude 协助证明黎曼猜想",
+   "player": "ANTH",
+   "kind": null,
+   "event_real_date": 20261120,
+   "source": "Anthropic 技术人员 Alpöge 11-20 宣布；Lean/ Mathlib 11-21 独立验证",
+   "action": "Anthropic 数学家称与 Claude 合作完成黎曼猜想证明（约 1700 万行 Lean 代码）",
+   "found_date": "2026-11-22",
+   "reason": "研究成果宣称，未同行评审，Clay 研究所仍列为未解；非公司动作；无对应种类"
+  },
+  {
+   "event_name": "DeepSeek V4.1 Flash 遭劫持经 OpenRouter 提供服务 53 小时",
+   "player": "DPSK",
+   "kind": null,
+   "event_real_date": 20261108,
+   "source": "Prime Intellect 11-19 披露",
+   "action": "攻击者替换托管端点的 DeepSeek V4.1 Flash，11-08 至 11-10 间以去掉安全限制的版本服务客户请求 53 小时",
+   "found_date": "2026-11-22",
+   "reason": "第三方攻击/劫持，非 DeepSeek 自己的动作"
+  },
+  {
+   "event_name": "英伟达 Q3 财报：营收 1158 亿美元",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261117,
+   "source": "英伟达官方财报 11-17",
+   "action": "英伟达 Q3 营收 1158 亿美元（同比 +103%），数据中心收入 1076 亿美元，下季指引约 1300 亿美元",
+   "found_date": "2026-11-22",
+   "reason": "常规财报披露，无动作类种类对应；H200 停运一说无独立公告/一手来源佐证"
+  },
+  {
+   "event_name": "OpenAI 新一轮融资获约 110 亿美元承诺（目标 300 亿美元）",
+   "player": "OAI",
+   "kind": null,
+   "event_real_date": 20261120,
+   "source": "WSJ 约 11-20（经 Asia Daily）",
+   "action": "OpenAI 新一轮融资获约 110 亿美元承诺，估值 1.25 万亿美元，低于最初 300 亿美元目标",
+   "found_date": "2026-11-22",
+   "reason": "未正式官宣、未关闭；媒体数字不一致（CNBC 11-12 称已募 150 亿美元），不是已确认的融资动作"
+  },
+  {
+   "event_name": "苹果自研智能体计划（致 Anthropic 盘后跌）",
+   "player": "AAPL",
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "Bloomberg 11-19/20 转述",
+   "action": "报道称苹果在推进自研智能体计划",
+   "found_date": "2026-11-22",
+   "reason": "媒体报道/传闻，非官方宣布的动作"
+  },
+  {
+   "event_name": "Meta 员工内部发帖称 Muse 混淆对话、泄露隐私",
+   "player": "META",
+   "kind": null,
+   "event_real_date": 20261120,
+   "source": "Reuters 11-20",
+   "action": "Meta 内部帖子称 Muse 可能混淆不同账号的对话、暴露用户隐私数据",
+   "found_date": "2026-11-22",
+   "reason": "内部员工发帖，非公司公开动作"
+  },
+  {
+   "event_name": "软银 37 亿美元减值（俄亥俄 AI 园区电力设备采购计划变更）",
+   "player": "SFTB",
+   "kind": null,
+   "event_real_date": 20261110,
+   "source": "软银 2026 财年 Q2 财报 11-10",
+   "action": "软银因变更美国 AI 数据中心电力设备采购计划，计提 5972 亿日元（约 37 亿美元）减值",
+   "found_date": "2026-11-22",
+   "reason": "财报减值计提，非动作类事件，无对应种类"
+  },
+  {
+   "event_name": "路透：SEC 审查英伟达会计实务",
+   "player": "NVDA",
+   "kind": "sec_probe",
+   "event_real_date": 20261120,
+   "source": "Reuters 11-20",
+   "action": "SEC 执法人员审查英伟达潜在会计问题，英伟达当日跌 14%",
+   "found_date": "2026-11-22",
+   "reason": "已在 testset 里（v3 q64 / v4），不重复收"
+  },
+  {
+   "event_name": "英伟达董事会设立国家安全与出口管制委员会",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261117,
+   "source": "英伟达官方新闻 11-17",
+   "action": "英伟达董事会设立国家安全与出口管制委员会",
+   "found_date": "2026-11-22",
+   "reason": "治理流程动作（设委员会），非大厅动作类事件，无明确对应种类"
+  }
+ ]
 }
