@@ -31,6 +31,16 @@ EXPERIMENT = ["E1", "E2", "E3"]
 R6_CAPEX_EXPECTED = {"C1": 2, "C2": 5, "C3": 6, "E1": 10, "E2": 10}
 
 
+def norm_date(d):
+    if isinstance(d, int):
+        return d
+    if isinstance(d, str):
+        s = d.strip().replace("-", "")
+        if len(s) == 8 and s.isdigit():
+            return int(s)
+    return None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pred-dir", default=PRED_DIR)
@@ -110,8 +120,8 @@ def main():
             cited = 0
             for q in FOCUS:
                 g = got[q].get("guidance_cited")
-                if isinstance(g, dict) and g.get("date") is not None \
-                        and g["date"] < meta[q]["round_date"]:
+                gd = norm_date(g.get("date")) if isinstance(g, dict) else None
+                if gd is not None and gd < meta[q]["round_date"]:
                     cited += 1
             check(f"{batch} guidance_citation", want["guidance_citation"],
                   [cited, 10])

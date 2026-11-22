@@ -68,6 +68,18 @@ def is_correct(preds, truth, qid):
     return preds[qid]["predicted_kind"] == truth[qid]["kind"]
 
 
+def norm_date(d):
+    """Normalize a date to int YYYYMMDD. Accepts int YYYYMMDD, string
+    'YYYYMMDD', or string 'YYYY-MM-DD'. Returns None if unparseable."""
+    if isinstance(d, int):
+        return d
+    if isinstance(d, str):
+        s = d.strip().replace("-", "")
+        if len(s) == 8 and s.isdigit():
+            return int(s)
+    return None
+
+
 def guidance_cited_ok(pred, truth, qid):
     """Mechanical citation check: guidance_cited present, with a date
     strictly before the question's round_date. Content validity (is the
@@ -76,7 +88,7 @@ def guidance_cited_ok(pred, truth, qid):
     g = pred.get("guidance_cited")
     if not isinstance(g, dict):
         return False
-    d = g.get("date")
+    d = norm_date(g.get("date"))
     if d is None:
         return False
     return d < truth[qid]["round_date"]
