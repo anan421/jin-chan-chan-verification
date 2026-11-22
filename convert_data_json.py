@@ -211,11 +211,24 @@ SEMANTIC_UNKNOWN = "unknown"
 # (sha256 07995677...). Regression guard: the second-expansion rules
 # may only classify from the unknown pool, never steal a legacy hit.
 # If any count moves, a new rule (or a data change) stole a hit.
+# Updated 2026-11-22 (round-6 S5 patch: 9 missed events rewritten into
+# S5 actions; see design/s5patch-round6-2026-11-22.md). Five counts move
+# because the rewritten actions classify differently by substance:
+# - chatgpt 3->4: OAI S5 4-1 is now the GPT-6.2 launch (was an unknown gloss).
+# - bis_rule 4->5: TSMC S5 6-1 is now the BIS halt (was an unknown gloss).
+# - spacex_xai 4->5: MUSK S5 5-1 is now the Grok 4.8 soft rollout (was an
+#   anthropic_ipo classifier artifact: "IPO 窗口" is xAI's window, not
+#   Anthropic's IPO).
+# - stargate 15->14: SFTB S5 1-1 is now the $11.87B OpenAI loan (financing);
+#   the old "星门资金链被盘问" gloss was the 15th stargate hit.
+# - anthropic_ipo 8->7: MUSK S5 5-1 leaves anthropic_ipo (see above).
+# All other counts are unchanged; the guard still fails on any unexpected
+# move. The 9 new actions were verified to classify exactly as listed.
 EXPECTED_LEGACY_COUNTS = {
-    "stargate": 15, "anthropic_ipo": 8, "msft_invest": 7,
+    "stargate": 14, "anthropic_ipo": 7, "msft_invest": 7,
     "blackwell": 6, "r1": 6, "musk_table": 6, "colossus": 4,
-    "spacex_xai": 4, "doubao_price_war": 4, "bis_rule": 4,
-    "chatgpt": 3, "v3": 2, "overseas_rental": 2,
+    "spacex_xai": 5, "doubao_price_war": 4, "bis_rule": 5,
+    "chatgpt": 4, "v3": 2, "overseas_rental": 2,
     "huang_resign": 1, "sec_probe": 1,
 }
 

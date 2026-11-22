@@ -3916,9 +3916,9 @@
       ],
       [
        "SFTB",
-       "星门资金链被盘问",
-       -10,
-       -21
+       "软银落实 118.7 亿美元两年期定期贷款。为 OpenAI 投资融资",
+       2,
+       -2
       ]
      ]
     },
@@ -3968,9 +3968,9 @@
       ],
       [
        "AMZN",
-       "跟涨",
-       2,
-       1
+       "亚马逊 Q3 现金资本开支 759 亿美元。全年指引约 2200 亿美元",
+       3,
+       -6
       ],
       [
        "MUSK",
@@ -4174,9 +4174,9 @@
       ],
       [
        "OAI",
-       "最大客户之一。供应担忧",
-       -3,
-       -1
+       "GPT-6.2 Astra 与 Sol 发布。ChatGPT Work 与 Codex 同日上线",
+       4,
+       1
       ],
       [
        "MSFT",
@@ -4222,9 +4222,9 @@
       ],
       [
        "ALI",
-       "阿里港股当日承压",
-       -2,
-       0
+       "广州首个真武国产万卡智算集群投产运营。计划扩至 10 万卡",
+       3,
+       -1
       ],
       [
        "TCE",
@@ -4286,9 +4286,9 @@
      "moves": [
       [
        "NVDA",
-       "连跌第七日。收 145.98 一线",
-       -8,
-       -2
+       "FT 调查：Aivres–Megaspeed 芯片通道。Speedmatrix 申报自 Aivres 进口约 46 亿美元",
+       -10,
+       -3
       ],
       [
        "OAI",
@@ -4304,9 +4304,9 @@
       ],
       [
        "GOOG",
-       "股东受益。股价被带跌对冲",
-       -1,
-       2
+       "Google 发布 Gemini 4 Neon。中端编码与分析模型",
+       3,
+       1
       ],
       [
        "ANTH",
@@ -4328,9 +4328,9 @@
       ],
       [
        "MUSK",
-       "后续 IPO 排队者窗口变窄",
-       -4,
-       -2
+       "xAI Grok 4.8 开始向部分 Bot 用户软发布",
+       2,
+       -1
       ],
       [
        "BYTE",
@@ -4494,15 +4494,15 @@
       ],
       [
        "ORCL",
-       "债务担忧带跌",
-       -5,
-       -1
+       "甲骨文宣布 OpenAI 基建合同融资全部落实。约 3000 亿美元、4.5GW",
+       3,
+       2
       ],
       [
        "TSMC",
-       "大盘带跌。相对抗跌",
-       -2,
-       -1
+       "台积电执行 BIS 规则：叫停 16nm 及以下中国客户订单。无许可证改用 28nm/40nm",
+       -4,
+       -2
       ],
       [
        "SFTB",
@@ -6243,8 +6243,8 @@
    "oldOpening": 77,
    "prevEnd": 84,
    "breakpoint": -7,
-   "seasonEnd": 38,
-   "newSum": -46
+   "seasonEnd": 36,
+   "newSum": -48
   },
   {
    "season": "S5",
@@ -6257,8 +6257,8 @@
    "oldOpening": 58,
    "prevEnd": 90,
    "breakpoint": -32,
-   "seasonEnd": 55,
-   "newSum": -35
+   "seasonEnd": 54,
+   "newSum": -36
   },
   {
    "season": "S5",
@@ -6271,8 +6271,8 @@
    "oldOpening": 67,
    "prevEnd": 76,
    "breakpoint": -9,
-   "seasonEnd": 60,
-   "newSum": -16
+   "seasonEnd": 67,
+   "newSum": -9
   },
   {
    "season": "S5",
@@ -6285,8 +6285,8 @@
    "oldOpening": 48,
    "prevEnd": 55,
    "breakpoint": -7,
-   "seasonEnd": 48,
-   "newSum": -7
+   "seasonEnd": 50,
+   "newSum": -5
   },
   {
    "season": "S5",
@@ -6327,8 +6327,8 @@
    "oldOpening": 71,
    "prevEnd": 86,
    "breakpoint": -15,
-   "seasonEnd": 72,
-   "newSum": -14
+   "seasonEnd": 76,
+   "newSum": -10
   },
   {
    "season": "S5",
@@ -6341,8 +6341,8 @@
    "oldOpening": 63,
    "prevEnd": 78,
    "breakpoint": -15,
-   "seasonEnd": 70,
-   "newSum": -8
+   "seasonEnd": 69,
+   "newSum": -9
   },
   {
    "season": "S5",
@@ -6411,8 +6411,8 @@
    "oldOpening": 68,
    "prevEnd": 79,
    "breakpoint": -11,
-   "seasonEnd": 64,
-   "newSum": -15
+   "seasonEnd": 65,
+   "newSum": -14
   },
   {
    "season": "S5",
@@ -6425,8 +6425,8 @@
    "oldOpening": 59,
    "prevEnd": 68,
    "breakpoint": -9,
-   "seasonEnd": 62,
-   "newSum": -6
+   "seasonEnd": 55,
+   "newSum": -13
   },
   {
    "season": "S5",
@@ -6439,8 +6439,8 @@
    "oldOpening": 60,
    "prevEnd": 62,
    "breakpoint": -2,
-   "seasonEnd": 50,
-   "newSum": -12
+   "seasonEnd": 56,
+   "newSum": -6
   },
   {
    "season": "S5",
@@ -6453,8 +6453,8 @@
    "oldOpening": 37,
    "prevEnd": 35,
    "breakpoint": 2,
-   "seasonEnd": 28,
-   "newSum": -7
+   "seasonEnd": 29,
+   "newSum": -6
   },
   {
    "season": "S5",
@@ -6495,8 +6495,8 @@
    "oldOpening": 65,
    "prevEnd": 84,
    "breakpoint": -19,
-   "seasonEnd": 56,
-   "newSum": -28
+   "seasonEnd": 64,
+   "newSum": -20
   },
   {
    "season": "S5",
@@ -6509,8 +6509,8 @@
    "oldOpening": 40,
    "prevEnd": 70,
    "breakpoint": -30,
-   "seasonEnd": 40,
-   "newSum": -30
+   "seasonEnd": 43,
+   "newSum": -27
   },
   {
    "season": "S5",
@@ -6551,8 +6551,8 @@
    "oldOpening": 83,
    "prevEnd": 86,
    "breakpoint": -3,
-   "seasonEnd": 68,
-   "newSum": -18
+   "seasonEnd": 73,
+   "newSum": -13
   },
   {
    "season": "S5",
@@ -6565,8 +6565,8 @@
    "oldOpening": 58,
    "prevEnd": 64,
    "breakpoint": -6,
-   "seasonEnd": 48,
-   "newSum": -16
+   "seasonEnd": 47,
+   "newSum": -17
   },
   {
    "season": "S5",
@@ -6691,8 +6691,8 @@
    "oldOpening": 68,
    "prevEnd": 90,
    "breakpoint": -22,
-   "seasonEnd": 66,
-   "newSum": -24
+   "seasonEnd": 64,
+   "newSum": -26
   },
   {
    "season": "S5",
@@ -6705,8 +6705,8 @@
    "oldOpening": 64,
    "prevEnd": 82,
    "breakpoint": -18,
-   "seasonEnd": 68,
-   "newSum": -14
+   "seasonEnd": 67,
+   "newSum": -15
   },
   {
    "season": "S5",
@@ -6715,12 +6715,12 @@
    "playerName": "软银",
    "field": "hp",
    "moveFrom": -2,
-   "moveTo": -10,
+   "moveTo": 2,
    "oldOpening": 64,
    "prevEnd": 72,
-   "breakpoint": -8,
-   "seasonEnd": 52,
-   "newSum": -20
+   "breakpoint": 4,
+   "seasonEnd": 64,
+   "newSum": -8
   },
   {
    "season": "S5",
@@ -6729,12 +6729,12 @@
    "playerName": "软银",
    "field": "gold",
    "moveFrom": -2,
-   "moveTo": -21,
+   "moveTo": -2,
    "oldOpening": 41,
    "prevEnd": 60,
-   "breakpoint": -19,
-   "seasonEnd": 38,
-   "newSum": -22
+   "breakpoint": 0,
+   "seasonEnd": 57,
+   "newSum": -3
   }
  ],
  "roundRV": {
@@ -7102,6 +7102,11 @@
      "kind": "url",
      "ref": "https://www.zacks.com/stock/news/3031254/baidu-q3-earnings-miss-ai-cloud-strength-offsets-ad-weakness",
      "label": "百度 Q3 2026 财报（2026-11-16）：资本开支 73.5 亿元，同比增 116%，自由现金流 -45.7 亿元。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.japantimes.co.jp/business/2026/09/14/companies/softbank-loan-openai/",
+     "label": "软银落实 118.7 亿美元两年期定期贷款（2026-09-14，彭博）：约 20 家银行承诺，原目标 100 亿美元，超额认购；以 OpenAI 持股作抵押，用于 OpenAI 投资。"
     }
    ],
    "moves": {
@@ -7110,6 +7115,13 @@
       "kind": "url",
       "ref": "https://www.zacks.com/stock/news/3031254/baidu-q3-earnings-miss-ai-cloud-strength-offsets-ad-weakness",
       "label": "百度 Q3 资本开支 73.5 亿元；自由现金流 -45.7 亿元。"
+     }
+    ],
+    "17:SFTB": [
+     {
+      "kind": "url",
+      "ref": "https://www.japantimes.co.jp/business/2026/09/14/companies/softbank-loan-openai/",
+      "label": "软银落实 118.7 亿美元两年期定期贷款（2026-09-14，彭博）：约 20 家银行承诺，原目标 100 亿美元，超额认购；以 OpenAI 持股作抵押，用于 OpenAI 投资。"
      }
     ]
    },
@@ -7122,9 +7134,22 @@
      "kind": "url",
      "ref": "https://financefeeds.com/nvidia-nvda-stock-216-tuesday-spacex-40-billion-gpu-debt-anthropic-ipo-rally-bull-243-bear-190/",
      "label": "英伟达 2026-10-06 收盘 239.24 美元创纪录，盘中高点 243.37 美元；Anthropic 将于 10 月 26 日公开递交招股文件。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://gloom.sh/stocks/amzn/transcripts/q3-2026",
+     "label": "亚马逊 Q3 财报电话会（2026-10-29）：Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元，多数投向 AWS；2027 年将显著增加。"
     }
    ],
-   "moves": {},
+   "moves": {
+    "6:AMZN": [
+     {
+      "kind": "url",
+      "ref": "https://gloom.sh/stocks/amzn/transcripts/q3-2026",
+      "label": "亚马逊 Q3 财报电话会（2026-10-29）：Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元，多数投向 AWS；2027 年将显著增加。"
+     }
+    ]
+   },
    "note": ""
   },
   "S5:3-2": {
@@ -7151,6 +7176,16 @@
      "kind": "url",
      "ref": "https://www.financialexpress.com/market/global-markets/nvidia-loses-2-6-trillion-slips-behind-alphabet-as-shares-suffer-7th-straight-weekly-loss/4390357/",
      "label": "2026-11-12 英伟达开盘跌约 14%，收跌 4.34% 至 166.19 美元；盘中低点 148.80 美元。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://openai.com/index/introducing-gpt-6-2-astra-sol/",
+     "label": "OpenAI 发布 GPT-6.2 Astra 与 Sol（2026-11-17）：旗舰模型更新，ChatGPT Work 与 Codex 同日上线；Astra API 价降 20%。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://news.dayoo.com/finance/202611/16/171077_55024197.htm",
+     "label": "广州首个真武国产万卡智算集群投产运营（2026-11-16）：中国电信广东公司联合阿里云智能集团主办，黄埔区上线发布；计划扩至 10 万卡，TokenHub 平台同步发布。"
     }
    ],
    "moves": {
@@ -7159,6 +7194,20 @@
       "kind": "edgar",
       "ref": "0001045810-26-000082",
       "label": "CEO 辞职：董事会 11-11 接受辞职；NVDA ΔHP −16 为模型分。"
+     }
+    ],
+    "1:OAI": [
+     {
+      "kind": "url",
+      "ref": "https://openai.com/index/introducing-gpt-6-2-astra-sol/",
+      "label": "OpenAI 发布 GPT-6.2 Astra 与 Sol（2026-11-17）：旗舰模型更新，ChatGPT Work 与 Codex 同日上线；Astra API 价降 20%。"
+     }
+    ],
+    "11:ALI": [
+     {
+      "kind": "url",
+      "ref": "https://news.dayoo.com/finance/202611/16/171077_55024197.htm",
+      "label": "广州首个真武国产万卡智算集群投产运营（2026-11-16）：中国电信广东公司联合阿里云智能集团主办，黄埔区上线发布；计划扩至 10 万卡，TokenHub 平台同步发布。"
      }
     ]
    },
@@ -7186,6 +7235,21 @@
      "kind": "url",
      "ref": "https://www.neoteo.com/en/nvidia-chips-megaspeed-and-the-military-linked-ai-lab",
      "label": "纽约时报调查（2026-11-18）：阿里是 Megaspeed 的客户与资金支持方；Megaspeed 几年间购买逾 40 亿美元英伟达芯片。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/",
+     "label": "Google 发布 Gemini 4 Neon（2026-11-18）：Gemini 4 家族中端模型，介于 Carbon 与 Hydrogen 之间；1M 上下文，$3/$15。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://fourweekmba.com/ai-ft-maps-4-6b-chip-route-nvidia-says-it-blocked-megaspeed/",
+     "label": "FT 调查（2026-11-20）：浪潮未列清单的美国子公司 Aivres 持续与英伟达交易；Megaspeed 马来西亚子公司 Speedmatrix 申报自 Aivres 进口约 46 亿美元货物；英伟达称 2025 年已将 Megaspeed 列入内部禁售名单。（FT 原文付费墙，本条为转述）"
+    },
+    {
+     "kind": "url",
+     "ref": "https://explainx.ai/blog/grok-4-8-soft-rollout-rl-cpp-stack-november-2026",
+     "label": "xAI Grok 4.8 软发布（2026-11-18，马斯克 X 帖文）：已向部分 Grok Bot 用户软发布，全面发布还需一到两周打磨；无 xAI 官方新闻稿、无 API 发布、无基准成绩。（本条为马斯克帖文转述）"
     }
    ],
    "moves": {
@@ -7207,6 +7271,27 @@
       "ref": "https://www.neoteo.com/en/nvidia-chips-megaspeed-and-the-military-linked-ai-lab",
       "label": "纽约时报调查：阿里是 Megaspeed 客户与资金支持方。"
      }
+    ],
+    "3:GOOG": [
+     {
+      "kind": "url",
+      "ref": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/",
+      "label": "Google 发布 Gemini 4 Neon（2026-11-18）：Gemini 4 家族中端模型，介于 Carbon 与 Hydrogen 之间；1M 上下文，$3/$15。"
+     }
+    ],
+    "0:NVDA": [
+     {
+      "kind": "url",
+      "ref": "https://fourweekmba.com/ai-ft-maps-4-6b-chip-route-nvidia-says-it-blocked-megaspeed/",
+      "label": "FT 调查（2026-11-20）：浪潮未列清单的美国子公司 Aivres 持续与英伟达交易；Megaspeed 马来西亚子公司 Speedmatrix 申报自 Aivres 进口约 46 亿美元货物；英伟达称 2025 年已将 Megaspeed 列入内部禁售名单。（FT 原文付费墙，本条为转述）"
+     }
+    ],
+    "7:MUSK": [
+     {
+      "kind": "url",
+      "ref": "https://explainx.ai/blog/grok-4-8-soft-rollout-rl-cpp-stack-november-2026",
+      "label": "xAI Grok 4.8 软发布（2026-11-18，马斯克 X 帖文）：已向部分 Grok Bot 用户软发布，全面发布还需一到两周打磨；无 xAI 官方新闻稿、无 API 发布、无基准成绩。（本条为马斯克帖文转述）"
+     }
     ]
    },
    "note": ""
@@ -7223,6 +7308,16 @@
      "kind": "url",
      "ref": "https://www.fool.com/investing/2026/11/20/here-is-why-nvidia-stock-crashed-on-friday/",
      "label": "2026-11-20 英伟达收 125.53 美元，跌 14.01%；当周跌约 23%，为 2008 年以来最差一周。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.taiwannews.com.tw/news/6478978",
+     "label": "台积电叫停 16nm 及以下中国客户订单（2026-11-20，路透引述知情人士）：无许可证暂停，改用 28nm/40nm、无 HBM 或先进封装；BIS 远程规则 11-19 生效后执行收紧。（Nikkei Asia 同日跟进）"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.oracle.com/news/announcement/oracle-statement-2026-11-20/",
+     "label": "甲骨文官方声明（2026-11-20）：OpenAI 基建合同融资已全部落实；五年约 3000 亿美元、4.5GW；最后一次融资约 100 亿美元股票 + 100 亿美元债务。"
     }
    ],
    "moves": {
@@ -7231,6 +7326,20 @@
       "kind": "url",
       "ref": "https://www.thedailystar.net/news/world/news/nvidias-accounting-focus-us-sec-investigation-sources-say-4329306",
       "label": "SEC 调查报道触发当日大跌；NVDA ΔHP −18 为模型分。"
+     }
+    ],
+    "16:TSMC": [
+     {
+      "kind": "url",
+      "ref": "https://www.taiwannews.com.tw/news/6478978",
+      "label": "台积电叫停 16nm 及以下中国客户订单（2026-11-20，路透引述知情人士）：无许可证暂停，改用 28nm/40nm、无 HBM 或先进封装；BIS 远程规则 11-19 生效后执行收紧。（Nikkei Asia 同日跟进）"
+     }
+    ],
+    "9:ORCL": [
+     {
+      "kind": "url",
+      "ref": "https://www.oracle.com/news/announcement/oracle-statement-2026-11-20/",
+      "label": "甲骨文官方声明（2026-11-20）：OpenAI 基建合同融资已全部落实；五年约 3000 亿美元、4.5GW；最后一次融资约 100 亿美元股票 + 100 亿美元债务。"
      }
     ]
    },
