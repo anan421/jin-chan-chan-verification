@@ -2,11 +2,11 @@
  "meta": {
   "s6_start_date": 20261122,
   "last_run_date": "2026-11-22",
-  "testset_n": 99,
-  "gap_to_140": 41,
+  "testset_n": 98,
+  "gap_to_140": 42,
   "created": "2026-11-22",
   "updated": "2026-11-22",
-  "note": "Round-6 S5 patch 2026-11-22: S5 re-opened by Gu's decision and re-verified (./run.sh exit 0, runs/2026-11-22_054658/). All 9 missed_s5 events patched into S5 (GPT-6.2, Gemini 4 Neon, FT Aivres-Megaspeed, Zhenwu Guangzhou cluster, TSMC halt, Oracle financing secured, Amazon Q3 capex, SoftBank loan, Grok 4.8 soft launch); testset-v5.json 99 questions (A 50 / B 49). Previous note: 2 missed_s5 events patched into S5 on 2026-11-22 (Baidu Q3 capex, NYT Alibaba-Megaspeed); testset-v4.json 90 questions. 2026-11-22 11:35 run: +9 missed_s5, +2 kind_gap, +16 rejected; candidates still 0; new missed_s5 are S5-era gaps found by directed search (trial run window was only 11-16 to 11-22); patching S5 again is Gu's decision."
+  "note": "Round-6 S5 patch 2026-11-22: S5 re-opened by Gu's decision and re-verified (./run.sh exit 0, runs/2026-11-22_054658/). All 9 missed_s5 events patched into S5 (GPT-6.2, Gemini 4 Neon, FT Aivres-Megaspeed, Zhenwu Guangzhou cluster, TSMC halt, Oracle financing secured, Amazon Q3 capex, SoftBank loan, Grok 4.8 soft launch); testset-v5.json 99 questions (A 50 / B 49). Previous note: 2 missed_s5 events patched into S5 on 2026-11-22 (Baidu Q3 capex, NYT Alibaba-Megaspeed); testset-v4.json 90 questions. 2026-11-22 11:35 run: +9 missed_s5, +2 kind_gap, +16 rejected; candidates still 0; new missed_s5 are S5-era gaps found by directed search (trial run window was only 11-16 to 11-22); patching S5 again is Gu's decision. Round-7 Part 1 2026-11-22: 撤 q79（Grok 4.8，无官方公告）+ 修 23 处日期违规（最长 153 天 q40），S5 重验通过（./run.sh exit 0, runs/2026-11-22_064252/）；testset-v6.json 98 道题（A 50 / B 48）。"
  },
  "candidates": [],
  "missed_s5": [],
