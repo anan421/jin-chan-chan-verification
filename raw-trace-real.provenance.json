@@ -2,8 +2,8 @@
  "converter": "convert_data_json.py (data.json -> schema v3 raw trace)",
  "source": {
   "file": "data.json",
-  "sha256": "08ca9a1a911990b67cc5cea8c8fa282614c990e145c251d78f9bf994b40db821",
-  "bytes": 193737,
+  "sha256": "7eda7ce45afcbde2b249ed9d2ea0943f6b0154f4ded10e14c188a130bd4ceb05",
+  "bytes": 194852,
   "note": "machine copy (cp) of page assets/data.json; no hand transcription, no rank back-computation"
  },
  "page_version": "v13 (per parent handoff 2026-11-21 19:48 CST)",
@@ -183,7 +183,7 @@
    "ascend": 9,
    "bis_rule": 4,
    "blackwell": 6,
-   "capex": 15,
+   "capex": 16,
    "chatgpt": 3,
    "claude": 5,
    "colossus": 4,
@@ -195,7 +195,7 @@
    "huang_resign": 1,
    "hunyuan": 11,
    "llama": 5,
-   "megaspeed": 1,
+   "megaspeed": 2,
    "msft_invest": 7,
    "musk_table": 6,
    "open_source": 24,
@@ -206,12 +206,12 @@
    "spacex_xai": 4,
    "stargate": 15,
    "tongyi": 11,
-   "unknown": 346,
+   "unknown": 344,
    "v3": 2,
    "wenxin": 11
   },
-  "classified": 212,
-  "unknown": 346,
+  "classified": 214,
+  "unknown": 344,
   "note": "Per-move substantive action thread, classified from the move's own action text (see design/semantic-kinds.md). action_kind (round-type slug) is unchanged. generic and openai_mar26 have no instance in the real trace."
  },
  "rules": [

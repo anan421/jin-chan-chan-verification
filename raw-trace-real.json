@@ -2,8 +2,8 @@
  "schema_version": 3,
  "source_data_json": {
   "path": "data.json",
-  "sha256": "08ca9a1a911990b67cc5cea8c8fa282614c990e145c251d78f9bf994b40db821",
-  "bytes": 193737
+  "sha256": "7eda7ce45afcbde2b249ed9d2ea0943f6b0154f4ded10e14c188a130bd4ceb05",
+  "bytes": 194852
  },
  "players": [
   {
@@ -9144,8 +9144,8 @@
    "hp_delta": -8,
    "gold_delta": -9,
    "action_kind": "economy",
-   "semantic_kind": "unknown",
-   "action": "百度自由现金流转负。投入最克制",
+   "semantic_kind": "capex",
+   "action": "百度 Q3 资本开支 73.5 亿元。自由现金流转负",
    "date": 20260101,
    "hp_start": 70,
    "gold_start": 42,
@@ -10544,8 +10544,8 @@
    "hp_delta": -5,
    "gold_delta": -2,
    "action_kind": "draft",
-   "semantic_kind": "unknown",
-   "action": "阿里港股承压。海外云受限最直接",
+   "semantic_kind": "megaspeed",
+   "action": "纽约时报调查：阿里是 Megaspeed 客户与资金支持方",
    "date": 20261118,
    "hp_start": 79,
    "gold_start": 52,
