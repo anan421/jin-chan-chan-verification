@@ -2,8 +2,8 @@
  "converter": "convert_data_json.py (data.json -> schema v3 raw trace)",
  "source": {
   "file": "data.json",
-  "sha256": "07995677f405f030d66188e6ab910450bb50db96dbcc3549556f066d941f365d",
-  "bytes": 194222,
+  "sha256": "08ca9a1a911990b67cc5cea8c8fa282614c990e145c251d78f9bf994b40db821",
+  "bytes": 193737,
   "note": "machine copy (cp) of page assets/data.json; no hand transcription, no rank back-computation"
  },
  "page_version": "v13 (per parent handoff 2026-11-21 19:48 CST)",
