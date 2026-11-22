@@ -1,0 +1,128 @@
+{
+ "meta": {
+  "s6_start_date": 20261122,
+  "last_run_date": "2026-11-22",
+  "testset_n": 88,
+  "gap_to_140": 52,
+  "created": "2026-11-22",
+  "updated": "2026-11-22"
+ },
+ "candidates": [],
+ "missed_s5": [
+  {
+   "event_name": "百度 Q3 财报：资本开支 73.5 亿元",
+   "player": "BIDU",
+   "kind": "capex",
+   "event_real_date": 20261116,
+   "source": "百度 Q3 财报（Capital Times、Motley Fool 实录）",
+   "action": "百度 Q3 资本开支 73.5 亿元，同比翻倍以上",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里"
+  },
+  {
+   "event_name": "纽约时报调查：阿里是 Megaspeed 的客户与资金支持方",
+   "player": "ALI",
+   "kind": "megaspeed",
+   "event_real_date": 20261118,
+   "source": "纽约时报 11-18/19 调查（NeoTeo、explainx 转述）",
+   "action": "纽约时报调查披露阿里是 Megaspeed 的客户与资金支持方",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里"
+  }
+ ],
+ "kind_gap": [
+  {
+   "event_name": "Ricketts 参议员提出《MEGA 法案》",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261117,
+   "source": "参议员办公室新闻稿 11-17",
+   "action": "《MEGA 法案》提出，要求商务部 30 天内决定是否将 Megaspeed 列入实体清单",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "35 个种类里无对应种类"
+  },
+  {
+   "event_name": "加州总检察长 Bonta 向英伟达发出调查传票",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "加州司法部官网新闻稿 11-19",
+   "action": "Bonta 向英伟达发调查传票，查芯片或机密是否流向中国",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "35 个种类里无对应种类"
+  }
+ ],
+ "new_player": [],
+ "rejected": [
+  {
+   "event_name": "腾讯 Q3 财报：资本开支 814.33 亿元（+527%）",
+   "player": "TCE",
+   "kind": "capex",
+   "event_real_date": 20261118,
+   "source": "腾讯官方财报",
+   "action": "腾讯 Q3 资本开支 814.33 亿元，增 527%",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "已在testset里，不重复收"
+  },
+  {
+   "event_name": "Anthropic IPO 交割：超额配售权全额行使，募资约 935 亿美元",
+   "player": "ANTH",
+   "kind": "anthropic_ipo",
+   "event_real_date": 20261120,
+   "source": "Anthropic 官方公告 11-20",
+   "action": "IPO 交割，承销商全额行使超额配售权，合计发行 11.27 亿股",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "已在testset里，不重复收"
+  },
+  {
+   "event_name": "加州候任州长 Becerra 支持对失控智能体刑事指控",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "POLITICO 首报 11-19",
+   "action": "Becerra 表态：智能体发起网络攻击时刑事指控应成为选项",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "政策表态，未点名公司，无玩家动作"
+  },
+  {
+   "event_name": "黄仁勋同意在参议院银行委员会公开作证",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "参议院银行委员会主席 Scott 11-19 确认",
+   "action": "黄仁勋同意圣诞节前公开作证，日期未定",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "未来事件，还没发生"
+  },
+  {
+   "event_name": "众议院三委员会 12-01 闭门访谈黄仁勋",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261201,
+   "source": "众议院 11-18 确认",
+   "action": "众议院 12-01 闭门访谈黄仁勋（未来事件）",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "未来事件，还没发生"
+  },
+  {
+   "event_name": "马斯克 TomorrowX：SpaceX 每月带上线约 0.5GW AI 算力",
+   "player": "MUSK",
+   "kind": "datacenter",
+   "event_real_date": 20261118,
+   "source": "TomorrowX 11-18（马斯克本人表述，未独立核验）",
+   "action": "马斯克称 SpaceX 每月带上线约 0.5GW AI 算力",
+   "found_date": "2026-11-22",
+   "status": null,
+   "reason": "只是主张/目标，不是已发生的公开动作；且日期在 S5 时期内"
+  }
+ ]
+}
