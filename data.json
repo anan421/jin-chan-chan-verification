@@ -3880,7 +3880,7 @@
       ],
       [
        "BIDU",
-       "百度自由现金流转负。投入最克制",
+       "百度 Q3 资本开支 73.5 亿元。自由现金流转负",
        -8,
        -9
       ],
@@ -4340,7 +4340,7 @@
       ],
       [
        "ALI",
-       "阿里港股承压。海外云受限最直接",
+       "纽约时报调查：阿里是 Megaspeed 客户与资金支持方",
        -5,
        -2
       ],
@@ -7097,8 +7097,22 @@
   },
   "S5:1-1": {
    "status": "opinion",
-   "items": [],
-   "moves": {},
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.zacks.com/stock/news/3031254/baidu-q3-earnings-miss-ai-cloud-strength-offsets-ad-weakness",
+     "label": "百度 Q3 2026 财报（2026-11-16）：资本开支 73.5 亿元，同比增 116%，自由现金流 -45.7 亿元。"
+    }
+   ],
+   "moves": {
+    "13:BIDU": [
+     {
+      "kind": "url",
+      "ref": "https://www.zacks.com/stock/news/3031254/baidu-q3-earnings-miss-ai-cloud-strength-offsets-ad-weakness",
+      "label": "百度 Q3 资本开支 73.5 亿元；自由现金流 -45.7 亿元。"
+     }
+    ]
+   },
    "note": "本轮其余大动作（NVDA、GOOG、META、HUAWEI、DPSK、AAPL、ORCL、TSMC、SFTB）无逐动作证据：S5 首轮增量含跨季对账断点（S5 英伟达金币、Anthropic 血量硬错误均记入首轮，见验证章），数值为对账后的模型分。"
   },
   "S5:2-1": {
@@ -7167,6 +7181,11 @@
      "kind": "url",
      "ref": "https://www.kdlg.org/as-heard-on-npr/2026-11-18/anthropic-ipo-raises-record-81-3-billion-on-strong-ai-demand",
      "label": "Anthropic 2026-11-18 定价 83 美元，售股 9.8 亿股，募资约 813 亿美元，创最大 IPO 纪录；11-19 首日交易。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.neoteo.com/en/nvidia-chips-megaspeed-and-the-military-linked-ai-lab",
+     "label": "纽约时报调查（2026-11-18）：阿里是 Megaspeed 的客户与资金支持方；Megaspeed 几年间购买逾 40 亿美元英伟达芯片。"
     }
    ],
    "moves": {
@@ -7180,6 +7199,13 @@
       "kind": "url",
       "ref": "https://www.kdlg.org/as-heard-on-npr/2026-11-18/anthropic-ipo-raises-record-81-3-billion-on-strong-ai-demand",
       "label": "2026-11-18 定价 83 美元，募资约 813 亿美元。"
+     }
+    ],
+    "11:ALI": [
+     {
+      "kind": "url",
+      "ref": "https://www.neoteo.com/en/nvidia-chips-megaspeed-and-the-military-linked-ai-lab",
+      "label": "纽约时报调查：阿里是 Megaspeed 客户与资金支持方。"
      }
     ]
    },
