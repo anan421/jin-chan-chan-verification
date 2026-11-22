@@ -132,14 +132,33 @@ AI 基础设施；预计资本开支将按美元口径环比增加，由云与 A
 第 2 步 → 资本开支。
 
 **q16，BIDU，资本开支（S5 1-1，新题，第 5 轮没诊断过）。**
-按第 1 步找：先找这次财报之前的指引和趋势。
-没有一家给出明确的资本开支金额指引。能用的只有管理层展望和趋势：
-2026 年 5 月 18 日 Q1 电话会说“保持战略投资强度”、
-继续投基础模型和全栈 AI；2026 年 8 月 18 日 Q2 电话会说
-AI 云基建下半年有望强劲增长；最近几个季度资本开支趋势向上。
-按第 1 步 (c) 后备趋势 + 第 2 步 → 资本开支，只标中把握。
+第 1 步 (a)：这次有管理层原话，不再只靠趋势。来源是百度
+Q1/Q2 2026 财报电话会文字稿（StockAnalysis 转录；电话会开场说明
+回放见百度 IR 网站 ir.baidu.com），日期都在轮次日期 20261116 之前。
+- 2026 年 5 月 18 日 Q1 电话会，分析师直接问 2026 年 CapEx 水平，
+CFO Henry Haijian He 答：“our overall approach is to maintain
+strategic investment intensity while preserving financial discipline.
+AI remains Baidu's most important long-term opportunity, and we will
+continue to invest in foundation models to stay competitive at the
+frontier, but also across our full-stack AI capability more broadly.”
+同场 CEO Robin Li 说：“We will continue to invest in ERNIE with
+conviction.” AI 云负责人 Dou Shen 说，需求强、供给相对紧张，
+“we are actively expanding capacity and improving resource efficiency
+to better support the growing customer needs.”
+- 2026 年 8 月 18 日 Q2 电话会，分析师问 CapEx 继续爬坡之下怎么看
+利润，CFO Henry Haijian He 答：“we are still in an AI investment
+cycle, and our commitment to that investment is unwavering… We are
+now in a critical phase of investment, and we intend to keep investing
+decisively in the areas that matters most to our long-term competitive
+position…” 同场 Dou Shen 说：“we believe AI Cloud Infra revenue
+growth will remain strong in the second half, with the potential for
+further acceleration.”
+第 2 步：指引说继续投、处在投资关键阶段 → 资本开支，只标中把握。
+注意：两场电话会都没有给出明确的资本开支金额指引（没有金额，
+没有区间）。按第 5 步，上面是来源 + 日期 + 原话齐全的指引引用，
+不再算弱引用；但因为没有金额指引，不要编一个金额，也不标高把握。
 注意：例题以前直接写了本题的事件数字，那是答案，不该写。
-这里不写事件数字。也没有明确的金额指引，不要编一个。
+这里不写事件数字。Q3 财报本身的任何数字都不许当指引。
 
 **q19，AMZN，资本开支（S5 2-1，新题，第 5 轮没诊断过）。**
 第 1 步 (a)：2026 年 7 月 30 日 Q2 电话会，CEO Andy Jassy 把 2026 年
@@ -152,6 +171,28 @@ AI 云基建下半年有望强劲增长；最近几个季度资本开支趋势�
 这里只用 Q2 电话会（轮次日期之前）的指引，不写 Q3 的数字。
 
 ## 第 5 轮第二批错在哪（对照）
+
+## 更正记录（2026-11-22，第 9 轮）
+
+- q16 例题原先只有趋势描述，没有管理层原话。第 8 轮审计：
+  两批实验组都在 q16 上引用弱。
+- 已补两场电话会的管理层原话（来源 + 日期 + 原话）：
+  2026-05-18 Q1 电话会，CFO Henry Haijian He 答分析师关于
+  2026 年 CapEx 水平的问题：“maintain strategic investment
+  intensity… we will continue to invest in foundation models…
+  across our full-stack AI capability more broadly”；同场
+  Robin Li：“We will continue to invest in ERNIE with conviction”；
+  Dou Shen：“we are actively expanding capacity and improving
+  resource efficiency to better support the growing customer needs”。
+  2026-08-18 Q2 电话会，CFO Henry Haijian He：“we are still in
+  an AI investment cycle, and our commitment to that investment is
+  unwavering… We are now in a critical phase of investment, and we
+  intend to keep investing decisively…”；同场 Dou Shen：
+  AI Cloud Infra 收入下半年“remain strong in the second half,
+  with the potential for further acceleration”。
+- 两场电话会都没有明确的资本开支金额指引，不编金额，
+  把握仍标中把握。引用来源日期都在轮次日期 20261116 之前，
+  例题里没有事件数字。
 
 ## 更正记录（2026-11-22，第 8 轮，第 7 轮审计后）
 
