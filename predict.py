@@ -672,6 +672,7 @@ def reverify(fork):
             "gaps": r.gaps, "coverage": coverage}
     except Exception as e:
         out["check"] = {"verdict": "error", "error": str(e)}
+    tmp = None
     try:
         tmp = Path(tempfile.mkdtemp(prefix="predict-lean-"))
         lean_tmp = tmp / "lean"
@@ -716,6 +717,9 @@ def reverify(fork):
         }
     except Exception as e:
         out["lean"] = {"status": "error", "error": str(e)}
+    finally:
+        if tmp is not None:
+            shutil.rmtree(tmp, ignore_errors=True)
     return out
 
 

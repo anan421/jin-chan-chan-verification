@@ -1,5 +1,18 @@
-# 管线状态（2026-11-21 晚）
+# 管线状态（2026-11-24）
 
+## 当前状态（2026-11-24）
+
+- 数据：751 条动作、32 名玩家、94 轮、7 个赛季（S0–S6）。页面 v13。
+- S5 季末：Anthropic 121 血 / 113 金，OpenAI 79 血 / 58 金，英伟达 36 血 / 54 金。
+  S6 季末：Anthropic 121 / 113，OpenAI 82 / 59，英伟达 37 / 55。
+- 2026-11-24 三项决定：① S5 11 月轮与 S6 1-1 轮不合并，分立两轮，
+  标签分别为 11 月 1–21 日与 11 月 22–30 日，S5 季末不变；
+  ② Megaspeed 列入实体清单记在 NVDA 名下，进 S6 1-1 轮，血 -5、金 -2；
+  ③ Lean 徽章重验 751 条全部通过后改回真实总数。
+- 最新运行 `runs/2026-11-24_055133/` 总体 pass，0 sorry。
+  真实 trace 已抽取：`traces/trace-latest.json`（schema v4，751 条）。
+- 下文 2026-11-21 各节中的 558 条指当时的真实 trace 或 fixture 规模，
+  属历史记录；当前口径为 751 条。fixture 合成数据仍为 558 条，规模不变。
 - Lean 4.36.0 + Lake 5.0.0 已装（elan，走 GitHub releases 直链）。
   elan.lean-lang.org 返回 404，GitHub API 限流——安装走 GitHub
   releases 直链。
@@ -17,16 +30,11 @@
     合并报告 fail。报告：`runs/2026-11-21_101129/merged-report.md`。
   - 曾抓到一次空跑：`lake build` 无默认目标时返回 0 且什么都不编。
     已修：TOML 加 `defaultTargets`，`run.sh` 加 Proofs.olean 落盘校验。
-- 真实 trace 尚未抽取：`traces/` 为空。
-  诊断（v4）确认逐轮增量与赛季末排名两套数据未对账；修复路径为
-  单一事实源 data.json。页面现为 v6（v5 为形式化检测那轮，
-  v6 为段位看板）。诊断 882e34f3 结论：v6 仍无 data.json，
-  仍是单一自包含 index.html，内嵌四份并行手写数据源；
-  赛季末排名与总图折线均为手写静态值。真实抽取继续等待修复，
-  修复未授权，不得擅自修页面。
-- 抽取检查已派：inspect 882e34f3，问 v6 是否已带 data.json；
-  若有，返回 data.json 内容与显示的排名/总图数据。
-  回执到后：`extract.py` 入库 → `./run.sh` 跑首份真实合并报告。
+- 真实 trace 已抽取：`traces/trace-latest.json`（schema v4，751 条）。
+  页面现为 v13，data.json 为单一事实源。最新运行
+  `runs/2026-11-24_055133/` 总体 pass，0 sorry。
+- 抽取检查已派（2026-11-21，inspect 882e34f3，问 v6 是否已带 data.json）：
+  已回执。首份真实合并报告见 `runs/2026-11-21_115719/merged-report.md`。
 
 ## 2026-11-21 晚新增（用户批准的三件事已建成）
 

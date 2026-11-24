@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 """S6 daily monitor helper: pool I/O, dedup, watermark.
 
-Pool file: /home/hatch/workspace/verification/s6-pending-pool.json
+Pool file: s6-pending-pool.json (next to the repository root)
 Schema:
-  meta: {s6_start_date, last_run_date, testset_n, gap_to_140, created, updated}
-  candidates: verified S6 candidates (event_real_date > 20261121)
-  missed_s5: S5-era events (<= 20261121) not in trace/testset
-  kind_gap: real public events with no matching kind among the 35
+  meta: {s6_start_date, last_run_date, testset_n, gap_to_140,
+         gap_to_140_status, created, updated}
+  candidates: verified S6 candidates (event_real_date >= S6_START_DATE,
+    i.e. real date later than 2026-11-21; S6 starts 2026-11-22)
+  missed_s5: S5-era events (< S6_START_DATE) not in trace/testset
+  kind_gap: real public events with no matching kind among the KINDS
+    read from testset-v7
   rejected: examined but rejected, with reason
 
+Unified vocabulary sources (read, never hard-coded):
+  - players: data.json "players" (32 historical players)
+  - kinds: testset-v7 questions' "kind" field (43 kinds)
+  - trace: traces/trace-latest.json (751 moves)
+
 Dedup sources (read-only):
-  - trace: /home/hatch/workspace/verification/traces/trace-latest.json (558 moves)
-  - testset: /home/hatch/workspace/verification-v1-walkforward/testset-v3.json (88)
+  - trace: traces/trace-latest.json
+  - testset: ../verification-v1-testset-complete/testset-v7.json (215)
 
 Usage:
   python3 scripts/s6_monitor.py trial   # run the trial classification, write pool
@@ -25,32 +33,53 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 POOL_PATH = os.path.join(ROOT, "s6-pending-pool.json")
-TRACE_PATH = "/home/hatch/workspace/verification/traces/trace-latest.json"
-TESTSET_PATH = ("/home/hatch/workspace/verification-v1-walkforward/"
-                "testset-v3.json")
+DATA_PATH = os.path.join(ROOT, "data.json")
+TRACE_PATH = os.path.join(ROOT, "traces", "trace-latest.json")
+TESTSET_PATH = os.path.normpath(
+    os.path.join(ROOT, "..", "verification-v1-testset-complete",
+                 "testset-v7.json"))
 
-PLAYERS = ['NVDA', 'OAI', 'MSFT', 'GOOG', 'ANTH', 'META', 'AMZN', 'MUSK',
-           'AAPL', 'ORCL', 'BYTE', 'ALI', 'TCE', 'BIDU', 'HUAWEI', 'DPSK',
-           'TSMC', 'SFTB']
-S6_START = 20261121  # candidates must have event_real_date > this
+# Single S6 boundary constant. S6 starts 2026-11-22. A candidate must
+# have a real date later than 2026-11-21, i.e. event_real_date >=
+# S6_START_DATE. Pool meta s6_start_date uses this same constant.
+S6_START_DATE = 20261122
 
-# 35 kinds (from design/kind-boundary-rules.md).
-KINDS = {'stargate', 'anthropic_ipo', 'msft_invest', 'blackwell', 'r1',
-         'musk_table', 'colossus', 'spacex_xai', 'doubao_price_war',
-         'bis_rule', 'chatgpt', 'v3', 'overseas_rental', 'huang_resign',
-         'sec_probe', 'tongyi', 'hunyuan', 'ascend', 'doubao', 'wenxin',
-         'pangu', 'llama', 'claude', 'gemini', 'megaspeed', 'energy',
-         'financing', 'capex', 'open_source', 'datacenter', 'compliance',
-         'invest_plan', 'generic', 'openai_mar26'}
+# Legacy 140-question target. The target expired: testset-v7 already
+# holds 215 questions. Do not set a new target here. gap_to_140 is
+# computed honestly as LEGACY_TARGET_140 - testset_n and marked
+# legacy_target_pending_rescope until Gu re-scopes it.
+LEGACY_TARGET_140 = 140
+GAP_TO_140_STATUS = "legacy_target_pending_rescope"
+
+
+def _load_players():
+    with open(DATA_PATH, encoding="utf-8") as f:
+        data = json.load(f)
+    return [p["id"] for p in data["players"]]
+
+
+def _load_testset_questions():
+    with open(TESTSET_PATH, encoding="utf-8") as f:
+        return json.load(f)["questions"]
+
+
+# Unified vocabulary, read from the sources above at import time.
+PLAYERS = _load_players()
+_TESTSET_QUESTIONS = _load_testset_questions()
+KINDS = {q["kind"] for q in _TESTSET_QUESTIONS}
+TESTSET_N = len(_TESTSET_QUESTIONS)
 
 
 def new_pool():
     return {
         "meta": {
-            "s6_start_date": 20261122,
+            "s6_start_date": S6_START_DATE,
             "last_run_date": None,
-            "testset_n": 88,
-            "gap_to_140": 52,
+            "testset_n": TESTSET_N,
+            "gap_to_140": LEGACY_TARGET_140 - TESTSET_N,
+            "gap_to_140_status": GAP_TO_140_STATUS,
+            "note": ("2026-11-24: gap_to_140 为旧目标口径（140 道），待 Gu 重定"
+                     "新目标；数值按 140 - testset_n 如实计算。"),
             "created": "2026-11-22",
             "updated": "2026-11-22",
         },
@@ -82,15 +111,37 @@ def load_trace():
 
 
 def load_testset():
-    with open(TESTSET_PATH, encoding="utf-8") as f:
-        return json.load(f)["questions"]
+    return _TESTSET_QUESTIONS
 
 
 def player_of_trace_move(m):
     p = m.get("player")
     if isinstance(p, int):
+        if p < 0 or p >= len(PLAYERS):
+            raise ValueError(
+                "trace player index %d out of range for %d players "
+                "from data.json" % (p, len(PLAYERS)))
         return PLAYERS[p]
     return p
+
+
+def active_players(trace_moves):
+    """Players with at least one move in the latest season in the trace.
+
+    Computed from the trace, never hard-coded. Returns (season, players)
+    with players in roster order. Historical players are PLAYERS;
+    active players are this subset for the current season.
+    """
+    seasons = [m.get("season") for m in trace_moves
+               if isinstance(m.get("season"), int)]
+    if not seasons:
+        return (None, [])
+    latest = max(seasons)
+    active_idx = {m["player"] for m in trace_moves
+                  if m.get("season") == latest
+                  and isinstance(m.get("player"), int)}
+    return (latest, [PLAYERS[i] for i in sorted(active_idx)
+                     if 0 <= i < len(PLAYERS)])
 
 
 def is_duplicate(candidate, trace_moves, questions, pool):
@@ -109,10 +160,25 @@ def is_duplicate(candidate, trace_moves, questions, pool):
     for m in trace_moves:
         if player_of_trace_move(m) == pl and \
                 (m.get("semantic_kind") == kind or
-                 m.get("action_kind") == kind):
-            # same player + same kind in the trace: check the action text
+                 m.get("action_kind") == kind) and \
+                d is not None and m.get("date") == d:
+            # same player + same kind + same date in the trace: check the
+            # action text. Require at least two distinct name words in the
+            # action text, counting overlapping words once ("chat" inside
+            # "chatgpt" is one hit, not two). One generic word alone is not
+            # a duplicate: on 2026-11-24 the old any-word rule flagged
+            # Claude Ship on the single word "Claude" matching the old S1
+            # action "Claude 1 低调发布"; manual review confirmed it is
+            # not one. The date must also match: GPT-6.2 Sol Chat tab
+            # (20261123) is a different rollout from the S5 trace move
+            # "GPT-6.2 Astra 与 Sol 发布" (20261101), manually verified
+            # distinct. Near-duplicates stay a manual-review call.
             act = (m.get("action") or "").lower()
-            if name and any(w in act for w in name.split() if len(w) > 3):
+            words = [w for w in name.split() if len(w) > 3]
+            hits = [w for w in words if w in act]
+            hits = [w for w in hits
+                    if not any(w != u and w in u for u in hits)]
+            if name and len(hits) >= 2:
                 return ("trace", (m.get("season"), m.get("round_label")))
     for e in pool.get("candidates", []) + pool.get("missed_s5", []):
         if e.get("player") == pl and e.get("kind") == kind and \
@@ -136,13 +202,14 @@ def classify(event, trace_moves, questions, pool):
     if dup:
         return ("rejected", "已在%s里，不重复收" % dup[0])
     if kind is None or kind not in KINDS:
-        return ("kind_gap", "35 个种类里无对应种类")
+        return ("kind_gap", "%d 个种类里无对应种类" % len(KINDS))
     if pl is None:
         return ("rejected", "归属不清，无玩家")
     if pl not in PLAYERS:
-        return ("new_player", "玩家不在 18 人名单里，需 Gu 定是否加进大厅")
-    if d <= S6_START:
-        return ("missed_s5", "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里")
+        return ("new_player",
+                "玩家不在 %d 人名单里，需 Gu 定是否加进大厅" % len(PLAYERS))
+    if d < S6_START_DATE:
+        return ("missed_s5", "真实日期在 S5 时期内（<2026-11-22），不在 trace 里")
     return ("candidates", "已核验：公开动作、种类能定、真实日期晚于 2026-11-21、来源齐全")
 
 
@@ -241,9 +308,9 @@ def check():
     questions = load_testset()
     assert set(pool) >= {"meta", "candidates", "missed_s5", "kind_gap",
                          "new_player", "rejected"}, "pool schema incomplete"
-    # no candidate may have a date <= S6_START or duplicate the testset
+    # no candidate may have a date before S6 starts or duplicate the testset
     for e in pool["candidates"]:
-        assert e["event_real_date"] > S6_START, e
+        assert e["event_real_date"] >= S6_START_DATE, e
         assert not is_duplicate(e, trace_moves, questions,
                                 {"candidates": [], "missed_s5": []}), e
     # no candidate may duplicate another pool entry
@@ -252,16 +319,23 @@ def check():
         key = (e.get("player"), e.get("kind"), e.get("event_real_date"))
         assert key not in seen, key
         seen.add(key)
+    season, active = active_players(trace_moves)
     print("check ok:", {k: len(pool[k]) for k in
                         ("candidates", "missed_s5", "kind_gap", "new_player",
                          "rejected")})
+    print("players: historical=%d active(S%d)=%s"
+          % (len(PLAYERS), season, active))
 
 
 def status():
     pool = load_pool()
+    trace_moves = load_trace()
+    season, active = active_players(trace_moves)
     print(json.dumps(pool["meta"], ensure_ascii=False))
     print({k: len(pool[k]) for k in
            ("candidates", "missed_s5", "kind_gap", "new_player", "rejected")})
+    print("players: historical=%d active(S%d)=%s"
+          % (len(PLAYERS), season, active))
 
 
 if __name__ == "__main__":

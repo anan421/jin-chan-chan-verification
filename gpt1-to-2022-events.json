@@ -1,0 +1,642 @@
+{
+  "period": "2018-06 to 2022-12",
+  "count": 106,
+  "events": [
+    {
+      "date": "2018-06",
+      "player": "OAI",
+      "source": "The Register 2018-08-06报道首场6月比赛 https://www.theregister.com/software/2018/08/06/openai-bots-thrash-team-of-dota-2-semi-pros-set-eyes-on-mega-tourney/1205891（仅核实到月，日不确定）",
+      "title": "OpenAI Five首胜Dota 2业余队"
+    },
+    {
+      "date": "2018-06-11",
+      "player": "OAI",
+      "source": "OpenAI论文《Improving Language Understanding by Generative Pre-Training》；Wikipedia GPT-1 https://en.wikipedia.org/wiki/GPT-1",
+      "title": "GPT-1发布，生成式预训练范式确立"
+    },
+    {
+      "date": "2018-07-19",
+      "player": "OAI",
+      "source": "GIGAZINE 2018-07-19 https://gigazine.net/gsc_news/en/20180719-openai-five-benchmark",
+      "title": "OpenAI Five宣布8月对阵前职业队"
+    },
+    {
+      "date": "2018-08-13",
+      "player": "NVDA",
+      "source": "NVIDIA新闻中心 https://nvidianews.nvidia.com/news/nvidia-reinvents-computer-graphics-with-turing-architecture?pStoreID=fedex",
+      "title": "英伟达发布Turing架构GPU"
+    },
+    {
+      "date": "2018-09-28",
+      "player": "GOOG",
+      "source": "arXiv:1809.11096；Hugging Face论文页 https://huggingface.co/papers/1809.11096",
+      "title": "DeepMind发布BigGAN，大规模GAN训练"
+    },
+    {
+      "date": "2018-10-11",
+      "player": "GOOG",
+      "source": "arXiv:1810.04805 https://doi.org/10.48550/arXiv.1810.04805",
+      "title": "谷歌发布BERT论文，双向预训练"
+    },
+    {
+      "date": "2018-11-02",
+      "player": "GOOG",
+      "source": "Google AI博客《Open Sourcing BERT》 https://www.googblogs.com/open-sourcing-bert-state-of-the-art-pre-training-for-natural-language-processing/",
+      "title": "谷歌开源BERT代码与预训练模型"
+    },
+    {
+      "date": "2018-12",
+      "player": "GOOG",
+      "source": "Wikipedia AlphaFold https://en.wikipedia.org/wiki/AlphaFold（仅核实到月，CASP13于2018年12月举行）",
+      "title": "DeepMind AlphaFold赢得CASP13"
+    },
+    {
+      "date": "2018-12-07",
+      "player": "EU",
+      "source": "欧盟委员会 COM(2018) 795 final https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A52018DC0795",
+      "title": "欧盟发布AI协调计划，投200亿欧元"
+    },
+    {
+      "date": "2018-12-12",
+      "player": "NVDA",
+      "source": "arXiv:1812.04948；AI Wiki StyleGAN https://aiwiki.ai/wiki/stylegan",
+      "title": "英伟达发布StyleGAN，生成逼真人脸"
+    },
+    {
+      "date": "2019-01-24",
+      "player": "GOOG",
+      "source": "DeepMind博客；New Scientist 2019-01-24 https://www.newscientist.com/article/2191910-deepmind-ai-thrashes-human-professionals-at-video-game-starcraft-ii/",
+      "title": "AlphaStar首胜星际争霸2职业选手"
+    },
+    {
+      "date": "2019-02-11",
+      "player": "USGOV",
+      "source": "美国第13859号行政令，Federal Register https://regulations.justia.com/regulations/fedreg/2019/02/14/2019-02544.html",
+      "title": "美国发布行政令，启动美国AI倡议"
+    },
+    {
+      "date": "2019-02-14",
+      "player": "OAI",
+      "source": "OpenAI博客《Better Language Models》；Wikipedia GPT-2 https://en.wikipedia.org/wiki/GPT-2",
+      "title": "GPT-2发布，仅放124M版防滥用"
+    },
+    {
+      "date": "2019-03-11",
+      "player": "OAI",
+      "source": "OpenAI公告《OpenAI LP》（2019-03-11）；https://www.guidetoartificialintelligence.com/en/learn/what-is-openai-lp-capped-profit/",
+      "title": "OpenAI改制为上限利润公司"
+    },
+    {
+      "date": "2019-03-27",
+      "player": "ACM",
+      "source": "ACM公告 https://www.acm.org/media-center/2019/march/turing-award-2018",
+      "title": "深度学习三先驱获2018图灵奖"
+    },
+    {
+      "date": "2019-04-04",
+      "player": "GOOG",
+      "source": "MIT Technology Review 2019-04-05 https://www.technologyreview.com/2019/04/05/136188/google-has-now-cancelled-its-ai-ethics-board-after-a-backlash-from-staff/",
+      "title": "谷歌解散AI伦理委员会ATEAC"
+    },
+    {
+      "date": "2019-04-08",
+      "player": "EU",
+      "source": "欧盟AI高级别专家组《可信AI伦理指南》；Lexology https://www.lexology.com/library/detail.aspx?g=d0820c08-0842-4a3a-bd71-65e9622b31b5",
+      "title": "欧盟发布可信AI伦理指南"
+    },
+    {
+      "date": "2019-05",
+      "player": "OAI",
+      "source": "OpenAI《GPT-2: 6-month follow-up》 https://openai.com/index/gpt-2-6-month-follow-up/（仅核实到月；OpenAI自家时间线4月与5月说法不一，日不确定）",
+      "title": "GPT-2分阶段放出355M版"
+    },
+    {
+      "date": "2019-06-19",
+      "player": "GOOG",
+      "source": "arXiv:1906.08237 https://arxiv.org/abs/1906.08237",
+      "title": "谷歌与CMU发布XLNet，超BERT"
+    },
+    {
+      "date": "2019-07-22",
+      "player": "MSFT",
+      "source": "微软新闻中心；GeekWire https://www.geekwire.com/2019/microsoft-invests-1-billion-openai-vows-build-ai-technology-platform-unprecedented-scale/",
+      "title": "微软向OpenAI投资10亿美元"
+    },
+    {
+      "date": "2019-07-26",
+      "player": "META",
+      "source": "arXiv:1907.11692；AI Wiki https://aiwiki.ai/wiki/roberta",
+      "title": "Facebook发布RoBERTa，优化BERT训练"
+    },
+    {
+      "date": "2019-08-20",
+      "player": "OAI",
+      "source": "OpenAI《GPT-2: 6-month follow-up》 https://openai.com/index/gpt-2-6-month-follow-up/",
+      "title": "GPT-2放出774M版并发布分阶段报告"
+    },
+    {
+      "date": "2019-09-17",
+      "player": "NVDA",
+      "source": "arXiv:1909.08053 https://arxiv.org/abs/1909.08053v2",
+      "title": "英伟达发布Megatron-LM，83亿参数"
+    },
+    {
+      "date": "2019-09-26",
+      "player": "GOOG",
+      "source": "arXiv:1909.11942 https://arxiv.org/abs/1909.11942v1",
+      "title": "谷歌发布ALBERT，轻量版BERT"
+    },
+    {
+      "date": "2019-10-02",
+      "player": "HF",
+      "source": "arXiv:1910.01108；Hugging Face论文页 https://huggingface.co/papers/1910.01108",
+      "title": "Hugging Face发布DistilBERT"
+    },
+    {
+      "date": "2019-10-23",
+      "player": "GOOG",
+      "source": "arXiv:1910.10683；Wikipedia T5 https://en.wikipedia.org/wiki/T5_(language_model)",
+      "title": "谷歌发布T5，统一文本到文本框架"
+    },
+    {
+      "date": "2019-10-25",
+      "player": "GOOG",
+      "source": "Google博客 https://blog.google/products-and-platforms/products/search/search-language-understanding-bert/",
+      "title": "谷歌搜索上线BERT，影响一成查询"
+    },
+    {
+      "date": "2019-10-30",
+      "player": "GOOG",
+      "source": "Nature论文；Wikipedia 2019 in AI https://en.wikipedia.org/wiki/2019_in_artificial_intelligence",
+      "title": "AlphaStar达星际2宗师级水平"
+    },
+    {
+      "date": "2019-11-05",
+      "player": "OAI",
+      "source": "OpenAI《GPT-2: 1.5B Release》；Wikipedia GPT-2 https://en.wikipedia.org/wiki/GPT-2",
+      "title": "GPT-2完整15亿参数版发布"
+    },
+    {
+      "date": "2019-11-19",
+      "player": "GOOG",
+      "source": "arXiv:1911.08265 https://arxiv.org/abs/1911.08265v1",
+      "title": "DeepMind发布MuZero，无规则自学规划"
+    },
+    {
+      "date": "2019-12-03",
+      "player": "NVDA",
+      "source": "arXiv:1912.04958；AI Wiki StyleGAN https://aiwiki.ai/wiki/stylegan",
+      "title": "英伟达发布StyleGAN2，画质再提升"
+    },
+    {
+      "date": "2020-01-23",
+      "player": "OAI",
+      "source": "arXiv:2001.08361 https://arxiv.org/abs/2001.08361",
+      "title": "Scaling Laws论文发布，揭示规模定律"
+    },
+    {
+      "date": "2020-02",
+      "player": "GOOG",
+      "source": "谷歌AI博客 https://ai.googleblog.com/2020/02/exploring-transfer-learning-with-t5.html",
+      "title": "谷歌发布T5-11B统一文本到文本模型"
+    },
+    {
+      "date": "2020-02-13",
+      "player": "MSFT",
+      "source": "微软研究院博客 https://www.microsoft.com/en-us/research/blog/turing-nlg-a-17-billion-parameter-language-model-by-microsoft/",
+      "title": "微软发布170亿参数Turing-NLG"
+    },
+    {
+      "date": "2020-03-05",
+      "player": "GOOG",
+      "source": "DeepMind博客，经Synced Review报道 https://syncedreview.com/2020/03/05/google-deepmind-releases-structure-predictions-for-coronavirus-linked-proteins/amp/",
+      "title": "DeepMind发布新冠病毒蛋白结构预测"
+    },
+    {
+      "date": "2020-03-28",
+      "player": "HUAWEI",
+      "source": "华为MindSpore官网 https://www.mindspore.cn/news/en/176",
+      "title": "华为MindSpore框架正式开源"
+    },
+    {
+      "date": "2020-04-29",
+      "player": "META",
+      "source": "Meta AI博客 https://ai.meta.com/blog/state-of-the-art-open-source-chatbot/",
+      "title": "Facebook开源94亿参数聊天机器人Blender"
+    },
+    {
+      "date": "2020-05-14",
+      "player": "NVDA",
+      "source": "NVIDIA官方新闻 https://rss.globenewswire.com/en/news-release/2020/05/14/2033550/0/en/NVIDIA-s-New-Ampere-Data-Center-GPU-in-Full-Production.html",
+      "title": "英伟达发布A100 GPU与Ampere架构"
+    },
+    {
+      "date": "2020-05-28",
+      "player": "OAI",
+      "source": "arXiv:2005.14165 https://arxiv.org/abs/2005.14165",
+      "title": "GPT-3论文发布，1750亿参数少样本学习"
+    },
+    {
+      "date": "2020-06-11",
+      "player": "OAI",
+      "source": "OpenAI博客，经Wikipedia GPT-3条目 https://en.wikipedia.org/wiki/GPT-3",
+      "title": "GPT-3 API开启私人内测"
+    },
+    {
+      "date": "2020-06-30",
+      "player": "GOOG",
+      "source": "arXiv:2006.16668 https://arxiv.org/abs/2006.16668",
+      "title": "谷歌GShard论文，6000亿参数稀疏模型"
+    },
+    {
+      "date": "2020-07-28",
+      "player": "GOOG",
+      "source": "Google AI博客 https://www.googblogs.com/announcing-scann-efficient-vector-similarity-search/",
+      "title": "谷歌开源向量检索库ScaNN"
+    },
+    {
+      "date": "2020-08-04",
+      "player": "GOOG",
+      "source": "Wikipedia 2020年人工智能条目 https://en.wikipedia.org/wiki/2020_in_artificial_intelligence",
+      "title": "DeepMind更新新冠蛋白AlphaFold预测"
+    },
+    {
+      "date": "2020-09-07",
+      "player": "UCB",
+      "source": "arXiv:2009.03300 https://arxiv.org/abs/2009.03300",
+      "title": "MMLU基准发布，57学科多任务评测"
+    },
+    {
+      "date": "2020-09-22",
+      "player": "MSFT",
+      "source": "微软官方博客 https://blogs.microsoft.com/blog/2020/09/22/microsoft-teams-up-with-openai-to-exclusively-license-gpt-3-language-model/",
+      "title": "微软独家授权GPT-3模型"
+    },
+    {
+      "date": "2020-10",
+      "player": "GOOG",
+      "source": "arXiv:2010.11934，经AI Wiki翻译模型条目 https://aiwiki.ai/wiki/translation_models",
+      "title": "谷歌发布101语言多语言模型mT5"
+    },
+    {
+      "date": "2020-10",
+      "player": "GOOG",
+      "source": "arXiv:2010.11929 https://arxiv.org/abs/2010.11929",
+      "title": "谷歌发布视觉Transformer论文ViT"
+    },
+    {
+      "date": "2020-11-30",
+      "player": "GOOG",
+      "source": "DeepMind博客 https://deepmind.google/science/alphafold/",
+      "title": "DeepMind AlphaFold 2赢得CASP14"
+    },
+    {
+      "date": "2020-12-23",
+      "player": "GOOG",
+      "source": "Nature论文 https://www.nature.com/articles/s41586-020-03051-4",
+      "title": "DeepMind MuZero论文登Nature，无规则学棋"
+    },
+    {
+      "date": "2021-01-01",
+      "player": "USGOV",
+      "source": "美国法典15 U.S.C.第119章 https://www.govinfo.gov/content/pkg/USCODE-2020-title15/html/USCODE-2020-title15-chap119.htm",
+      "title": "美国国家AI倡议法案正式生效"
+    },
+    {
+      "date": "2021-01-05",
+      "player": "OAI",
+      "source": "OpenAI博客 https://openai.com/index/dall-e/",
+      "title": "OpenAI发布文生图模型DALL-E"
+    },
+    {
+      "date": "2021-01-05",
+      "player": "OAI",
+      "source": "OpenAI博客 https://openai.com/index/clip/",
+      "title": "OpenAI发布图文对比模型CLIP"
+    },
+    {
+      "date": "2021-01-11",
+      "player": "GOOG",
+      "source": "arXiv:2101.03961 https://arxiv.org/abs/2101.03961",
+      "title": "谷歌Switch Transformer论文，万亿参数MoE"
+    },
+    {
+      "date": "2021-01-26",
+      "player": "ANTH",
+      "source": "Wikipedia Anthropic条目 https://en.wikipedia.org/wiki/Anthropic",
+      "title": "Anthropic正式成立，Amodei兄妹出走创立"
+    },
+    {
+      "date": "2021-02-19",
+      "player": "GOOG",
+      "source": "TechCrunch http://techcrunch.com/2021/02/19/google-fires-top-ai-ethics-researcher-margaret-mitchell/",
+      "title": "谷歌解雇AI伦理团队负责人Mitchell"
+    },
+    {
+      "date": "2021-03-04",
+      "player": "META",
+      "source": "Facebook AI博客，经Digital Trends https://www.digitaltrends.com/web/facebook-seer-image-recognition-ai/",
+      "title": "Facebook发布自监督视觉模型SEER"
+    },
+    {
+      "date": "2021-04-21",
+      "player": "EU",
+      "source": "EUR-Lex COM(2021)206 https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A52021PC0206",
+      "title": "欧盟委员会公布人工智能法案草案"
+    },
+    {
+      "date": "2021-05-18",
+      "player": "GOOG",
+      "source": "Google博客 https://blog.google/innovation-and-ai/technology/developers-tools/io21-helpful-google/",
+      "title": "谷歌I/O发布对话模型LaMDA"
+    },
+    {
+      "date": "2021-05-28",
+      "player": "ANTH",
+      "source": "Anthropic官网 https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems",
+      "title": "Anthropic完成1.24亿美元A轮融资"
+    },
+    {
+      "date": "2021-06-29",
+      "player": "MSFT",
+      "source": "GitHub博客，经TechCrunch https://techcrunch.com/2021/06/29/github-previews-new-ai-tool-that-makes-coding-suggestions/",
+      "title": "GitHub Copilot开启技术预览"
+    },
+    {
+      "date": "2021-07-07",
+      "player": "OAI",
+      "source": "arXiv:2107.03374 https://arxiv.org/abs/2107.03374",
+      "title": "Codex论文发布，GPT-3微调学写代码"
+    },
+    {
+      "date": "2021-07-15",
+      "player": "GOOG",
+      "source": "Nature论文，经Wikipedia AlphaFold条目 https://en.wikipedia.org/wiki/AlphaFold",
+      "title": "AlphaFold 2论文与数据库在Nature发表"
+    },
+    {
+      "date": "2021-07-16",
+      "player": "META",
+      "source": "Meta AI博客，经Engadget https://www.engadget.com/facebooks-open-source-chatbot-no-longer-has-the-mental-fortitude-of-a-goldfish-133039125.html",
+      "title": "Facebook发布BlenderBot 2.0，带记忆联网"
+    },
+    {
+      "date": "2021-08-04",
+      "player": "AI21",
+      "source": "AI21官网 https://www.ai21.com/blog/announcing-ai21-studio-and-jurassic-1/",
+      "title": "AI21发布1780亿参数Jurassic-1"
+    },
+    {
+      "date": "2021-08-10",
+      "player": "OAI",
+      "source": "OpenAI博客 https://openai.com/blog/openai-codex/",
+      "title": "OpenAI Codex API开启私人内测"
+    },
+    {
+      "date": "2021-09-03",
+      "player": "GOOG",
+      "source": "arXiv:2109.01652 https://arxiv.org/abs/2109.01652",
+      "title": "谷歌FLAN论文，指令微调提升零样本能力"
+    },
+    {
+      "date": "2021-10-11",
+      "player": "MSFT",
+      "source": "微软研究院博客 https://www.microsoft.com/en-us/research/blog/using-deepspeed-and-megatron-to-train-megatron-turing-nlg-530b-the-worlds-largest-and-most-powerful-generative-language-model/",
+      "title": "微软与英伟达发布5300亿参数MT-NLG"
+    },
+    {
+      "date": "2021-10-28",
+      "player": "META",
+      "source": "Meta官网 https://about.fb.com/news/2021/10/facebook-company-is-now-meta/",
+      "title": "Facebook公司更名为Meta"
+    },
+    {
+      "date": "2021-11-18",
+      "player": "OAI",
+      "source": "OpenAI博客 https://openai.com/index/api-no-waitlist/",
+      "title": "OpenAI取消GPT-3 API等候名单"
+    },
+    {
+      "date": "2021-12-08",
+      "player": "GOOG",
+      "source": "arXiv:2112.11446 https://arxiv.org/abs/2112.11446",
+      "title": "DeepMind发布2800亿参数语言模型Gopher"
+    },
+    {
+      "date": "2021-12-14",
+      "player": "OAI",
+      "source": "OpenAI博客，经VentureBeat https://venturebeat.com/technology/openai-begins-allowing-customers-to-fine-tune-gpt-3",
+      "title": "OpenAI开放GPT-3微调功能"
+    },
+    {
+      "date": "2022-01-27",
+      "player": "OAI",
+      "source": "OpenAI博客《Aligning language models to follow instructions》(2022-01-27); https://aiwiki.ai/wiki/instructgpt",
+      "title": "OpenAI发布InstructGPT，RLHF规模化"
+    },
+    {
+      "date": "2022-01-28",
+      "player": "GOOG",
+      "source": "arXiv:2201.11903《Chain of Thought Prompting Elicits Reasoning in Large Language Models》; https://arxiv.org/abs/2201.11903",
+      "title": "谷歌发表思维链提示论文"
+    },
+    {
+      "date": "2022-02-15",
+      "player": "ANTH",
+      "source": "arXiv:2202.07785《Predictability and Surprise in Large Generative Models》; https://arxiv.org/abs/2202.07785v2",
+      "title": "Anthropic发表大模型可预测与意外论文"
+    },
+    {
+      "date": "2022-03-15",
+      "player": "OAI",
+      "source": "Wikipedia GPT-3.5; https://en.wikipedia.org/wiki/GPT-3.5",
+      "title": "OpenAI上线GPT-3.5系列API模型"
+    },
+    {
+      "date": "2022-03-21",
+      "player": "GOOG",
+      "source": "arXiv:2203.11147《Teaching language models to support answers with verified quotes》; https://arxiv.org/abs/2203.11147",
+      "title": "DeepMind发布GopherCite，引用证据作答"
+    },
+    {
+      "date": "2022-03-22",
+      "player": "NVDA",
+      "source": "NVIDIA新闻《NVIDIA Announces Hopper Architecture》; https://nvidianews.nvidia.com/news/nvidia-announces-hopper-architecture-the-next-generation-of-accelerated-computing?nvid=nv-int-cwmfg-641230",
+      "title": "英伟达发布Hopper架构与H100"
+    },
+    {
+      "date": "2022-03-29",
+      "player": "GOOG",
+      "source": "arXiv:2203.15556《Training Compute-Optimal Large Language Models》; https://arxiv.org/abs/2203.15556v1",
+      "title": "DeepMind发表Chinchilla缩放定律论文"
+    },
+    {
+      "date": "2022-04",
+      "player": "ANTH",
+      "source": "Anthropic Series B轮5.8亿美元，2022年4月(Crunchbase); https://cointelegraph.com/news/google-invests-300m-in-ai-firm-previously-funded-by-sam-bankman-fried",
+      "title": "Anthropic完成5.8亿美元B轮融资"
+    },
+    {
+      "date": "2022-04-04",
+      "player": "GOOG",
+      "source": "Google Research博客《Pathways Language Model (PaLM)》; https://en.wikipedia.org/wiki/Pathways_Language_Model",
+      "title": "谷歌发布5400亿参数PaLM"
+    },
+    {
+      "date": "2022-04-06",
+      "player": "OAI",
+      "source": "OpenAI发布DALL·E 2; https://www.fastcompany.com/90738554/openais-dall-e-ai-is-becoming-a-scary-good-graphic-artist",
+      "title": "OpenAI发布DALL-E 2文生图模型"
+    },
+    {
+      "date": "2022-04-28",
+      "player": "GOOG",
+      "source": "Google DeepMind博客《Tackling multiple tasks with a single visual language model》; https://deepmind.google/blog/tackling-multiple-tasks-with-a-single-visual-language-model/",
+      "title": "DeepMind发布视觉语言模型Flamingo"
+    },
+    {
+      "date": "2022-05-03",
+      "player": "META",
+      "source": "arXiv:2205.01068《OPT: Open Pre-trained Transformer Language Models》; https://ar5iv.labs.arxiv.org/html/2205.01068v1",
+      "title": "Meta发布OPT-175B开放大模型"
+    },
+    {
+      "date": "2022-05-09",
+      "player": "HF",
+      "source": "TechCrunch《Hugging Face nabs $100M》; https://techcrunch.com/2022/05/09/hugging-face-reaches-2-billion-valuation-to-build-the-github-of-machine-learning/",
+      "title": "Hugging Face完成1亿美元C轮融资"
+    },
+    {
+      "date": "2022-05-11",
+      "player": "GOOG",
+      "source": "TechCrunch《Google details its latest language model and AI Test Kitchen》; https://techcrunch.com/2022/05/11/google-details-its-latest-language-model-and-ai-test-kitchen-a-showcase-for-ai-research/",
+      "title": "谷歌发布LaMDA 2与AI Test Kitchen"
+    },
+    {
+      "date": "2022-05-12",
+      "player": "GOOG",
+      "source": "Google DeepMind博客《A Generalist Agent》; https://deepmind.google/blog/a-generalist-agent/",
+      "title": "DeepMind发布通用智能体Gato"
+    },
+    {
+      "date": "2022-05-23",
+      "player": "GOOG",
+      "source": "arXiv:2205.11487《Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding》; https://en.wikipedia.org/wiki/Imagen_(text-to-image_model)",
+      "title": "谷歌发布文生图模型Imagen"
+    },
+    {
+      "date": "2022-06-11",
+      "player": "GOOG",
+      "source": "Washington Post 2022-06-11报道谷歌工程师Blake Lemoine称LaMDA有知觉; https://en.wikipedia.org/wiki/LaMDA",
+      "title": "谷歌工程师称LaMDA有知觉引争议"
+    },
+    {
+      "date": "2022-06-15",
+      "player": "GOOG",
+      "source": "arXiv:2206.07682《Emergent Abilities of Large Language Models》; https://arxiv.org/abs/2206.07682v1",
+      "title": "谷歌等发表大模型涌现能力论文"
+    },
+    {
+      "date": "2022-06-29",
+      "player": "GOOG",
+      "source": "arXiv:2206.14858《Solving Quantitative Reasoning Problems with Language Models》; https://arxiv.org/pdf/2206.14858",
+      "title": "谷歌发布数学推理模型Minerva"
+    },
+    {
+      "date": "2022-07-12",
+      "player": "HF",
+      "source": "BigScience/Hugging Face发布BLOOM; https://en.wikipedia.org/wiki/BLOOM_(language_model)",
+      "title": "BigScience发布1760亿参数BLOOM"
+    },
+    {
+      "date": "2022-07-12",
+      "player": "MJ",
+      "source": "Wikipedia Midjourney; https://en.wikipedia.org/wiki/Midjourney",
+      "title": "Midjourney开放公测"
+    },
+    {
+      "date": "2022-07-20",
+      "player": "OAI",
+      "source": "TechCrunch《OpenAI expands access to DALL-E 2》; https://techcrunch.com/2022/07/20/openai-expands-access-to-dall-e-2-its-powerful-image-generating-ai-system/",
+      "title": "DALL-E 2进入百万人候补测试"
+    },
+    {
+      "date": "2022-08-22",
+      "player": "STAB",
+      "source": "Wikipedia Stable Diffusion; https://en.wikipedia.org/wiki/Stable_Diffusion",
+      "title": "开源发布Stable Diffusion模型"
+    },
+    {
+      "date": "2022-09-21",
+      "player": "OAI",
+      "source": "TechCrunch《OpenAI open-sources Whisper》; https://techcrunch.com/2022/09/21/openai-open-sources-whisper-a-multilingual-speech-recognition-system/",
+      "title": "OpenAI开源语音识别模型Whisper"
+    },
+    {
+      "date": "2022-09-28",
+      "player": "GOOG",
+      "source": "arXiv:2209.14375《Improving alignment of dialogue agents via targeted human judgements》; https://arxiv.org/abs/2209.14375",
+      "title": "DeepMind发布对话智能体Sparrow"
+    },
+    {
+      "date": "2022-10-04",
+      "player": "USGOV",
+      "source": "白宫OSTP《Blueprint for an AI Bill of Rights》; https://bidenwhitehouse.archives.gov/ostp/news-updates/2022/10/04/blueprint-for-an-ai-bill-of-rightsa-vision-for-protecting-our-civil-rights-in-the-algorithmic-age/",
+      "title": "白宫发布AI权利法案蓝图"
+    },
+    {
+      "date": "2022-10-05",
+      "player": "GOOG",
+      "source": "Nature《Discovering faster matrix multiplication algorithms with reinforcement learning》, DOI 10.1038/s41586-022-05172-4, 2022-10-05在线发表",
+      "title": "DeepMind的AlphaTensor登上《自然》"
+    },
+    {
+      "date": "2022-10-17",
+      "player": "STAB",
+      "source": "TechCrunch《Stability AI raises $101M》; https://techcrunch.com/2022/10/17/stability-ai-the-startup-behind-stable-diffusion-raises-101m/",
+      "title": "Stability AI融资1.01亿美元估值10亿"
+    },
+    {
+      "date": "2022-11-15",
+      "player": "META",
+      "source": "Meta AI发布Galactica, arXiv:2211.09085; https://aiwiki.ai/wiki/galactica",
+      "title": "Meta发布科学大模型Galactica"
+    },
+    {
+      "date": "2022-11-24",
+      "player": "STAB",
+      "source": "Stability AI《Stable Diffusion 2.0 Release》; http://stability.ai/news-updates/stable-diffusion-v2-release",
+      "title": "发布Stable Diffusion 2.0"
+    },
+    {
+      "date": "2022-11-28",
+      "player": "OAI",
+      "source": "Wikipedia GPT-3.5, text-davinci-003于2022-11-28推出; https://en.wikipedia.org/wiki/GPT-3.5",
+      "title": "OpenAI发布text-davinci-003"
+    },
+    {
+      "date": "2022-11-30",
+      "player": "OAI",
+      "source": "OpenAI博客《Introducing ChatGPT》(2022-11-30); https://en.wikipedia.org/wiki/Chat_GPT",
+      "title": "OpenAI发布ChatGPT"
+    },
+    {
+      "date": "2022-12-06",
+      "player": "EU",
+      "source": "欧盟理事会文件ST 15698/22, 2022-12-06; https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CONSIL:ST_15698_2022_INIT",
+      "title": "欧盟理事会通过AI法案总体立场"
+    },
+    {
+      "date": "2022-12-08",
+      "player": "OAI",
+      "source": "Wikipedia Whisper, large-v2于2022-12-08发布; https://en.wikipedia.org/wiki/Whisper_(speech_recognition_system)",
+      "title": "OpenAI发布Whisper large-v2"
+    },
+    {
+      "date": "2022-12-15",
+      "player": "ANTH",
+      "source": "arXiv:2212.08073《Constitutional AI: Harmlessness from AI Feedback》; https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback?ref=codependentai.co",
+      "title": "Anthropic发表宪法AI论文"
+    }
+  ]
+}

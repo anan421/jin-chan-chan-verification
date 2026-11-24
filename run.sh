@@ -40,9 +40,15 @@ while [ $# -gt 0 ]; do
   esac
 done
 TRACE="${TRACE:-$DIR/traces/trace-latest.json}"
-RUN_ID="$(date +%Y-%m-%d_%H%M%S)"
+RUN_ID="$(date +%Y-%m-%d_%H%M%S)-$$-$RANDOM"
 RUN_DIR="$DIR/runs/$RUN_ID"
 mkdir -p "$RUN_DIR"
+# Let a caller (e.g. daily_run.sh) learn this run's directory without
+# guessing it from timestamps: when RUN_DIR_FILE is set, record the
+# directory there.
+if [ -n "${RUN_DIR_FILE:-}" ]; then
+  echo "$RUN_DIR" > "$RUN_DIR_FILE"
+fi
 
 if [ ! -f "$TRACE" ]; then
   echo "run: trace not found: $TRACE" >&2
@@ -90,6 +96,14 @@ if [ "$GATE_RC" -eq 0 ]; then
       && CLASSIFICATION_REPORT="$RUN_DIR/classification.json"
   fi
 
+  # Snapshot the content hashes of every Lean source before
+  # generation. gen_trace_lean.py rewrites the generated sources on
+  # every run, so their mtimes advance even when the content is
+  # unchanged; the guard below compares hashes against this snapshot
+  # instead of comparing mtimes.
+  HASH_BEFORE="$RUN_DIR/source-hashes-before.txt"
+  sha256sum "$DIR/lean/Verification/"*.lean 2>/dev/null > "$HASH_BEFORE" || true
+
   echo "run: generating Trace.lean..."
   if [ "$MODULAR" -eq 1 ]; then
     python3 "$DIR/gen_trace_lean.py" "$TRACE" \
@@ -115,23 +129,63 @@ if [ "$GATE_RC" -eq 0 ]; then
     echo "run: Lean modular build exit=$LEAN_RC"
   fi
   # Guard against a vacuous build: each proof module must have produced
-  # an .olean, newer than its source. A "Nothing to build" exit 0 is
-  # a failure.
+  # an .olean that matches the current source content. Lake decides
+  # rebuilds by content hash, not by timestamp: gen_trace_lean.py
+  # rewrites the generated sources on every run, so their mtimes
+  # advance even when the content is unchanged, while an unchanged
+  # .olean keeps its old mtime. Comparing mtimes therefore reports a
+  # false failure on a second run of an unchanged trace (this happened
+  # on 2026-11-24: run 055105 failed, the same trace passed at 055133
+  # after lake clean). This guard compares content hashes instead: an
+  # .olean is stale only when a source it depends on changed content
+  # since before generation and the .olean is older than that source.
+  # A missing .olean is still a failure. Guard failures are written to
+  # the run directory log as well as to standard error.
+  guard_fail() {
+    local msg="run: Lean build produced no fresh $1 (vacuous build)"
+    echo "$msg" >&2
+    echo "$msg" >> "$RUN_DIR/lean-build.log"
+    echo "$msg" >> "$RUN_DIR/lean-guard.log"
+    LEAN_RC=1
+  }
+  source_changed() {
+    # Returns 0 when $1 changed content since before generation
+    # (or did not exist in the snapshot, or no snapshot exists).
+    local f="$1" h old
+    if [ ! -f "$f" ] || [ ! -f "${HASH_BEFORE:-}" ]; then return 0; fi
+    h="$(sha256sum "$f" | cut -d' ' -f1)"
+    old="$(awk -v f="$f" '$2 == f {print $1}' "$HASH_BEFORE")"
+    [ -z "$old" ] || [ "$old" != "$h" ]
+  }
   check_olean() {
-    local olean="$1" src="$2"
-    if [ ! -f "$olean" ] || [ "$olean" -ot "$src" ]; then
-      echo "run: Lean build produced no fresh $olean (vacuous build)" >&2
-      LEAN_RC=1
+    local olean="$1"; shift
+    local src
+    if [ ! -f "$olean" ]; then
+      guard_fail "$olean"
+      return
     fi
+    for src in "$@"; do
+      if source_changed "$src" && [ "$olean" -ot "$src" ]; then
+        guard_fail "$olean"
+        return
+      fi
+    done
   }
   if [ "$LEAN_RC" -eq 0 ]; then
     check_olean "$DIR/lean/.lake/build/lib/lean/Verification/Proofs.olean" \
-                "$DIR/lean/Verification/Proofs.lean"
+                "$DIR/lean/Verification/Proofs.lean" \
+                "$DIR/lean/Verification/Trace.lean" \
+                "$DIR/lean/Verification/Model.lean" \
+                "$DIR/lean/Verification/Dynamics.lean"
     if [ "$MODULAR" -eq 1 ]; then
       check_olean "$DIR/lean/.lake/build/lib/lean/Verification/ProofsByPlayer.olean" \
-                  "$DIR/lean/Verification/ProofsByPlayer.lean"
+                  "$DIR/lean/Verification/ProofsByPlayer.lean" \
+                  "$DIR/lean/Verification/Trace.lean" \
+                  "$DIR/lean/Verification/Model.lean"
       check_olean "$DIR/lean/.lake/build/lib/lean/Verification/ProofsBySeason.olean" \
-                  "$DIR/lean/Verification/ProofsBySeason.lean"
+                  "$DIR/lean/Verification/ProofsBySeason.lean" \
+                  "$DIR/lean/Verification/Trace.lean" \
+                  "$DIR/lean/Verification/Model.lean"
     fi
   fi
 else

@@ -190,7 +190,12 @@ def setup(trace):
                  base_now["params"]["hp_cap"])
     current = predict.current_states(trace)
     lasts = predict.last_moves(trace)
-    all_kinds = sorted({m["action_kind"] for m in moves})
+    # Semantic kinds, as in predict.py main: kind_of() reads
+    # semantic_kind and falls back to action_kind for traces that
+    # predate the semantic layer (e.g. the fixture). "unknown" is a
+    # classification gap, never a candidate (same rule as
+    # predict.py:1127 and backtest.py:348-349).
+    all_kinds = sorted({predict.kind_of(m) for m in moves} - {"unknown"})
     candidates = {}
     for p in players:
         pid = p["id"]
@@ -200,9 +205,11 @@ def setup(trace):
             banned |= set(ov["params"].get("banned_action_kinds", []))
         candidates[pid] = [k for k in all_kinds if k not in banned]
     per_mean, glob_mean = predict.expected_deltas(moves)
-    exp = predict.make_expectation(per_mean, glob_mean)
-    start_actions = {pid: lasts[pid]["action_kind"]
-                     for pid in lasts if lasts[pid]["action_kind"]
+    support = predict.expectation_support(moves)
+    exp = predict.make_expectation(per_mean, glob_mean,
+                                   global_mean=tuple(support["global_mean"]))
+    start_actions = {pid: predict.kind_of(lasts[pid])
+                     for pid in lasts if predict.kind_of(lasts[pid])
                      in candidates.get(pid, [])}
     acting = sorted(pid for pid in pmap if current.get(pid, (0, 0))[0] > 0)
     state = {pid: current[pid] for pid in pmap}

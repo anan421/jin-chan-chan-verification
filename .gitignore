@@ -11,3 +11,9 @@ traces/
 # logs
 *.log
 .DS_Store
+# backups
+*.bak
+# generated modular Lean proofs (regenerable with ./run.sh --modular;
+# the default run deletes them, so they are not tracked)
+lean/Verification/ProofsByPlayer.lean
+lean/Verification/ProofsBySeason.lean

@@ -2,8 +2,8 @@
  "schema_version": 3,
  "source_data_json": {
   "path": "data.json",
-  "sha256": "04241a52cb5e45c8f77a18089a1cd0ee9a9db838f0a0db28ccd10d5e891afc1e",
-  "bytes": 277618
+  "sha256": "3478f59a23e2c02f72bc73ff95d84f17527ca1d7773f5431b5c0057728e3bd7b",
+  "bytes": 245343
  },
  "players": [
   {
@@ -417,7 +417,7 @@
    "season": 6,
    "name": "S6",
    "start_date": 20261122,
-   "end_date": 20261101,
+   "end_date": 20261130,
    "rounds": 1,
    "moves": 3,
    "active_players": [

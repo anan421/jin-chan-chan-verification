@@ -55,7 +55,7 @@ done
 EVENTS="${EVENTS:-$DIR/daily/events-$DATE.json}"
 DAILY_DIR="$DIR/daily"
 ARCHIVE_DIR="$DIR/archive"
-WORK_DIR="$DAILY_DIR/work/$DATE"
+WORK_DIR="$DAILY_DIR/work/$DATE-$$-$RANDOM"
 LOG_FILE="$DAILY_DIR/logs/$DATE.log"
 mkdir -p "$WORK_DIR" "$DAILY_DIR/logs" "$ARCHIVE_DIR" "$RELEASE_DIR"
 
@@ -153,11 +153,19 @@ log "run.sh..."
 RUN_ARGS=("$RECOMPUTED")
 if [ "$PREDICT" -eq 1 ]; then RUN_ARGS+=(--predict); fi
 if [ -n "$CLAIMS" ]; then RUN_ARGS+=(--claims "$CLAIMS"); fi
-touch "$WORK_DIR/before-run"
-"$DIR/run.sh" "${RUN_ARGS[@]}" 2>&1 | tee -a "$LOG_FILE"
+RUN_DIR_FILE="$WORK_DIR/run-dir.txt"
+RUN_DIR_FILE="$RUN_DIR_FILE" "$DIR/run.sh" "${RUN_ARGS[@]}" 2>&1 | tee -a "$LOG_FILE"
 RUN_RC=${PIPESTATUS[0]}
 log "run.sh exit=$RUN_RC"
-RUN_DIR="$(find "$DIR/runs" -mindepth 1 -maxdepth 1 -type d -newer "$WORK_DIR/before-run" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -1 | cut -d' ' -f2-)"
+# The run directory is recorded explicitly by run.sh (see run-dir.txt);
+# it is never inferred from timestamps, so a parallel or manual run
+# cannot make this step pick the wrong directory.
+if [ -f "$WORK_DIR/run-dir.txt" ]; then
+  RUN_DIR="$(cat "$WORK_DIR/run-dir.txt")"
+else
+  RUN_DIR=""
+  log "WARNING: run.sh did not record a run directory"
+fi
 RUN_ID="$(basename "${RUN_DIR:-none}")"
 MERGED_REPORT="$RUN_DIR/merged-report.md"
 
