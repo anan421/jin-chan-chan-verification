@@ -81,8 +81,8 @@ civil_war、leverage、settlement、final、wild、event）加 4 个事件种类
 
 | 优先级 | 种类 | 规则 | 命中 move |
 |---|---|---|---|
-| 1 | sec_probe | 文本含 `SEC` | S5 6-1 NVDA「SEC 调查报道。恐慌卖出」 |
-| 2 | huang_resign | 文本含 `辞职` | S5 4-1 NVDA「CEO 辞职。单轮重扣」 |
+| 1 | sec_probe | 文本含 `SEC` | （纯属构造）规则 1 举例：虚构动作“虚构公司灯塔算力收到 SEC 问询函。股价下跌”。文本含 `SEC`，归该规则种类。公司名、事件、数字全部虚构。 |
+| 2 | huang_resign | 文本含 `辞职` | （纯属构造）规则 2 举例：虚构动作“虚构公司星野科技首席执行官辞职。股价下跌”。文本含 `辞职`，归该规则种类。公司名、事件全部虚构。 |
 | 3 | stargate | 文本含 `星门` | 15 条：S4 1-1 MSFT、S4 1-2 NVDA/OAI/MSFT/AAPL/ORCL/TSMC/SFTB、S4 1-3 ORCL/SFTB、S4 4-1 ORCL/SFTB、S5 1-1 SFTB、S5 2-1 ORCL、S5 6-2 SFTB |
 | 4 | colossus | 文本含 `Colossus`，或玩家 MUSK 且含 `集群` | 4 条：S2 4-1、S3 1-1、S3 4-1、S4 1-2（均为 MUSK） |
 | 5 | spacex_xai | 文本含 `xAI` / `Grok` / `SpaceX` | 4 条：S2 2-1「宣布组建 xAI」、S2 5-1 / S3 3-2 / S4 4-1 Grok |
@@ -90,12 +90,12 @@ civil_war、leverage、settlement、final、wild、event）加 4 个事件种类
 | 7 | r1 | 文本含 `R1`，或 S4 1-1 轮且含 `DeepSeek` | 6 条：S4 1-1 AMZN/HUAWEI/DPSK/TSMC（R1）+ TCE/ORCL（DeepSeek） |
 | 8 | v3 | 文本含 `V3` | 2 条：S3 6-1 HUAWEI、DPSK |
 | 9 | blackwell | 文本含 `B200` / `B300` / `Blackwell` / `GB200` | 6 条：S3 2-1 NVDA/MSFT/GOOG/ALI/ORCL/TSMC |
-| 10 | doubao_price_war | 文本含 `价格战` / `降价` / `价格再降` | 4 条：S2 5-1 BIDU「文心年底降价伏笔埋下」、S3 3-2 BYTE「豆包多模态跟进。价格再降」、S3 6-1 BYTE「豆包价格战被验证」、BIDU「文心降价跟随」 |
-| 11 | bis_rule | 文本含 `BIS` / `出口管制` / `远程规则` | 4 条：S5 3-2 TSMC「出口管制执行方」、ALI「阿里海外云节点受远程规则关注」、S5 5-1 BYTE「BIS 远程规则收紧」、DPSK「权重开源分发不受远程规则限」 |
-| 12 | anthropic_ipo | 文本含 `IPO`（不含 `未上市`）；或玩家 ANTH 且含 `上市`（不含 `未上市`）；或玩家 ANTH 且含 `募资`；或玩家 ANTH 且 S5 1-1 轮含 `承诺` | 8 条：S5 1-1 ANTH「9009 亿美元承诺签字方」、S5 2-1 ANTH「IPO 进程启动」、S5 4-1 ANTH「上市路演期」、S5 5-1 ANTH「分阶段募资到手」、MUSK「后续 IPO 排队者窗口变窄」、SFTB「后续 IPO 窗口变窄」、S5 6-1 ANTH「上市次日跌 8.5%」、S5 6-2 ANTH「募资已到账」 |
+| 10 | doubao_price_war | 文本含 `价格战` / `降价` / `价格再降` | 4 条：S2 5-1 BIDU「文心年底降价伏笔埋下」、S3 3-2 BYTE「虚构公司竹影数据新品上线。价格再降」（纯属构造）、S3 6-1 BYTE「豆包价格战被验证」、BIDU「文心降价跟随」 |
+| 11 | bis_rule | 文本含 `BIS` / `出口管制` / `远程规则` | 4 条：S5 3-2 TSMC「出口管制执行方」、ALI「虚构公司松涛科技海外节点适用远程规则限制」（纯属构造）、虚构公司灯塔算力「出口管制收紧，海外订单受限」（纯属构造）、DPSK「权重开源分发不受远程规则限」 |
+| 12 | anthropic_ipo | 文本含 `IPO`（不含 `未上市`）；或玩家 ANTH 且含 `上市`（不含 `未上市`）；或玩家 ANTH 且含 `募资`；或玩家 ANTH 且 S5 1-1 轮含 `承诺` | 8 条：S5 1-1 ANTH「4200 亿元承诺签字方」（纯属构造）、S5 2-1 ANTH「IPO 申请已递交」（纯属构造）、S5 4-1 ANTH「上市路演期」、S5 5-1 ANTH「分阶段募资到手」（纯属构造）、MUSK「后续 IPO 排队者窗口变窄」、SFTB「后续 IPO 窗口变窄」、S5 6-1 ANTH「上市次日跌 6.2%」（纯属构造）、S5 6-2 ANTH「募资已到账」（纯属构造） |
 | 13 | msft_invest | 玩家 MSFT/OAI 且含 `100 亿美元`；或玩家 MSFT 且含 `追加投资`；或含 `循环图最大投资方` | 7 条：S1 3-2 OAI/MSFT、S2 1-1 OAI/MSFT（100 亿美元）、S1 2-5 MSFT「追加投资谈判启动」、S4 5-1 MSFT/OAI「循环图最大投资方」 |
-| 14 | chatgpt | 文本含 `ChatGPT` / `GPT-4`（含 GPT-4o） | 3 条：S1 2-1 BYTE「类 ChatGPT 托管」、S2 2-1 OAI「GPT-4 接入 Bing 和 Office」、S3 3-2 OAI「GPT-4o 声量赢」 |
-| 15 | overseas_rental | 文本含 `海外算力` | 2 条：S5 3-2 BYTE「海外算力租赁需求被点名」、S5 4-1 BYTE「抢租海外算力报道的主角之一」 |
+| 14 | chatgpt | 文本含 `ChatGPT` / `GPT-4`（含 GPT-4o） | 3 条：S1 2-1 BYTE「类 ChatGPT 托管」、S2 2-1 OAI「虚构公司雾凇云 GPT-4 已上线客服系统」（纯属构造）、S3 3-2 OAI「GPT-4o 声量赢」 |
+| 15 | overseas_rental | 文本含 `海外算力` | 2 条：S5 3-2 BYTE「海外算力租赁需求被点名」、S5 4-1 BYTE「虚构公司青石网络海外算力租赁订单激增」（纯属构造） |
 | — | unknown | 以上全不命中 | 485 条（扩展前；扩展后 346 条，见下） |
 
 ### 第二次扩展：规则 16–29（2026-11-21）
@@ -110,7 +110,7 @@ civil_war、leverage、settlement、final、wild、event）加 4 个事件种类
 
 | 优先级 | 种类 | 规则 | 命中 move（新增数） |
 |---|---|---|---|
-| 16 | tongyi | 文本含 `通义` | 11 条：S1 1-4 / S1 2-1 / S1 2-5 / S2 2-1 / S2 3-2 / S2 5-1 / S3 3-2 / S3 5-1 / S3 6-1 / S4 1-1 / S4 4-1（均为 ALI；S3 2-1 ALI「通义新版发布。阿里云打包 B200 替代方案」含 B200，旧规则 9 blackwell 优先，仍属 blackwell，不计入此） |
+| 16 | tongyi | 文本含 `通义` | 11 条：S1 1-4 / S1 2-1 / S1 2-5 / S2 2-1 / S2 3-2 / S2 5-1 / S3 3-2 / S3 5-1 / S3 6-1 / S4 1-1 / S4 4-1（均为 ALI；S3 2-1 ALI「虚构公司雪松数据新版发布。云平台打包芯片替代方案」（纯属构造）含 B200，旧规则 9 blackwell 优先，仍属 blackwell，不计入此） |
 | 17 | hunyuan | 文本含 `混元`，或玩家 TCE 且含 `微信` | 11 条：混元 10 条（S1 1-1 / S1 2-1 / S1 2-5 / S2 2-1 / S2 3-2 / S2 5-1 / S3 2-1 / S3 3-2 / S3 5-1 / S4 4-1）+ TCE S2 1-1「围观。微信入口不押注单队」 |
 | 18 | ascend | 文本含 `昇腾` | 9 条：S1 1-1 / S1 2-5 / S2 2-6 / S2 4-1 / S2 5-1 / S3 1-1 / S3 2-1 / S3 5-1 / S5 1-1（均为 HUAWEI；S4 1-1 HUAWEI「昇腾成 R1 落地主平台」旧规则 7 r1 优先，仍属 r1） |
 | 19 | doubao | 文本含 `豆包` | 8 条：S1 2-5 / S2 2-1 / S2 3-2（含「拿 Llama 路线做内部版」，doubao 优先于 llama，见第 4 节）/ S2 5-1 / S3 2-1 / S3 5-1 / S4 1-1 / S4 4-1（均为 BYTE；价格战 2 条旧规则 10 优先，仍属 doubao_price_war） |
@@ -118,11 +118,11 @@ civil_war、leverage、settlement、final、wild、event）加 4 个事件种类
 | 21 | pangu | 文本含 `盘古` | 6 条：S1 1-4 / S1 2-1 / S2 2-1 / S2 3-2（「盘古开源行业模型」，pangu 优先于 open_source）/ S3 3-2 / S4 4-1（均为 HUAWEI） |
 | 22 | llama | 文本含 `Llama` | 5 条：S2 2-1 META「Llama 1 权重流出」、S2 3-2 MSFT/OAI「把 Llama 上架 Azure」/「上架 Llama」、S2 3-2 META「Llama 2 开源」、S3 3-2 META「Llama 3 开源跟进」（BYTE S2 3-2 豆包拿 Llama 路线归 doubao，见规则 19） |
 | 23 | claude | 文本含 `Claude` | 5 条：S1 2-1 / S2 2-1 / S2 3-2 / S3 3-2 / S4 4-1（均为 ANTH） |
-| 24 | gemini | 文本含 `Gemini` / `Bard` | 4 条：S2 5-1 / S3 3-2 / S4 4-1 Gemini（均为 GOOG）+ S2 2-1 GOOG「Bard 演示出错。市值蒸发」（Bard 为 Gemini 前身产品，同一谷歌对话产品线程） |
-| 25 | megaspeed | 文本含 `Megaspeed` | 1 条：S5 3-2 HUAWEI「Megaspeed 线牵连国产链声誉。中方否认间谍叙事」 |
-| 26 | energy | 文本含 `核电` / `三哩岛` / `电力` / `绿电` / `燃气电厂` / `供电` | 10 条（全在 S4 3-2 能源轮）：OAI「签核电重启合同。三哩岛入局」、MSFT「三哩岛核电合同。保电力」、ANTH「靠云厂电力间接受益」、META「园区选址被电力拖慢」、AAPL「抢签电力。园区扩张」、MUSK「自建燃气电厂抢时间」、BYTE「火山引擎抢签绿电园区」、ALI「阿里云西部园区与绿电布局占优」、NVDA「卖整柜方案。含供电设计」、HUAWEI「卖整柜含供电方案。国产版」 |
-| 27 | financing | 文本含 `融资` / `债务` / `借钱` | 19 条：融资 11 条（ANTH S1 2-5「拿到谷歌等新融资线索」/ S1 3-2「靠融资续命」/ S3 6-1「成本话题对其融资故事不利」、BYTE S1 3-2「国内融资收紧」、DPSK S1 3-2「量化主业供血。不靠融资」、AMZN S3 4-1「项目融资模式扩散」、ORCL S4 5-1「债务加股权双线融资」/ S5 1-1「债务融资继续加码」/ S5 2-1「融资窗口全开」/ S5 6-1「未上市。融资环境骤冷」/ S5 6-2「融资窗口观察中」）+ 纯债务 5 条（AAPL S3 6-1「债务包热销。窗口全开」、ORCL S4 5-1「约 380 亿美元债务包挂单」/ S5 5-1「债务包约 100 亿美元未配售曝光」/ S5 6-1「债务担忧带跌」/ S5 6-2「等债务包配售结果」）+ 纯借钱 3 条（AAPL S2 4-1「借钱扩云。杠杆起步」/ S3 1-1「资本开支翻倍。借钱扩容」/ MSFT S3 4-1「表内借钱稳健。杠杆中等」；其中 S3 1-1 AAPL 同时含资本开支，financing 优先于 capex） |
-| 28 | capex | 文本含 `资本开支` | 15 条：S3 1-1 9 条（OAI/MSFT/GOOG/META/AMZN/BYTE/TCE/BIDU/TSMC；AAPL 该轮「资本开支翻倍。借钱扩容」归 financing，规则 27 优先）/ S3 6-1 MSFT「资本开支再上调」/ S4 1-3 MSFT「被带跌。资本开支被质问」/ S5 1-1 BYTE/ALI/TCE / S5 6-2 TCE「等资本开支指引」 |
+| 24 | gemini | 文本含 `Gemini` / `Bard` | 4 条：S2 5-1 / S3 3-2 / S4 4-1 Gemini（均为 GOOG）+ S2 2-1 GOOG「虚构公司灯塔算力 Bard 演示故障。股价下跌」（纯属构造）（Bard 为 Gemini 前身产品，同一谷歌对话产品线程） |
+| 25 | megaspeed | 文本含 `Megaspeed` | （纯属构造）规则 25 举例：虚构动作“虚构公司星野科技的 Megaspeed 渠道影响供应链声誉。官方否认相关说法”。文本含 `Megaspeed`，归该规则种类。公司名、事件全部虚构。 |
+| 26 | energy | 文本含 `核电` / `三哩岛` / `电力` / `绿电` / `燃气电厂` / `供电` | 10 条（全在 S4 3-2 能源轮）：OAI「签核电重启合同。三哩岛入局」、MSFT「虚构公司清泉能源签核电重启合同。保障供电」（纯属构造）、ANTH「靠云厂电力间接受益」、META「园区选址被电力拖慢」、AAPL「抢签电力。园区扩张」、MUSK「虚构公司雾凇云自建燃气电厂抢工期」（纯属构造）、BYTE「火山引擎抢签绿电园区」、ALI「阿里云西部园区与绿电布局占优」、NVDA「卖整柜方案。含供电设计」、HUAWEI「卖整柜含供电方案。国产版」 |
+| 27 | financing | 文本含 `融资` / `债务` / `借钱` | 19 条：融资 11 条（ANTH S1 2-5「拿到谷歌等新融资线索」/ S1 3-2「靠融资续命」/ S3 6-1「成本话题对其融资故事不利」、BYTE S1 3-2「国内融资收紧」、DPSK S1 3-2「量化主业供血。不靠融资」、AMZN S3 4-1「项目融资模式扩散」、ORCL S4 5-1「债务加股权双线融资」/ S5 1-1「虚构公司红枫科技债务融资规模继续扩大」（纯属构造）/ S5 2-1「融资窗口全开」/ S5 6-1「未上市。融资环境骤冷」/ S5 6-2「融资窗口观察中」）+ 纯债务 5 条（AAPL S3 6-1「债务包热销。窗口全开」、ORCL S4 5-1「虚构公司丹青智能 410 亿美元债务债券挂单未售」（纯属构造）/ S5 5-1「债务包约 100 亿美元未配售曝光」/ S5 6-1「债务担忧带跌」/ S5 6-2「等债务包配售结果」）+ 纯借钱 3 条（AAPL S2 4-1「借钱扩云。杠杆起步」/ S3 1-1「资本开支翻倍。借钱扩容」/ MSFT S3 4-1「表内借钱稳健。杠杆中等」；其中 S3 1-1 AAPL 同时含资本开支，financing 优先于 capex） |
+| 28 | capex | 文本含 `资本开支` | 15 条：S3 1-1 9 条（OAI/MSFT/GOOG/META/AMZN/BYTE/TCE/BIDU/TSMC；AAPL 该轮「资本开支翻倍。借钱扩容」归 financing，规则 27 优先）/ S3 6-1 MSFT「虚构公司绿谷科技资本开支继续上调」（纯属构造）/ S4 1-3 MSFT「被带跌。资本开支被质问」/ S5 1-1 BYTE/ALI/TCE / S5 6-2 TCE「等资本开支指引」 |
 | 29 | open_source | 文本含 `开源` 且不含 `不开源` | 24 条：S1 1-4 MSFT/META/AMZN/AAPL、S2 1-1 META、S2 3-2 NVDA/GOOG/AMZN/MUSK/AAPL/ORCL/TSMC/SFTB、S2 4-5 META、S2 5-1 META、S3 5-1 META、S3 6-1 META、S4 1-1 META/ORCL、S4 1-3 META、S5 3-2 DPSK、S5 6-1 DPSK、S5 6-2 DPSK。产品名已归产品种类的 11 条不在此（通义 6、混元 1、Llama 2、文心 1、盘古 1）；DPSK S5 5-1「权重开源分发不受远程规则限」旧规则 11 bis_rule 优先；GOOG S1 1-4「Imagen 不开源」被排除，仍 unknown |
 
 新规则共从 unknown 池分类 139 条：tongyi 11、hunyuan 11、
