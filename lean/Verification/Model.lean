@@ -52,10 +52,15 @@ structure Ranking where
   goldEnd : Int
   deriving DecidableEq, Repr, Inhabited
 
-/-- One season: its round count and its active players. -/
+/-- One season: its round count, its recorded move total, and its
+    active players. `moves` is the converter-recorded move total for
+    the season (added 2026-11-24 for the monthly structure, where a
+    round holds a variable number of moves and the old
+    rounds * players equality no longer holds). -/
 structure SeasonInfo where
   season : Nat
   rounds : Nat
+  moves : Nat
   activePlayers : List Nat
   deriving DecidableEq, Repr, Inhabited
 
@@ -210,11 +215,15 @@ def capHp (r : RuleVersion) (x : Int) : Int :=
 def movesOf (ms : List Move) (s p : Nat) : List Move :=
   ms.filter fun m => m.season == s && m.player == p
 
-/-- Strictly increasing round indices (no duplicate round in a group). -/
-def strictlyIncreasing : List Nat → Bool
+/-- Non-decreasing round indices (a player may act several times in
+    one round; the order within the round is trace order). Monthly
+    structure (2026-11-24): the old strictly-increasing requirement
+    assumed one move per player per round, which the monthly rounds
+    (up to 117 moves in one round) do not satisfy. -/
+def nonDecreasing : List Nat → Bool
   | [] => true
   | [_] => true
-  | a :: b :: rest => decide (a < b) && strictlyIncreasing (b :: rest)
+  | a :: b :: rest => decide (a ≤ b) && nonDecreasing (b :: rest)
 
 /-- End of the round span `[date, spanEnd]` for one move. `spans` is
     a list of `(season, roundIdx, spanEnd)` from `rules/round-spans.json`
@@ -239,8 +248,8 @@ def ruleWindowOverlaps (r : RuleVersion) (start spanEnd : Nat) : Bool :=
     (global) rule in effect at the move's date, or a base rule whose
     effective window overlaps the round span `[date, spanEnd]`
     (decision 2026-11-21, Gu approved). The span case covers a round
-    whose true date range crosses a rule-change day, e.g. S5 round 5
-    ("5-1", 2026-11-18–19): its moves record RV-2026.2, whose window
+    whose true date range crosses a rule-change day, e.g. S5 round
+    2026-11 (2026-11-01–21): its moves record RV-2026.2, whose window
     `[20261119, ∞)` overlaps the span at 20261119, although the base
     rule on the earliest day 20261118 is RV-2026.1. Player-specific
     overlays never qualify. Ban and date checks still use the move
@@ -303,10 +312,22 @@ def checkGroup (rules : List RuleVersion) (spans : List (Nat × Nat × Nat))
     (ms : List Move)
     (st : SeasonState) (rk : Ranking) : Bool :=
   let group := movesOf ms st.season st.player
-  let idxOk := strictlyIncreasing (group.map (·.roundIdx))
+  let idxOk := nonDecreasing (group.map (·.roundIdx))
   let (ok, hpFinal, goldFinal) := chainFold rules spans st.hpStart st.goldStart group
   match endRule rules ms st.season st.player with
-  | none => false
+  | none =>
+    -- No moves in this (season, player) group (monthly structure,
+    -- 2026-11-24: S6 has 3 moves for 24 active players, so most S6
+    -- groups are empty, as are MANUS/ZHIPU/MINIMAX in S5; the old
+    -- structure had no empty group). The end must equal the start,
+    -- with no penalty (borrowed is 0), and the ranking must match.
+    -- `ok`, `hpFinal`, `goldFinal` are the chainFold results on the
+    -- empty group (true, hpStart, goldStart).
+    idxOk && ok &&
+    hpFinal == st.hpEnd && goldFinal == st.goldEnd &&
+    st.penalty == 0 &&
+    hpFinal == rk.hpEnd && goldFinal == rk.goldEnd &&
+    st.season == rk.season && st.player == rk.player
   | some er =>
     let pen := st.borrowed * (er.penaltyNumer : Int) / (er.penaltyDenom : Int)
     let hpEnd := if er.penaltyAppliesToHp then capHp er (hpFinal - pen)
@@ -319,17 +340,21 @@ def checkGroup (rules : List RuleVersion) (spans : List (Nat × Nat × Nat))
     hpEnd == rk.hpEnd && goldEnd == rk.goldEnd &&
     st.season == rk.season && st.player == rk.player
 
-/-- C1: counts. Seasons carry their own round counts and active
-    rosters; nothing about the number of seasons or players is
-    hard-coded. -/
+/-- C1: counts. Seasons carry their own round counts, move totals
+    and active rosters; nothing about the number of seasons or
+    players is hard-coded. Monthly structure (2026-11-24): a round
+    holds a variable number of moves, so the move total and the
+    per-season move totals are checked against the recorded season
+    move counts, and the distinct round indices per season against
+    the round counts. The old per-(season, player) == rounds
+    equality assumed one move per player per round and does not
+    apply. -/
 def checkCounts (ms : List Move) (seasons : List SeasonInfo) : Bool :=
   ms.length ==
-    (seasons.foldl (fun acc s => acc + s.rounds * s.activePlayers.length) 0)
+    (seasons.foldl (fun acc s => acc + s.moves) 0)
   &&
   seasons.all fun s =>
-    s.activePlayers.all fun p =>
-      (ms.filter fun m => m.season == s.season && m.player == p).length
-        == s.rounds
+    (ms.filter fun m => m.season == s.season).length == s.moves
   &&
   seasons.all fun s =>
     (distinct ((ms.filter fun m => m.season == s.season)
@@ -419,7 +444,10 @@ def checkFacts (ipo : IpoFacts) (nv : NvdaFacts) : Bool :=
   (nv.intradayHighCents - nv.lowCents) * 1000 / nv.intradayHighCents
     == nv.intradayDropTenthsPct
 
-/-- C8: roster. Every round holds exactly the season's active players;
+/-- C8: roster. Every round holds a subset of the season's active
+    players (monthly structure, 2026-11-24: a round holds a variable
+    number of moves; the old equality -- every round holds exactly
+    the active set -- assumed one move per player per round);
     rankings complete; no legacy id among player names. -/
 def checkRoster (ms : List Move) (rankings : List Ranking)
     (seasons : List SeasonInfo) (playerNames : List String)
@@ -428,9 +456,9 @@ def checkRoster (ms : List Move) (rankings : List Ranking)
     let rounds := (ms.filter fun m => m.season == s.season)
       |>.map (·.roundIdx) |> distinct
     rounds.all fun ridx =>
-      (distinct ((ms.filter fun m => m.season == s.season &&
-        m.roundIdx == ridx) |>.map (·.player))).length
-        == s.activePlayers.length
+      ((ms.filter fun m => m.season == s.season &&
+        m.roundIdx == ridx) |>.map (·.player) |> distinct).all
+        fun p => s.activePlayers.contains p
   &&
   rankings.length ==
     (seasons.foldl (fun acc s => acc + s.activePlayers.length) 0)

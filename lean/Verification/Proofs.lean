@@ -84,29 +84,30 @@ theorem trace_rules_wellformed :
     dynRulesOk traceRules = true := by
   native_decide
 
-/-- D-layer: every player's initial state satisfies the dynamic
-    invariant under the rule table. Instance check, written in the
-    `all_range_get` form so the universal link below can read it off. -/
+/-- D-layer: every recorded initial state (one per (player, season)
+    segment) satisfies the dynamic invariant under the rule table.
+    Instance check, written in the `all_range_get` form so the
+    universal link below can read it off. -/
 theorem trace_initial_ok :
     (List.range traceDynInit.length).all
       (fun i => dynInvariant traceRules (traceDynInit.getD i default))
       = true := by
   native_decide
 
-/-- D-layer: every player's recorded move list runs legally from
-    their initial state, and every visited state satisfies the
-    dynamic invariant. Instance check. -/
+/-- D-layer: every recorded season segment's move list runs legally
+    from its initial state (the season opening), and every visited
+    state satisfies the dynamic invariant. Instance check. -/
 theorem trace_trajectory_ok :
     checkDynamics traceRules traceRoundSpans traceDynInit traceMoves
       = true := by
   native_decide
 
-/-- D-layer link: the 558 recorded moves are ONE instance of the
-    unbounded theorem. For any player, any move list of any length
-    (past rounds and future rounds to 2030 alike), a legal run from
-    their initial state ends in a state satisfying the invariant.
-    Proved from `invariant_run` by induction, not by deciding the
-    recorded trace. -/
+/-- D-layer link: the 751 recorded moves are ONE instance of the
+    unbounded theorem. For any recorded initial state, any move list
+    of any length (past rounds and future rounds to 2030 alike), a
+    legal run from that initial state ends in a state satisfying the
+    invariant. Proved from `invariant_run` by induction, not by
+    deciding the recorded trace. -/
 theorem dynamics_trace_via_universal :
     ∀ (i : Nat) (_hi : i < traceDynInit.length) (ms : List Move)
       (s' : DState),
@@ -122,11 +123,15 @@ theorem dynamics_trace_via_universal :
     (dynRulesOk_uniq trace_rules_wellformed) ms _ s' hinit hrun
 
 /-- D-layer link: every intermediate state of any run from a
-    player's initial state satisfies the invariant. -/
+    recorded initial state, over that initial state's own segment
+    moves, satisfies the invariant. -/
 theorem trace_states_satisfy_invariants :
     ∀ (i : Nat) (_hi : i < traceDynInit.length) (states : List DState),
       runStates traceRules traceRoundSpans (traceDynInit.getD i default)
-        (traceMoves.filter fun m => m.player == i) = some states →
+        (traceMoves.filter fun m => m.player ==
+          (traceDynInit.getD i default).player &&
+          m.season == (traceDynInit.getD i default).season)
+        = some states →
       states.all (dynInvariant traceRules) = true := by
   intro i hi states hrun
   have hinit : dynInvariant traceRules (traceDynInit.getD i default)

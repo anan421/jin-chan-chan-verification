@@ -175,20 +175,45 @@ def run(trace):
     rule_action_by_id = {x["rule_id"]: x for x in rule_actions}
 
     # ---------- C1 counts ----------
-    total_expected = sum(s["rounds"] * len(s["active_players"])
-                         for s in seasons)
-    if len(moves) != total_expected:
-        r.fail("C1", None, None, None, "moves_total", total_expected,
-               len(moves))
+    # Monthly structure (2026-11-24): a round holds a variable number of
+    # moves (S0: 1-5, S1-S5: 1-117 per round); a player may act several
+    # times in one round or not at all. The old "one move per player per
+    # round" equalities (moves_total == sum(rounds * active), per
+    # (season, player) == rounds) are false for this shape and are NOT
+    # checked. What is checked: the move total and the per-season move
+    # totals against the converter-recorded counts (seasons[].moves,
+    # present in traces built from the 7-season data), the distinct
+    # round indices per season, the ranking rows, and the hp series.
+    # Traces without seasons[].moves (old fixtures) keep the old
+    # equalities, which are correct for the old shape.
+    new_shape = all("moves" in s for s in seasons)
+    if new_shape:
+        total_expected = sum(s["moves"] for s in seasons)
+        if len(moves) != total_expected:
+            r.fail("C1", None, None, None, "moves_total", total_expected,
+                   len(moves))
+        else:
+            r.ok("C1", f"moves_total={total_expected}")
+        for s in seasons:
+            got = sum(1 for m in moves if m["season"] == s["season"])
+            if got != s["moves"]:
+                r.fail("C1", s["season"], None, None,
+                       "moves_per_season", s["moves"], got)
     else:
-        r.ok("C1", f"moves_total={total_expected}")
-    per_ps = Counter((m["season"], m["player"]) for m in moves)
-    for s in seasons:
-        for pid in s["active_players"]:
-            got = per_ps.get((s["season"], pid), 0)
-            if got != s["rounds"]:
-                r.fail("C1", s["season"], None, pname[pid],
-                       "moves_per_player_season", s["rounds"], got)
+        total_expected = sum(s["rounds"] * len(s["active_players"])
+                             for s in seasons)
+        if len(moves) != total_expected:
+            r.fail("C1", None, None, None, "moves_total", total_expected,
+                   len(moves))
+        else:
+            r.ok("C1", f"moves_total={total_expected}")
+        per_ps = Counter((m["season"], m["player"]) for m in moves)
+        for s in seasons:
+            for pid in s["active_players"]:
+                got = per_ps.get((s["season"], pid), 0)
+                if got != s["rounds"]:
+                    r.fail("C1", s["season"], None, pname[pid],
+                           "moves_per_player_season", s["rounds"], got)
     per_season_rounds = defaultdict(set)
     for m in moves:
         per_season_rounds[m["season"]].add(m["round_index"])
@@ -294,6 +319,43 @@ def run(trace):
             if rk["gold_end"] != st["gold_end"]:
                 r.fail("C9", s, None, pname[pid], "ranking_gold_end",
                        st["gold_end"], rk["gold_end"])
+    # Empty groups (monthly structure, 2026-11-24): an active player
+    # with no moves in a season (most S6 players; MANUS/ZHIPU/MINIMAX
+    # in S5) must end the season where they started, with no penalty,
+    # and the ranking must match. The old structure had no empty
+    # group, so the loop above never saw one.
+    for s in seasons:
+        for pid in s["active_players"]:
+            if (s["season"], pid) in by_ps:
+                continue
+            st = state.get((s["season"], pid))
+            if st is None:
+                r.fail("C2", s["season"], None, pname[pid],
+                       "season_state", "present", "missing")
+                continue
+            if st["hp_end"] != st["hp_start"]:
+                r.fail("C2", s["season"], None, pname[pid], "hp_end",
+                       st["hp_start"], st["hp_end"], "no moves in season")
+            if st["gold_end"] != st["gold_start"]:
+                r.fail("C3", s["season"], None, pname[pid], "gold_end",
+                       st["gold_start"], st["gold_end"],
+                       "no moves in season")
+            if st.get("penalty", 0) != 0:
+                r.fail("C3", s["season"], None, pname[pid],
+                       "leverage_penalty", 0, st.get("penalty"),
+                       "no moves in season")
+            rk = rank.get((s["season"], pid))
+            if rk is None:
+                r.fail("C9", s["season"], None, pname[pid],
+                       "ranking_row", "present", "missing")
+            else:
+                if rk["hp_end"] != st["hp_end"]:
+                    r.fail("C9", s["season"], None, pname[pid],
+                           "ranking_hp_end", st["hp_end"], rk["hp_end"])
+                if rk["gold_end"] != st["gold_end"]:
+                    r.fail("C9", s["season"], None, pname[pid],
+                           "ranking_gold_end", st["gold_end"],
+                           rk["gold_end"])
     if not r.failures and not r.gaps:
         r.ok("C2", "hp chain + season ends reconcile")
         r.ok("C3", "gold chain + season ends reconcile")
@@ -458,9 +520,17 @@ def run(trace):
             if m["season"] == s["season"]:
                 round_players[m["round_index"]].add(m["player"])
         for idx, ps in round_players.items():
-            if ps != set(s["active_players"]):
+            # Monthly structure (2026-11-24): a round holds a subset of
+            # the season's active players (a player may act several
+            # times in one round or not at all). The old equality
+            # (every round holds exactly the active set) is false for
+            # this shape; what is checked is that no round holds a
+            # player outside the active set.
+            extra = ps - set(s["active_players"])
+            if extra:
                 r.fail("C8", s["season"], idx, None, "players_per_round",
-                       sorted(s["active_players"]), sorted(ps))
+                       f"subset of {sorted(s['active_players'])}",
+                       sorted(ps), f"not active: {sorted(extra)}")
     probe = {k: v for k, v in trace.items() if k != "legacy_ids"}
     blob = json.dumps(probe, ensure_ascii=False)
     for legacy in legacy_ids:

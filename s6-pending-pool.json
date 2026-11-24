@@ -1,15 +1,123 @@
 {
  "meta": {
   "s6_start_date": 20261122,
-  "last_run_date": "2026-11-22",
-  "testset_n": 99,
-  "gap_to_140": 41,
+  "last_run_date": "2026-11-24",
+  "testset_n": 215,
+  "gap_to_140": -75,
   "created": "2026-11-22",
-  "updated": "2026-11-22",
-  "note": "Round-6 S5 patch 2026-11-22: S5 re-opened by Gu's decision and re-verified (./run.sh exit 0, runs/2026-11-22_054658/). All 9 missed_s5 events patched into S5 (GPT-6.2, Gemini 4 Neon, FT Aivres-Megaspeed, Zhenwu Guangzhou cluster, TSMC halt, Oracle financing secured, Amazon Q3 capex, SoftBank loan, Grok 4.8 soft launch); testset-v5.json 99 questions (A 50 / B 49). Previous note: 2 missed_s5 events patched into S5 on 2026-11-22 (Baidu Q3 capex, NYT Alibaba-Megaspeed); testset-v4.json 90 questions. 2026-11-22 11:35 run: +9 missed_s5, +2 kind_gap, +16 rejected; candidates still 0; new missed_s5 are S5-era gaps found by directed search (trial run window was only 11-16 to 11-22); patching S5 again is Gu's decision."
+  "updated": "2026-11-24",
+  "note": "2026-11-24 11:35 run (Tue): FIRST S6 candidates +3 (Claude Ship 11-23, GPT-6.2 Sol Chat 标签页 11-23, Muse×沃尔玛 Agent Gateway 11-23); +3 missed_s5 (阿里云 9 国数据中心 11-17, Duplex 进 Gemini Tasks 11-20, OpenAI 收购 Pierre 11-04); +4 kind_gap (黄仁勋复任 11-23, OpenAI 学术赠予计划 11-16, 四非营利组织冻结诉讼 11-12, 微软 7 款 MAI 模型 11-17); +2 new_player (BIS 列 Megaspeed 入实体清单 11-23, 智谱 GLM-5.4 11-23); +4 rejected. Candidates now 4. NOTE: live testset is v7 (215 questions), already past the 140 target (gap -75) — the 88→140 framing in the design doc / pool meta is stale, needs Gu to re-scope (new target or stop). NOTE: kind list in design doc / s6_monitor.py (35) is stale vs testset-v7 (43 kinds: muse/glm/acquisition/partnership etc.); classification used the v7 43-kind set. NOTE: 18-player roster is stale vs the board's 32 players (USGOV, 智谱 already on the board). NOTE: GPT-6.2 Sol Chat 11-23 vs testset-v7 q24 GPT-6.2 发布 11-17 — distinct rollout surface/date, manually checked, not a duplicate. Previous note: 2026-11-23 11:35 run (Mon): +0 candidates, +3 missed_s5, +3 kind_gap, +13 rejected; candidates still 0, gap 41 (testset 99). CHECK: s6_monitor.py check 本轮对 Claude Ship 误报 trace 重复（词级匹配仅命中通用词 Claude 于 S1 2-1 等旧动作“Claude 1 低调发布”等），人工核查确认非重复；GPT-6.2 Sol Chat 与 Muse×沃尔玛两项 check 通过。脚本未改（11-23 已知问题）。 NOTE 2026-11-24 13:26: Gu 定 Megaspeed 记 NVDA（通道被堵），已从 new_player 移入 candidates（第 4 道候选，kind megaspeed）；S6 1-1 棋盘动作 NVDA -5/-2；S6-FC-01 已结算为命中。"
  },
- "candidates": [],
- "missed_s5": [],
+ "candidates": [
+  {
+   "event_name": "Anthropic 发布 Claude Ship：PR 评审、修复与审批智能体",
+   "player": "ANTH",
+   "kind": "claude",
+   "event_real_date": 20261123,
+   "source": "TechCrunch 11-23（Anthropic 官方发布）",
+   "action": "Claude Ship 上线：Code Review 已 GA，新增 PR Steward 与 Claude Approvals（beta），面向 Claude Team/Enterprise 的 GitHub 仓库，可审 PR、推修复、按团队策略自动批准常规变更",
+   "found_date": "2026-11-24",
+   "status": "verified"
+  },
+  {
+   "event_name": "GPT-6.2 Sol 上线 ChatGPT Chat 标签页，并宣布 GPT-5.6 Sol/Terra 于 12-23 退役",
+   "player": "OAI",
+   "kind": "chatgpt",
+   "event_real_date": 20261123,
+   "source": "9to5Mac 11-23（OpenAI 官方 @ChatGPT 帖文；北京时间 11-24）",
+   "action": "GPT-6.2 Sol 上线 ChatGPT Chat 标签页（Plus/Pro/Business/Enterprise）；同时宣布 GPT-5.6 Sol 将于 12-23 从 Chat、Work、Codex 退役，GPT-5.6 Terra 同日从 Work、Codex 退役",
+   "found_date": "2026-11-24",
+   "status": "verified"
+  },
+  {
+   "event_name": "Meta Muse 接入沃尔玛 Agent Gateway，可在对话内购物结账",
+   "player": "META",
+   "kind": "muse",
+   "event_real_date": 20261123,
+   "source": "The Verge 11-23（沃尔玛 Agent Gateway 上线）",
+   "action": "沃尔玛 Agent Gateway 上线，Meta Muse 为首个接入智能体：可在对话内搜索商品、建购物车、用已存沃尔玛卡结账，设消费限额（Agent Profile）",
+   "found_date": "2026-11-24",
+   "status": "verified"
+  },
+  {
+   "event_name": "BIS 将 Megaspeed 及 6 家关联实体列入实体清单",
+   "player": "NVDA",
+   "kind": "megaspeed",
+   "event_real_date": 20261123,
+   "source": "BIS 最终规则（联邦纪事文件号 2026-23999，11-23 提交、11-25 刊登）",
+   "action": "BIS 发布最终规则，将 Megaspeed 及 6 家关联实体（新加坡、马来西亚、泰国共 7 家）列入实体清单，许可推定拒绝；13 个月来首次新增。棋盘 S6 1-1 记 NVDA -5/-2（通道被堵，Gu 2026-11-24 定；先例：BIS 远程规则轮阿里 -5/-2）",
+   "found_date": "2026-11-24",
+   "status": "verified"
+  }
+ ],
+ "missed_s5": [
+  {
+   "event_name": "微软宣布 GPT-6.2 Sol 与 Astra 上线 Microsoft Copilot",
+   "player": "MSFT",
+   "kind": "chatgpt",
+   "event_real_date": 20261120,
+   "source": "微软 Copilot 博客 11-20（一手）",
+   "action": "GPT-6.2 Sol 与 Astra 上线 Microsoft Copilot，Sol 覆盖 Copilot Chat 与 Word/Excel/PowerPoint",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里"
+  },
+  {
+   "event_name": "xAI 推出 Grok Bot 1.0：Slack 与 Teams 团队机器人",
+   "player": "MUSK",
+   "kind": "spacex_xai",
+   "event_real_date": 20261111,
+   "source": "xAI 11-11（x.ai 页面戳 11-02）",
+   "action": "Grok Bot 1.0 上线：Slack 与 Teams 共享团队机器人，可参会、主动执行任务",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里。注：脚本词级去重曾误判为 trace 重复，人工核查匹配到的 trace 动作只是同玩家同种类的通用短句（如“Grok 仓促上线”“Gemini 争议”），并非本事件；testset-v7 亦无本事件"
+  },
+  {
+   "event_name": "Gemini Mac 应用新增 computer use",
+   "player": "GOOG",
+   "kind": "gemini",
+   "event_real_date": 20261119,
+   "source": "Google 11-19（Gadgets360、openloopnews 转述）",
+   "action": "Gemini Mac 应用新增 computer use，可在后台窗口点击、输入、填表",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里。注：脚本词级去重曾误判为 trace 重复，人工核查匹配到的 trace 动作只是同玩家同种类的通用短句（如“Grok 仓促上线”“Gemini 争议”），并非本事件；testset-v7 亦无本事件"
+  },
+  {
+   "event_name": "阿里云 9 国新建数据中心",
+   "player": "ALI",
+   "kind": "datacenter",
+   "event_real_date": 20261117,
+   "source": "财新 11-17（阿里云香港峰会；Gate News、HK01 转述）",
+   "action": "阿里云宣布 12 个月内在香港、马来西亚、土耳其、巴西、德国、阿联酋、法国、荷兰、芬兰新建数据中心，香港优先、巴西首次入选",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里。注：多数地域与 09-23 云栖大会计划重叠，巴西为新增；trace 里阿里云动作均为通用短句，无本事件"
+  },
+  {
+   "event_name": "Google Duplex 接入 Gemini Tasks，可代打电话",
+   "player": "GOOG",
+   "kind": "gemini",
+   "event_real_date": 20261120,
+   "source": "Google Research 官方博客 11-20",
+   "action": "Duplex 接入 Gemini App 的 Tasks，可代用户给商家打电话办杂事（预约、询价等），由 Gemini 4 Hydrogen 与 Neon 驱动",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里"
+  },
+  {
+   "event_name": "OpenAI 宣布收购 Pierre Computer Company",
+   "player": "OAI",
+   "kind": "acquisition",
+   "event_real_date": 20261104,
+   "source": "OpenAI 官方公告 11-04（Axios 同日独家）",
+   "action": "OpenAI 宣布收购 Pierre Computer Company（Code Storage 与 Trees/Diffs 开源工具），以扩展 Codex；价格未披露，交割待监管批准，两家交割前保持独立",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "真实日期在 S5 时期内（<=2026-11-21），不在 trace 里。注：仅为宣布收购协议，尚未交割"
+  }
+ ],
  "kind_gap": [
   {
    "event_name": "Ricketts 参议员提出《MEGA 法案》",
@@ -52,9 +160,98 @@
    "action": "针对 xAI 的 deepfake 相关诉讼于 11-18 立案",
    "found_date": "2026-11-22",
    "reason": "35 个种类里无对应种类（诉讼）；单源转述，需一手来源确认后才可合题"
+  },
+  {
+   "event_name": "OpenAI 首席科学家 Pachocki 提议以困惑度设行业共同发展上限",
+   "player": "OAI",
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "OpenAI 官方博客《Perplexity and Intelligence》11-22（TechCrunch 11-22 转述）",
+   "action": "Pachocki 公布 GPT-3.5 以来内部预训练困惑度曲线，提议前沿实验室以困惑度为共同标尺、0.68-0.70 区间设首道上限",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "35 个种类里无对应种类（行业限速提案）"
+  },
+  {
+   "event_name": "富士康子公司 FIH Mobile 获 OpenAI 首款手机总装订单",
+   "player": "OAI",
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "证券时报 11-19 独家（供应链消息；财联社、Android Authority 佐证）",
+   "action": "FIH Mobile 获 OpenAI 首款智能手机总装订单，目标 2027 上半年量产、2027-2028 共 3000 万台",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "35 个种类里无对应种类（硬件制造合同）；未获 OpenAI/富士康官方确认"
+  },
+  {
+   "event_name": "DeepSeek 取消模型触发式联网搜索与抓取的单独计费",
+   "player": "DPSK",
+   "kind": null,
+   "event_real_date": 20261118,
+   "source": "DeepSeek 官方定价页 11-18 更新（RouterPlus、AICoder 11-22 转述）",
+   "action": "DeepSeek 模型触发的服务端搜索与网页抓取不再单独计费，只收 token 费；独立 Search/Fetch API 仍按次收费",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "35 个种类里无对应种类（API 定价变更；doubao_price_war 只认 BYTE）"
+  },
+  {
+   "event_name": "黄仁勋复任英伟达 CEO",
+   "player": "NVDA",
+   "kind": null,
+   "event_real_date": 20261123,
+   "source": "英伟达官方新闻稿 11-23（路透、WSJ、CNN、TechCrunch）",
+   "action": "英伟达董事会一致投票恢复黄仁勋总裁、CEO 及董事职务，立即生效，距 11-12 辞职仅 11 天；Colette Kress 回任 CFO，股价当日涨约 31%",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "35/43 个种类里无对应种类（huang_resign 只认辞职本身）。注：已进棋盘 S6 1-1（血 +6、金 +3）；需决定是否新建 huang_reinstate 种类或扩展 huang_resign"
+  },
+  {
+   "event_name": "OpenAI 学术研究者计划扩至 20 万人，11-23 开放 5 万份免费申请",
+   "player": "OAI",
+   "kind": null,
+   "event_real_date": 20261116,
+   "source": "OpenAI 官方博客 11-16（CASRAI、Neowin 转述）",
+   "action": "OpenAI 将 ChatGPT for Academic Researchers 目标从 10 万扩至 20 万名研究者；11-23 开放新一轮 5 万份免费 ChatGPT Plus 申请，先到先得，每份覆盖本人及最多两名合作者",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "35/43 个种类里无对应种类（免费赠予计划，非产品发布/更新）；公告日 11-16 为 S5 时期，申请窗口 11-23 开放"
+  },
+  {
+   "event_name": "四家非营利组织起诉五家 AI 公司，要求冻结新模型开发",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261112,
+   "source": "Public Citizen 11-12（AP 首报；CASRAI 转述）",
+   "action": "Irreplaceable Education Fund、Public Citizen 等四家非营利组织在旧金山高等法院起诉 Anthropic、Google、Meta、OpenAI 与 SpaceX 超级智能部门，要求禁令冻结比现有最强系统更强的新模型开发部署",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "35/43 个种类里无对应种类（诉讼/执法类不进题集）；S5 时期事件"
+  },
+  {
+   "event_name": "微软 Ignite 发布 7 款 MAI 模型",
+   "player": "MSFT",
+   "kind": null,
+   "event_real_date": 20261117,
+   "source": "微软 Ignite 11-17（Neowin、TechMonitor）",
+   "action": "微软在 Ignite 发布 7 款 MAI 模型：MAI Cyber 2 Flash、MAI Code 2、MAI Code 2 Flash、MAI Image 2.7、MAI Realtime 1、MAI Transcribe 2（Dragon Copilot 转录）、Decision 1.1",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "35/43 个种类里无对应种类（无 MAI 模型种类）；S5 时期事件"
   }
  ],
- "new_player": [],
+ "new_player": [
+  {
+   "event_name": "智谱发布 GLM-5.4：首个 Loop Transformer，新增视觉",
+   "player": "Z.ai",
+   "kind": "glm",
+   "event_real_date": 20261123,
+   "source": "Z.ai 官方博客《GLM-5.4》11-23（TechNode、WinBuzzer）",
+   "action": "智谱发布 GLM-5.4（750B Loop Transformer，28 层权重共享跑两遍），面向 GLM Coding Plan 全量订阅用户，新增视觉输入，1M 上下文，周配额较 GLM-5.3 增 50%",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "玩家不在 18 人名单里（智谱/Z.ai），需 Gu 定是否加进大厅。注：棋盘 11-23 扩展后已有智谱玩家；testset-v7 已有 glm 种类（仅 GLM-4.5）"
+  }
+ ],
  "rejected": [
   {
    "event_name": "腾讯 Q3 财报：资本开支 814.33 亿元（+527%）",
@@ -281,6 +478,215 @@
    "action": "英伟达董事会设立国家安全与出口管制委员会",
    "found_date": "2026-11-22",
    "reason": "治理流程动作（设委员会），非大厅动作类事件，无明确对应种类"
+  },
+  {
+   "event_name": "Newsom 11-18 发布加州 AI 安全专家小组报告《AI Safety in 2026 and Beyond》",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261118,
+   "source": "加州州长办公室 11-18",
+   "action": "Newsom 11-18 发布加州 AI 安全专家小组报告《AI Safety in 2026 and Beyond》",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "政策报告，未点名公司，无玩家动作"
+  },
+  {
+   "event_name": "Cantwell 与 Rounds 11-18 联名致信白宫超级智能工作组主席 Clayton",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261118,
+   "source": "参议院商务委员会官网 11-18",
+   "action": "Cantwell 与 Rounds 11-18 联名致信白宫超级智能工作组主席 Clayton",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "国会致信，无玩家动作"
+  },
+  {
+   "event_name": "众议院 11-19 成立 AI 安全与创新党团",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261119,
+   "source": "Beyer 众议员官网 11-19",
+   "action": "众议院 11-19 成立 AI 安全与创新党团",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "国会党团成立，无玩家动作"
+  },
+  {
+   "event_name": "FDA 11-16 启动术语转换：以「超级智能」替代「人工智能」",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261116,
+   "source": "FDA 11-16 通知（CASRAI 转述）",
+   "action": "FDA 11-16 启动术语转换：以「超级智能」替代「人工智能」",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "纯术语转换，无监管变化，无玩家动作"
+  },
+  {
+   "event_name": "OpenAI 11-21 认证数据库故障 3.5 小时，请求失败率峰值 75%",
+   "player": "OAI",
+   "kind": null,
+   "event_real_date": 20261121,
+   "source": "AI Morning Brief 11-23",
+   "action": "OpenAI 11-21 认证数据库故障 3.5 小时，请求失败率峰值 75%",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "故障事件，非玩家主动动作，无对应种类；且日期在 S5 时期内"
+  },
+  {
+   "event_name": "Meta 正式重估 2030 净零承诺",
+   "player": "META",
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "AI Briefing 11-22",
+   "action": "Meta 正式重估 2030 净零承诺",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "政策重估，无具体能源动作，无对应种类"
+  },
+  {
+   "event_name": "中国审查 Meta 收购 Manus 是否违反技术出口管制",
+   "player": "META",
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "FT 11-22 经 Reuters 转述",
+   "action": "中国审查 Meta 收购 Manus 是否违反技术出口管制",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "政府审查动作，非玩家动作；单源链、Reuters 未独立核验"
+  },
+  {
+   "event_name": "MiniMax 内部模型攻破多项前沿密码学方案",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "MiniMax 11-22 晚间宣布（AI Morning Brief 转述）",
+   "action": "MiniMax 内部模型攻破多项前沿密码学方案",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "玩家不在 18 人名单里；未核验的研究宣称；无对应种类"
+  },
+  {
+   "event_name": "OpenRouter 下架三家推理服务商、125 个端点取消零留存",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "OpenRouter 11-22",
+   "action": "OpenRouter 下架三家推理服务商、125 个端点取消零留存",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "玩家不在 18 人名单里；无对应种类"
+  },
+  {
+   "event_name": "Together AI 编码智能体泄露 Hugging Face 凭证、客户提示词外泄",
+   "player": null,
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "Together AI 11-22（AI Morning Brief 转述）",
+   "action": "Together AI 编码智能体泄露 Hugging Face 凭证、客户提示词外泄",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "第三方安全事故，非玩家公开动作"
+  },
+  {
+   "event_name": "NYU 与 Anthropic 研究者宣称 AI 辅助证明 Navier-Stokes 爆破",
+   "player": "ANTH",
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "openloopnews 11-23",
+   "action": "NYU 与 Anthropic 研究者宣称 AI 辅助证明 Navier-Stokes 爆破",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "未核验的研究宣称，非公司动作；无对应种类（同黎曼先例）"
+  },
+  {
+   "event_name": "DeepSeek 第二轮融资：至少 9 家券商合计出资约 95 亿元",
+   "player": "DPSK",
+   "kind": null,
+   "event_real_date": 20261122,
+   "source": "中国证券报 11-22",
+   "action": "DeepSeek 第二轮融资：至少 9 家券商合计出资约 95 亿元",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "轮次本身已记录（S5 时期），本次只是出资细节跟进"
+  },
+  {
+   "event_name": "Anthropic IPO 承销商关闭股价稳定操作",
+   "player": "ANTH",
+   "kind": "anthropic_ipo",
+   "event_real_date": 20261120,
+   "source": "Reuters 11-20",
+   "action": "Anthropic IPO 承销商关闭股价稳定操作",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "S5 时期事件；IPO 线已在题集里"
+  },
+  {
+   "event_name": "Anthropic 采购 1.7GW 燃气发电机（34 亿美元）",
+   "player": "ANTH",
+   "kind": "energy",
+   "event_real_date": 20261116,
+   "source": "Better Data Center Project 案例研究 11-16",
+   "action": "Anthropic 采购 1.7GW 燃气发电机（34 亿美元）",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "采购真实日期不清（研究发布日非采购日），日期不清的不要"
+  },
+  {
+   "event_name": "Grok 4.6 上线 xAI API",
+   "player": "MUSK",
+   "kind": "spacex_xai",
+   "event_real_date": 20261122,
+   "source": "AI Briefing 11-22（聚合器）",
+   "action": "Grok 4.6 上线 xAI API",
+   "found_date": "2026-11-23",
+   "status": null,
+   "reason": "聚合器重报：Grok 4.6 本身为 8 月发布，S5 时期；API 上架无一手来源日期"
+  },
+  {
+   "event_name": "Anthropic 发布《Working with AI》企业研究：58 家客户访谈",
+   "player": "ANTH",
+   "kind": null,
+   "event_real_date": 20261123,
+   "source": "Anthropic 11-23（explainx 转述）",
+   "action": "Anthropic 发布 58 家企业客户研究：AI 导致裁员少、招聘放缓普遍，按 Claude 重组工作流程价值更高",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "研究报告发布，非大厅动作类事件（同 Newsom 报告先例）"
+  },
+  {
+   "event_name": "DeepMind Gemini 智能体降低量子线路成本",
+   "player": "GOOG",
+   "kind": null,
+   "event_real_date": 20261123,
+   "source": "DeepMind 11-23（explainx 转述）",
+   "action": "DeepMind 智能体团队以 Lean 验证证明更便宜的量子线路，最高 11.8 倍融合增益，并开源库",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "未核验的研究成果宣称，非公司动作（同黎曼先例）"
+  },
+  {
+   "event_name": "Anthropic 宣称 Claude 证明 VP≠VNP 猜想",
+   "player": "ANTH",
+   "kind": null,
+   "event_real_date": 20261123,
+   "source": "Anthropic 11-23（explainx 转述；Lean 代码在 GitHub）",
+   "action": "Anthropic 发布宣称 Claude 证明 VP≠VNP 的 Lean 代码，可复跑步骤，但尚无数学家人工审验",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "未核验的研究宣称，非公司动作（同黎曼先例）"
+  },
+  {
+   "event_name": "Anthropic 宣称 Claude 计算 Hawking–Page 转变三圈系数",
+   "player": "ANTH",
+   "kind": null,
+   "event_real_date": 20261123,
+   "source": "Anthropic 11-23（AT Pulse 转述）",
+   "action": "Anthropic 称 Claude 智能体算出使弱耦合 Hawking–Page 转变为一阶的三圈系数，解答 2003 年以来悬而未决的问题",
+   "found_date": "2026-11-24",
+   "status": null,
+   "reason": "未核验的研究成果宣称，非公司动作（同黎曼先例）"
   }
  ]
 }

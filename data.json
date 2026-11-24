@@ -1,11 +1,11 @@
 {
  "meta": {
-  "title": "金铲铲复盘：AI 大厅 2022–2026 — 页面数据（单一事实源）",
-  "accounting": "跨季承接记账（本轮对账修正）。S1 开局见 openings 冻结开局表。S2–S5 开局等于上季季末：openings 存承接值，与程序按上季开局 + 全季逐轮增量算出的季末逐值相等，跨季断点为 0。赛季末排名是基准，不存第二份：由程序按本季开局 + 全季逐轮增量之和算出。逐轮增量已重算：每季增量之和 = 季末排名 − 上季季末。断点差额集中记入每季首轮增量，季内其余轮次增量未动，558 个季内时点数值与修正前逐点相同。人口与阵容标签为赛季末输入，见 seasons[].meta。roundEvidence 为每轮证据：状态（verified / opinion / pending）与指针（doc_number / edgar / trace / url），证据只证标题事件、不证模型分。",
+  "title": "金铲铲复盘：AI 大厅 2018–2026 — 页面数据（单一事实源）",
+  "accounting": "单一事实源。第一层：S0 前传赛季（2018-06 至 2022-12，55 个月轮，106 条事件，15 名玩家，100 血 / 0 金起算）；S1–S5 按月重组（642 条动作，Δ 未动，轮次从旧 31 轮变为 38 轮，2026 年 11 月 S5 轮与 S6 1-1 轮分立，见下）；S6 1-1 轮（Pachocki 提案、黄仁勋复任、Megaspeed 列入实体清单，3 条）。动作总数 751，轮次总数 94，玩家 32 名（新增 HF、STAB、MJ、AI21、UCB、EU、USGOV、ACM，均为 S0 进场）。S1 开局为冻结开局，不承接 S0 季末（S0 与 S1 在 2022 年日历重叠，属前传与正赛双轨）；S2–S6 开局承接上季季末。2026 年 11 月分立原因：Pachocki 提案为 OpenAI +3 血 / +1 金，若并入 S5 轮会使 S5 季末 OpenAI 变为 82 血 / 59 金，与已冻结的 79 血 / 58 金冲突；黄仁勋复任为 NVDA +6 血 / +3 金、Megaspeed 列入实体清单为 NVDA -5 血 / -2 金，若并入 S5 轮还会使 S5 季末 NVDA 变为 37 血 / 55 金，与已冻结的 36 血 / 54 金冲突，故 S5 11 月轮（117 条）与 S6 1-1 轮（3 条）并存，同月不同季。S5 11 月轮标签为 11 月 1–21 日，S6 1-1 轮标签为 11 月 22–30 日。S5 季末与 S6 开局值不变（OpenAI 79 血 / 58 金，Anthropic 121 血 / 113 金，英伟达 36 血 / 54 金）。其余核算口径与旧版一致：回合增量含跨季对账断点，断点记入每季首轮（S1 1-1、S2 1-1、S3 1-1、S4 1-1、S5 1-1 均为旧轮次代码，见 reconciliation 的 137 条对账记录，代码为重组前轮次代码）；'上月'指上一轮次的季内累计值，不含前一赛季的承接值。证据状态：verified = 有公开来源；opinion = 模型推断或无逐动作来源；pending = 结算中。金币为模型内结算单位，非财报口径。",
   "derived": {
-   "roundStart": "每轮轮初血量/金币由程序推导：赛季首轮轮初 = 赛季初开局值（S1 为冻结开局，S2–S5 为上季季末承接值）；其后每轮轮初 = 上一轮轮末值（轮末 = 轮初 + 本轮增量）。不另存第二份。",
+   "roundStart": "开局规则：S0 为 100 血 / 0 金。S1 为冻结开局，不承接 S0 季末。S2–S6 为上季季末承接值。冻结开局不等于当季实盘起点：S1 冻结开局只作为当季第一轮的基数。",
    "standings": "赛季末排名（血量/金币）由程序从 openings 与逐轮增量算出，按血量降序、meta 既定顺序处理并列。",
-   "chart": "总图折线 90 个点由程序从算出的赛季末血量生成。"
+   "chart": "总图折线 139 个点由程序从算出的赛季末血量生成。按季节内顺序走。"
   }
  },
  "players": [
@@ -224,6 +224,174 @@
    "open": "愿景基金弹药 + ARM 股权",
    "weak": "下注集中。一次看错，整季回血不能",
    "bond": "星门羁绊 + ARM 羁绊"
+  },
+  {
+   "id": "KIMI",
+   "code": "KIMI",
+   "name": "月之暗面 · Kimi",
+   "color": "#7c3aed",
+   "sym": "KM",
+   "role": "Agent 模型 · 长上下文位",
+   "style": "长上下文起家，Agent 模型出圈。",
+   "open": "Kimi 长上下文 + Agent 模型",
+   "weak": "没有云与入口，变现靠订阅与 API",
+   "bond": "开源 Agent 羁绊"
+  },
+  {
+   "id": "MANUS",
+   "code": "MANUS",
+   "name": "Manus",
+   "color": "#0e7490",
+   "sym": "MA",
+   "role": "通用 Agent · 黑马位",
+   "style": "通用 Agent 一夜炸场，邀测制。",
+   "open": "通用 Agent 邀测热度",
+   "weak": "算力与合规双线承压",
+   "bond": "Agent 羁绊"
+  },
+  {
+   "id": "ZHIPU",
+   "code": "ZHIPU",
+   "name": "智谱 · GLM",
+   "color": "#1d4ed8",
+   "sym": "ZP",
+   "role": "国产大模型 · GLM 位",
+   "style": "清华系，GLM 开源跟进。",
+   "open": "GLM 开源 + 政企客户",
+   "weak": "声量总慢半轮",
+   "bond": "国产开源羁绊"
+  },
+  {
+   "id": "MINIMAX",
+   "code": "MINIMAX",
+   "name": "MiniMax",
+   "color": "#ec4899",
+   "sym": "MM",
+   "role": "Agent 模型 · 出海位",
+   "style": "Agent 模型与出海并行。",
+   "open": "Agent 模型 + 出海收入",
+   "weak": "国内声量弱",
+   "bond": "Agent 羁绊"
+  },
+  {
+   "id": "OPENCLAW",
+   "code": "OPENCLAW",
+   "name": "OpenClaw",
+   "color": "#84cc16",
+   "sym": "OC",
+   "role": "开源 Agent 框架 · 社区位",
+   "style": "开源框架，社区驱动。",
+   "open": "开源社区热度",
+   "weak": "无商业模式",
+   "bond": "开源羁绊"
+  },
+  {
+   "id": "PANW",
+   "code": "PANW",
+   "name": "Palo Alto Networks",
+   "color": "#22c55e",
+   "sym": "PA",
+   "role": "安全巨头 · 并购位",
+   "style": "用安全并购切入 AI 基建。",
+   "open": "网络安全现金流 + 45 亿美元并购",
+   "weak": "非 AI 主业，整合风险",
+   "bond": "安全 × AI 基建羁绊"
+  },
+  {
+   "id": "HF",
+   "code": "HF",
+   "name": "Hugging Face",
+   "color": "#f59e0b",
+   "sym": "HF",
+   "role": "开源模型枢纽 · 2019 年起进场",
+   "style": "开源枢纽：模型库与社区是基本盘。",
+   "open": "开源模型库",
+   "weak": "平台而非模型厂",
+   "bond": "绑定开源社区：BLOOM 与 DistilBERT 的家。"
+  },
+  {
+   "id": "STAB",
+   "code": "STAB",
+   "name": "Stability AI",
+   "color": "#db2777",
+   "sym": "ST",
+   "role": "开源文生图 · 2022 年 8 月进场",
+   "style": "开源文生图：Stable Diffusion 一夜改写门槛。",
+   "open": "开源文生图模型",
+   "weak": "商业化薄弱",
+   "bond": "绑定开源文生图：Stable Diffusion 的家。"
+  },
+  {
+   "id": "MJ",
+   "code": "MJ",
+   "name": "Midjourney",
+   "color": "#0ea5e9",
+   "sym": "MJ",
+   "role": "AI 绘画社区 · 2022 年 7 月进场",
+   "style": "社区驱动绘画：审美即护城河。",
+   "open": "社区订阅制绘画",
+   "weak": "只做绘画",
+   "bond": "绑定 AI 绘画社区：Discord 里的画室。"
+  },
+  {
+   "id": "AI21",
+   "code": "AI21",
+   "name": "AI21 Labs",
+   "color": "#16a34a",
+   "sym": "A2",
+   "role": "大模型 · 2021 年 8 月进场",
+   "style": "以色列大模型：Jurassic 系列。",
+   "open": "Jurassic 大模型",
+   "weak": "规模不及头部",
+   "bond": "绑定大模型第二梯队：Jurassic-1 的家。"
+  },
+  {
+   "id": "UCB",
+   "code": "UCB",
+   "name": "加州大学伯克利分校",
+   "color": "#65a30d",
+   "sym": "UC",
+   "role": "学术机构 · 2020 年 9 月进场",
+   "style": "学术基准制定者：MMLU 影响全行业评测。",
+   "open": "学术研究与基准",
+   "weak": "不做产品",
+   "bond": "绑定学术界：MMLU 基准的家。"
+  },
+  {
+   "id": "EU",
+   "code": "EU",
+   "name": "欧盟",
+   "color": "#1e40af",
+   "sym": "EU",
+   "role": "监管机构 · 2018 年 12 月进场",
+   "style": "规则制定者：AI 法案是全桌的规则桌。",
+   "open": "AI 法案与伦理指南",
+   "weak": "不直接参赛",
+   "bond": "绑定规则桌：AI 法案的制定者。"
+  },
+  {
+   "id": "USGOV",
+   "code": "USGOV",
+   "name": "美国政府",
+   "color": "#b91c1c",
+   "sym": "US",
+   "role": "政策机构 · 2019 年 2 月进场",
+   "style": "政策制定者：行政令与法案定方向。",
+   "open": "AI 倡议与法案",
+   "weak": "不直接参赛",
+   "bond": "绑定政策桌：美国 AI 倡议的制定者。"
+  },
+  {
+   "id": "ACM",
+   "code": "ACM",
+   "name": "美国计算机学会",
+   "color": "#6b7280",
+   "sym": "AC",
+   "role": "学术机构 · 2019 年 3 月进场",
+   "style": "学术荣誉制定者：图灵奖定义先驱。",
+   "open": "图灵奖",
+   "weak": "不直接参赛",
+   "bond": "绑定学术界：图灵奖的颁发者。"
   }
  ],
  "openings": {
@@ -316,16 +484,16 @@
     "NVDA": 100,
     "OAI": 94,
     "MSFT": 92,
-    "GOOG": 74,
+    "GOOG": 77,
     "ANTH": 82,
     "META": 80,
     "AMZN": 78,
     "MUSK": 58,
     "AAPL": 83,
     "ORCL": 72,
-    "BYTE": 74,
-    "ALI": 76,
-    "TCE": 71,
+    "BYTE": 76,
+    "ALI": 82,
+    "TCE": 73,
     "BIDU": 66,
     "HUAWEI": 68,
     "DPSK": 55,
@@ -336,16 +504,16 @@
     "NVDA": 88,
     "OAI": 45,
     "MSFT": 70,
-    "GOOG": 66,
+    "GOOG": 68,
     "ANTH": 38,
     "META": 52,
     "AMZN": 64,
     "MUSK": 30,
     "AAPL": 92,
     "ORCL": 40,
-    "BYTE": 55,
-    "ALI": 60,
-    "TCE": 54,
+    "BYTE": 56,
+    "ALI": 64,
+    "TCE": 55,
     "BIDU": 38,
     "HUAWEI": 50,
     "DPSK": 14,
@@ -356,94 +524,1482 @@
   "S4": {
    "hp": {
     "NVDA": 98,
-    "OAI": 86,
+    "OAI": 96,
     "MSFT": 88,
-    "GOOG": 82,
+    "GOOG": 88,
     "ANTH": 85,
     "META": 84,
     "AMZN": 81,
     "MUSK": 68,
     "AAPL": 84,
     "ORCL": 80,
-    "BYTE": 82,
-    "ALI": 80,
-    "TCE": 74,
+    "BYTE": 84,
+    "ALI": 92,
+    "TCE": 79,
     "BIDU": 68,
     "HUAWEI": 78,
     "DPSK": 72,
     "TSMC": 95,
-    "SFTB": 66
+    "SFTB": 66,
+    "KIMI": 100,
+    "MANUS": 100,
+    "ZHIPU": 100,
+    "MINIMAX": 100
    },
    "gold": {
     "NVDA": 95,
-    "OAI": 60,
+    "OAI": 65,
     "MSFT": 72,
-    "GOOG": 74,
+    "GOOG": 78,
     "ANTH": 52,
     "META": 60,
     "AMZN": 70,
     "MUSK": 42,
     "AAPL": 90,
     "ORCL": 55,
-    "BYTE": 62,
-    "ALI": 58,
-    "TCE": 56,
+    "BYTE": 63,
+    "ALI": 65,
+    "TCE": 59,
     "BIDU": 40,
     "HUAWEI": 55,
     "DPSK": 20,
     "TSMC": 85,
-    "SFTB": 55
+    "SFTB": 55,
+    "KIMI": 0,
+    "MANUS": 0,
+    "ZHIPU": 0,
+    "MINIMAX": 0
    }
   },
   "S5": {
    "hp": {
     "NVDA": 84,
-    "OAI": 76,
+    "OAI": 94,
     "MSFT": 82,
-    "GOOG": 86,
-    "ANTH": 88,
-    "META": 82,
+    "GOOG": 106,
+    "ANTH": 115,
+    "META": 85,
     "AMZN": 79,
     "MUSK": 62,
     "AAPL": 85,
     "ORCL": 84,
-    "BYTE": 84,
-    "ALI": 86,
-    "TCE": 80,
-    "BIDU": 70,
-    "HUAWEI": 85,
-    "DPSK": 92,
+    "BYTE": 93,
+    "ALI": 105,
+    "TCE": 87,
+    "BIDU": 73,
+    "HUAWEI": 87,
+    "DPSK": 99,
     "TSMC": 90,
-    "SFTB": 72
+    "SFTB": 72,
+    "KIMI": 107,
+    "MANUS": 104,
+    "ZHIPU": 102,
+    "MINIMAX": 102,
+    "OPENCLAW": 100,
+    "PANW": 100
    },
    "gold": {
     "NVDA": 90,
-    "OAI": 55,
+    "OAI": 65,
     "MSFT": 66,
-    "GOOG": 78,
-    "ANTH": 60,
-    "META": 58,
+    "GOOG": 91,
+    "ANTH": 76,
+    "META": 59,
     "AMZN": 68,
     "MUSK": 35,
     "AAPL": 88,
     "ORCL": 70,
-    "BYTE": 60,
-    "ALI": 64,
-    "TCE": 58,
+    "BYTE": 65,
+    "ALI": 74,
+    "TCE": 63,
     "BIDU": 42,
-    "HUAWEI": 60,
-    "DPSK": 28,
+    "HUAWEI": 61,
+    "DPSK": 31,
     "TSMC": 82,
-    "SFTB": 60
+    "SFTB": 60,
+    "KIMI": 3,
+    "MANUS": 2,
+    "ZHIPU": 1,
+    "MINIMAX": 1,
+    "OPENCLAW": 0,
+    "PANW": 0
+   }
+  },
+  "S6": {
+   "hp": {
+    "NVDA": 36,
+    "OAI": 79,
+    "MSFT": 68,
+    "GOOG": 105,
+    "ANTH": 121,
+    "META": 67,
+    "AMZN": 65,
+    "MUSK": 59,
+    "AAPL": 70,
+    "ORCL": 64,
+    "BYTE": 83,
+    "ALI": 104,
+    "TCE": 78,
+    "BIDU": 61,
+    "HUAWEI": 74,
+    "DPSK": 90,
+    "TSMC": 64,
+    "SFTB": 64,
+    "KIMI": 120,
+    "MANUS": 104,
+    "ZHIPU": 102,
+    "MINIMAX": 102,
+    "OPENCLAW": 103,
+    "PANW": 102
+   },
+   "gold": {
+    "NVDA": 54,
+    "OAI": 58,
+    "MSFT": 60,
+    "GOOG": 88,
+    "ANTH": 113,
+    "META": 50,
+    "AMZN": 55,
+    "MUSK": 30,
+    "AAPL": 80,
+    "ORCL": 43,
+    "BYTE": 57,
+    "ALI": 63,
+    "TCE": 58,
+    "BIDU": 32,
+    "HUAWEI": 53,
+    "DPSK": 34,
+    "TSMC": 67,
+    "SFTB": 57,
+    "KIMI": 9,
+    "MANUS": 2,
+    "ZHIPU": 1,
+    "MINIMAX": 1,
+    "OPENCLAW": 1,
+    "PANW": 0
+   }
+  },
+  "S0": {
+   "hp": {
+    "GOOG": 100,
+    "OAI": 100,
+    "NVDA": 100,
+    "META": 100,
+    "MSFT": 100,
+    "ANTH": 100,
+    "HUAWEI": 100,
+    "HF": 100,
+    "STAB": 100,
+    "MJ": 100,
+    "AI21": 100,
+    "UCB": 100,
+    "EU": 100,
+    "USGOV": 100,
+    "ACM": 100
+   },
+   "gold": {
+    "GOOG": 0,
+    "OAI": 0,
+    "NVDA": 0,
+    "META": 0,
+    "MSFT": 0,
+    "ANTH": 0,
+    "HUAWEI": 0,
+    "HF": 0,
+    "STAB": 0,
+    "MJ": 0,
+    "AI21": 0,
+    "UCB": 0,
+    "EU": 0,
+    "USGOV": 0,
+    "ACM": 0
    }
   }
  },
  "seasons": [
   {
+   "id": "S0",
+   "year": "2018–2022",
+   "title": "前传赛季",
+   "patch": [
+    "版本改动：生成式 AI 解锁。GPT-1 到 ChatGPT，论文先行，产品后至。",
+    "旧阵容退环境：规则未成型。出口管制与 AI 立法都在起草中。",
+    "关键规则：先手在论文里。BERT、GPT-3、AlphaFold 2 先定义版本，产品随后跟进。"
+   ],
+   "start": "2018 年 6 月",
+   "end": "2022 年 12 月",
+   "theme": "GPT-1 到 ChatGPT。生成式 AI 从论文走向产品。先手在论文里，不在产品里。",
+   "meta": [
+    {
+     "id": "GOOG",
+     "pop": 7,
+     "label": "搜索城池"
+    },
+    {
+     "id": "OAI",
+     "pop": 4,
+     "label": "先手成型"
+    },
+    {
+     "id": "NVDA",
+     "pop": 5,
+     "label": "装备商"
+    },
+    {
+     "id": "META",
+     "pop": 6,
+     "label": "社交城池"
+    },
+    {
+     "id": "MSFT",
+     "pop": 6,
+     "label": "云厂就位"
+    },
+    {
+     "id": "ANTH",
+     "pop": 2,
+     "label": "安全小队"
+    },
+    {
+     "id": "HUAWEI",
+     "pop": 4,
+     "label": "昇腾出货"
+    },
+    {
+     "id": "HF",
+     "pop": 3,
+     "label": "开源枢纽"
+    },
+    {
+     "id": "STAB",
+     "pop": 2,
+     "label": "开源图像"
+    },
+    {
+     "id": "MJ",
+     "pop": 2,
+     "label": "图像新锐"
+    },
+    {
+     "id": "AI21",
+     "pop": 2,
+     "label": "大模型新军"
+    },
+    {
+     "id": "UCB",
+     "pop": 2,
+     "label": "学术基准"
+    },
+    {
+     "id": "EU",
+     "pop": 3,
+     "label": "规则制定"
+    },
+    {
+     "id": "USGOV",
+     "pop": 3,
+     "label": "政策制定"
+    },
+    {
+     "id": "ACM",
+     "pop": 1,
+     "label": "学术荣誉"
+    }
+   ],
+   "rounds": [
+    {
+     "code": "2018-06",
+     "date": "2018 年 6 月",
+     "type": "事件",
+     "title": "GPT-1发布，生成式预训练范式确立",
+     "global": "GPT-1 发布。生成式预训练范式确立。同月 OpenAI Five 首胜 Dota 2 业余队。",
+     "verdict": "胜：OpenAI。GPT-1 立住生成式预训练范式。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "OpenAI Five首胜Dota 2业余队",
+       1,
+       1
+      ],
+      [
+       "OAI",
+       "GPT-1发布，生成式预训练范式确立",
+       5,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2018-07",
+     "date": "2018 年 7 月",
+     "type": "事件",
+     "title": "OpenAI Five宣布8月对阵前职业队",
+     "global": "OpenAI Five 宣布 8 月对阵前职业队。Dota 2 的下一场硬仗约好了。",
+     "verdict": "胜：OpenAI。约战前职业队。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "OpenAI Five宣布8月对阵前职业队",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2018-08",
+     "date": "2018 年 8 月",
+     "type": "事件",
+     "title": "英伟达发布Turing架构GPU",
+     "global": "英伟达发布 Turing 架构 GPU。光线追踪进显卡，AI 训练也有了新装备。",
+     "verdict": "胜：英伟达。Turing 架构上市。负：无。",
+     "moves": [
+      [
+       "NVDA",
+       "英伟达发布Turing架构GPU",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2018-09",
+     "date": "2018 年 9 月",
+     "type": "事件",
+     "title": "DeepMind发布BigGAN，大规模GAN训练",
+     "global": "DeepMind 发布 BigGAN。大规模 GAN 训练，生成图像上了一个台阶。",
+     "verdict": "胜：谷歌。BigGAN 大规模生成。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "DeepMind发布BigGAN，大规模GAN训练",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2018-10",
+     "date": "2018 年 10 月",
+     "type": "事件",
+     "title": "谷歌发布BERT论文，双向预训练",
+     "global": "谷歌发布 BERT 论文。双向预训练，自然语言理解换了底座。",
+     "verdict": "胜：谷歌。BERT 双向预训练。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌发布BERT论文，双向预训练",
+       5,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2018-11",
+     "date": "2018 年 11 月",
+     "type": "事件",
+     "title": "谷歌开源BERT代码与预训练模型",
+     "global": "谷歌开源 BERT 代码与预训练模型。所有人都能站在 BERT 肩上。",
+     "verdict": "胜：谷歌。BERT 开源。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌开源BERT代码与预训练模型",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2018-12",
+     "date": "2018 年 12 月",
+     "type": "事件",
+     "title": "DeepMind AlphaFold赢得CASP13",
+     "global": "DeepMind AlphaFold 赢得 CASP13。蛋白质结构预测第一次被 AI 拿下。同月欧盟发布 AI 协调计划，投 200 亿欧元。英伟达发布 StyleGAN。",
+     "verdict": "胜：谷歌。AlphaFold 赢得 CASP13。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "DeepMind AlphaFold赢得CASP13",
+       2,
+       1
+      ],
+      [
+       "EU",
+       "欧盟发布AI协调计划，投200亿欧元",
+       1,
+       1
+      ],
+      [
+       "NVDA",
+       "英伟达发布StyleGAN，生成逼真人脸",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-01",
+     "date": "2019 年 1 月",
+     "type": "事件",
+     "title": "AlphaStar首胜星际争霸2职业选手",
+     "global": "DeepMind AlphaStar 首胜星际争霸 2 职业选手。实时战略游戏也被 AI 打穿。",
+     "verdict": "胜：谷歌。AlphaStar 首胜职业选手。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "AlphaStar首胜星际争霸2职业选手",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2019-02",
+     "date": "2019 年 2 月",
+     "type": "事件",
+     "title": "GPT-2发布，仅放124M版防滥用",
+     "global": "GPT-2 发布，只放 124M 版防滥用。同月美国发布行政令，启动美国 AI 倡议。",
+     "verdict": "胜：OpenAI。GPT-2 发布。负：无。",
+     "moves": [
+      [
+       "USGOV",
+       "美国发布行政令，启动美国AI倡议",
+       1,
+       1
+      ],
+      [
+       "OAI",
+       "GPT-2发布，仅放124M版防滥用",
+       3,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2019-03",
+     "date": "2019 年 3 月",
+     "type": "事件",
+     "title": "OpenAI改制为上限利润公司",
+     "global": "OpenAI 改制为上限利润公司。同月深度学习三先驱获 2018 图灵奖。",
+     "verdict": "胜：OpenAI。改制完成，融资通道打开。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "OpenAI改制为上限利润公司",
+       1,
+       1
+      ],
+      [
+       "ACM",
+       "深度学习三先驱获2018图灵奖",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-04",
+     "date": "2019 年 4 月",
+     "type": "事件",
+     "title": "谷歌解散AI伦理委员会ATEAC",
+     "global": "谷歌解散 AI 伦理委员会 ATEAC。成立一周即解散。同月欧盟发布可信 AI 伦理指南。",
+     "verdict": "胜：无。负：谷歌。伦理委员会一周解散。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌解散AI伦理委员会ATEAC",
+       -2,
+       0
+      ],
+      [
+       "EU",
+       "欧盟发布可信AI伦理指南",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2019-05",
+     "date": "2019 年 5 月",
+     "type": "事件",
+     "title": "GPT-2分阶段放出355M版",
+     "global": "GPT-2 分阶段放出 355M 版。OpenAI 的分阶段发布走到第二步。",
+     "verdict": "胜：OpenAI。分阶段发布继续。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "GPT-2分阶段放出355M版",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-06",
+     "date": "2019 年 6 月",
+     "type": "事件",
+     "title": "谷歌与CMU发布XLNet，超BERT",
+     "global": "谷歌与 CMU 发布 XLNet，超 BERT。预训练的排列组合又进一步。",
+     "verdict": "胜：谷歌。XLNet 超 BERT。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌与CMU发布XLNet，超BERT",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-07",
+     "date": "2019 年 7 月",
+     "type": "事件",
+     "title": "微软向OpenAI投资10亿美元",
+     "global": "微软向 OpenAI 投资 10 亿美元。同月 Facebook 发布 RoBERTa，优化 BERT 训练。",
+     "verdict": "胜：微软。10 亿美元锁死羁绊。负：无。",
+     "moves": [
+      [
+       "MSFT",
+       "微软向OpenAI投资10亿美元",
+       2,
+       2
+      ],
+      [
+       "META",
+       "Facebook发布RoBERTa，优化BERT训练",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-08",
+     "date": "2019 年 8 月",
+     "type": "事件",
+     "title": "GPT-2放出774M版并发布分阶段报告",
+     "global": "GPT-2 放出 774M 版，并发布分阶段报告。分阶段发布走到第三步。",
+     "verdict": "胜：OpenAI。分阶段发布继续。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "GPT-2放出774M版并发布分阶段报告",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-09",
+     "date": "2019 年 9 月",
+     "type": "事件",
+     "title": "英伟达发布Megatron-LM，83亿参数",
+     "global": "英伟达发布 Megatron-LM，83 亿参数。同月谷歌发布 ALBERT，轻量版 BERT。",
+     "verdict": "胜：英伟达。Megatron-LM 83 亿参数。负：无。",
+     "moves": [
+      [
+       "NVDA",
+       "英伟达发布Megatron-LM，83亿参数",
+       1,
+       0
+      ],
+      [
+       "GOOG",
+       "谷歌发布ALBERT，轻量版BERT",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-10",
+     "date": "2019 年 10 月",
+     "type": "事件",
+     "title": "谷歌发布T5，统一文本到文本框架",
+     "global": "谷歌发布 T5，统一文本到文本框架。同月 Hugging Face 发布 DistilBERT，谷歌搜索上线 BERT，AlphaStar 达宗师级。",
+     "verdict": "胜：谷歌。T5 统一框架。负：无。",
+     "moves": [
+      [
+       "HF",
+       "Hugging Face发布DistilBERT",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "谷歌发布T5，统一文本到文本框架",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "谷歌搜索上线BERT，影响一成查询",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "AlphaStar达星际2宗师级水平",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2019-11",
+     "date": "2019 年 11 月",
+     "type": "事件",
+     "title": "DeepMind发布MuZero，无规则自学规划",
+     "global": "DeepMind 发布 MuZero，无规则自学规划。同月 GPT-2 完整 15 亿参数版发布。",
+     "verdict": "胜：谷歌。MuZero 无规则自学。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "GPT-2完整15亿参数版发布",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "DeepMind发布MuZero，无规则自学规划",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2019-12",
+     "date": "2019 年 12 月",
+     "type": "事件",
+     "title": "英伟达发布StyleGAN2，画质再提升",
+     "global": "英伟达发布 StyleGAN2，画质再提升。生成人脸又真了一档。",
+     "verdict": "胜：英伟达。StyleGAN2 画质再升。负：无。",
+     "moves": [
+      [
+       "NVDA",
+       "英伟达发布StyleGAN2，画质再提升",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2020-01",
+     "date": "2020 年 1 月",
+     "type": "事件",
+     "title": "Scaling Laws论文发布，揭示规模定律",
+     "global": "Scaling Laws 论文发布，揭示规模定律。越大越好，第一次有了定量形状。",
+     "verdict": "胜：OpenAI。规模定律立住。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "Scaling Laws论文发布，揭示规模定律",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2020-02",
+     "date": "2020 年 2 月",
+     "type": "事件",
+     "title": "微软发布170亿参数Turing-NLG",
+     "global": "微软发布 170 亿参数 Turing-NLG。同月谷歌发布 T5-11B 统一文本到文本模型。",
+     "verdict": "胜：微软。Turing-NLG 170 亿参数。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌发布T5-11B统一文本到文本模型",
+       0,
+       0
+      ],
+      [
+       "MSFT",
+       "微软发布170亿参数Turing-NLG",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2020-03",
+     "date": "2020 年 3 月",
+     "type": "事件",
+     "title": "DeepMind发布新冠病毒蛋白结构预测",
+     "global": "DeepMind 发布新冠病毒蛋白结构预测。疫情当月，AI 直接上了抗疫前线。同月华为 MindSpore 框架正式开源。",
+     "verdict": "胜：谷歌。新冠蛋白结构预测。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "DeepMind发布新冠病毒蛋白结构预测",
+       1,
+       0
+      ],
+      [
+       "HUAWEI",
+       "华为MindSpore框架正式开源",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2020-04",
+     "date": "2020 年 4 月",
+     "type": "事件",
+     "title": "Facebook开源94亿参数聊天机器人Blender",
+     "global": "Facebook 开源 94 亿参数聊天机器人 Blender。对话模型开源到百亿级。",
+     "verdict": "胜：Meta。Blender 开源。负：无。",
+     "moves": [
+      [
+       "META",
+       "Facebook开源94亿参数聊天机器人Blender",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2020-05",
+     "date": "2020 年 5 月",
+     "type": "事件",
+     "title": "GPT-3论文发布，1750亿参数少样本学习",
+     "global": "GPT-3 论文发布，1750 亿参数少样本学习。同月英伟达发布 A100 与 Ampere 架构。",
+     "verdict": "胜：OpenAI。GPT-3 少样本学习。负：无。",
+     "moves": [
+      [
+       "NVDA",
+       "英伟达发布A100 GPU与Ampere架构",
+       3,
+       2
+      ],
+      [
+       "OAI",
+       "GPT-3论文发布，1750亿参数少样本学习",
+       6,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2020-06",
+     "date": "2020 年 6 月",
+     "type": "事件",
+     "title": "GPT-3 API开启私人内测",
+     "global": "GPT-3 API 开启私人内测。同月谷歌发表 GShard 论文，6000 亿参数稀疏模型。",
+     "verdict": "胜：OpenAI。GPT-3 API 内测。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "GPT-3 API开启私人内测",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "谷歌GShard论文，6000亿参数稀疏模型",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2020-07",
+     "date": "2020 年 7 月",
+     "type": "事件",
+     "title": "谷歌开源向量检索库ScaNN",
+     "global": "谷歌开源向量检索库 ScaNN。检索基础设施免费可用。",
+     "verdict": "胜：谷歌。ScaNN 开源。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌开源向量检索库ScaNN",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2020-08",
+     "date": "2020 年 8 月",
+     "type": "事件",
+     "title": "DeepMind更新新冠蛋白AlphaFold预测",
+     "global": "DeepMind 更新新冠蛋白 AlphaFold 预测。疫情预测继续迭代。",
+     "verdict": "胜：谷歌。AlphaFold 预测更新。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "DeepMind更新新冠蛋白AlphaFold预测",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2020-09",
+     "date": "2020 年 9 月",
+     "type": "事件",
+     "title": "微软独家授权GPT-3模型",
+     "global": "微软独家授权 GPT-3 模型。同月伯克利发布 MMLU 基准，57 学科多任务评测。",
+     "verdict": "胜：微软。独家授权 GPT-3。负：无。",
+     "moves": [
+      [
+       "UCB",
+       "MMLU基准发布，57学科多任务评测",
+       1,
+       1
+      ],
+      [
+       "MSFT",
+       "微软独家授权GPT-3模型",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2020-10",
+     "date": "2020 年 10 月",
+     "type": "事件",
+     "title": "谷歌发布视觉Transformer论文ViT",
+     "global": "谷歌发布视觉 Transformer 论文 ViT。同月发布 101 语言多语言模型 mT5。",
+     "verdict": "胜：谷歌。ViT 把 Transformer 带进视觉。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌发布101语言多语言模型mT5",
+       0,
+       0
+      ],
+      [
+       "GOOG",
+       "谷歌发布视觉Transformer论文ViT",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2020-11",
+     "date": "2020 年 11 月",
+     "type": "事件",
+     "title": "DeepMind AlphaFold 2赢得CASP14",
+     "global": "DeepMind AlphaFold 2 赢得 CASP14。蛋白质结构预测基本被解决。",
+     "verdict": "胜：谷歌。AlphaFold 2 赢得 CASP14。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "DeepMind AlphaFold 2赢得CASP14",
+       5,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2020-12",
+     "date": "2020 年 12 月",
+     "type": "事件",
+     "title": "DeepMind MuZero论文登Nature，无规则学棋",
+     "global": "DeepMind MuZero 论文登 Nature，无规则学棋。规划能力不需要人类规则。",
+     "verdict": "胜：谷歌。MuZero 登 Nature。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "DeepMind MuZero论文登Nature，无规则学棋",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2021-01",
+     "date": "2021 年 1 月",
+     "type": "事件",
+     "title": "OpenAI发布文生图模型DALL-E",
+     "global": "OpenAI 发布文生图模型 DALL-E 与图文对比模型 CLIP。同月美国国家 AI 倡议法案生效，谷歌发布 Switch Transformer，Anthropic 正式成立。",
+     "verdict": "胜：OpenAI。DALL-E 与 CLIP 同月发布。负：无。",
+     "moves": [
+      [
+       "USGOV",
+       "美国国家AI倡议法案正式生效",
+       1,
+       1
+      ],
+      [
+       "OAI",
+       "OpenAI发布文生图模型DALL-E",
+       2,
+       1
+      ],
+      [
+       "OAI",
+       "OpenAI发布图文对比模型CLIP",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "谷歌Switch Transformer论文，万亿参数MoE",
+       1,
+       0
+      ],
+      [
+       "ANTH",
+       "Anthropic正式成立，Amodei兄妹出走创立",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2021-02",
+     "date": "2021 年 2 月",
+     "type": "事件",
+     "title": "谷歌解雇AI伦理团队负责人Mitchell",
+     "global": "谷歌解雇 AI 伦理团队负责人 Mitchell。伦理团队连遭重创。",
+     "verdict": "胜：无。负：谷歌。解雇伦理团队负责人。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌解雇AI伦理团队负责人Mitchell",
+       -3,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2021-03",
+     "date": "2021 年 3 月",
+     "type": "事件",
+     "title": "Facebook发布自监督视觉模型SEER",
+     "global": "Facebook 发布自监督视觉模型 SEER。视觉自监督上量。",
+     "verdict": "胜：Meta。SEER 自监督视觉。负：无。",
+     "moves": [
+      [
+       "META",
+       "Facebook发布自监督视觉模型SEER",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2021-04",
+     "date": "2021 年 4 月",
+     "type": "事件",
+     "title": "欧盟委员会公布人工智能法案草案",
+     "global": "欧盟委员会公布人工智能法案草案。全球第一部全面 AI 立法进入程序。",
+     "verdict": "胜：欧盟。AI 法案草案公布。负：无。",
+     "moves": [
+      [
+       "EU",
+       "欧盟委员会公布人工智能法案草案",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2021-05",
+     "date": "2021 年 5 月",
+     "type": "事件",
+     "title": "谷歌I/O发布对话模型LaMDA",
+     "global": "谷歌 I/O 发布对话模型 LaMDA。对话模型进入产品线。同月 Anthropic 完成 1.24 亿美元 A 轮融资。",
+     "verdict": "胜：谷歌。LaMDA 发布。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌I/O发布对话模型LaMDA",
+       1,
+       1
+      ],
+      [
+       "ANTH",
+       "Anthropic完成1.24亿美元A轮融资",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2021-06",
+     "date": "2021 年 6 月",
+     "type": "事件",
+     "title": "GitHub Copilot开启技术预览",
+     "global": "GitHub Copilot 开启技术预览。AI 第一次坐进编辑器写代码。",
+     "verdict": "胜：微软。Copilot 技术预览。负：无。",
+     "moves": [
+      [
+       "MSFT",
+       "GitHub Copilot开启技术预览",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2021-07",
+     "date": "2021 年 7 月",
+     "type": "事件",
+     "title": "AlphaFold 2论文与数据库在Nature发表",
+     "global": "AlphaFold 2 论文与数据库在 Nature 发表。同月 OpenAI 发布 Codex 论文，Facebook 发布 BlenderBot 2.0。",
+     "verdict": "胜：谷歌。AlphaFold 2 论文与数据库发表。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "Codex论文发布，GPT-3微调学写代码",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "AlphaFold 2论文与数据库在Nature发表",
+       1,
+       1
+      ],
+      [
+       "META",
+       "Facebook发布BlenderBot 2.0，带记忆联网",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2021-08",
+     "date": "2021 年 8 月",
+     "type": "事件",
+     "title": "AI21发布1780亿参数Jurassic-1",
+     "global": "AI21 发布 1780 亿参数 Jurassic-1。同月 OpenAI Codex API 开启私人内测。",
+     "verdict": "胜：AI21。Jurassic-1 发布。负：无。",
+     "moves": [
+      [
+       "AI21",
+       "AI21发布1780亿参数Jurassic-1",
+       1,
+       1
+      ],
+      [
+       "OAI",
+       "OpenAI Codex API开启私人内测",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2021-09",
+     "date": "2021 年 9 月",
+     "type": "事件",
+     "title": "谷歌FLAN论文，指令微调提升零样本能力",
+     "global": "谷歌发表 FLAN 论文，指令微调提升零样本能力。对齐路线的早期一步。",
+     "verdict": "胜：谷歌。FLAN 指令微调。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌FLAN论文，指令微调提升零样本能力",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2021-10",
+     "date": "2021 年 10 月",
+     "type": "事件",
+     "title": "Facebook公司更名为Meta",
+     "global": "Facebook 公司更名为 Meta。同月微软与英伟达发布 5300 亿参数 MT-NLG。",
+     "verdict": "胜：Meta。公司更名，元宇宙 All in。负：无。",
+     "moves": [
+      [
+       "MSFT",
+       "微软与英伟达发布5300亿参数MT-NLG",
+       1,
+       1
+      ],
+      [
+       "META",
+       "Facebook公司更名为Meta",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2021-11",
+     "date": "2021 年 11 月",
+     "type": "事件",
+     "title": "OpenAI取消GPT-3 API等候名单",
+     "global": "OpenAI 取消 GPT-3 API 等候名单。GPT-3 正式向所有人开放。",
+     "verdict": "胜：OpenAI。GPT-3 API 全面开放。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "OpenAI取消GPT-3 API等候名单",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2021-12",
+     "date": "2021 年 12 月",
+     "type": "事件",
+     "title": "DeepMind发布2800亿参数语言模型Gopher",
+     "global": "谷歌 DeepMind 发布 2800 亿参数语言模型 Gopher。同月 OpenAI 开放 GPT-3 微调功能。",
+     "verdict": "胜：谷歌。Gopher 发布。负：无。",
+     "moves": [
+      [
+       "GOOG",
+       "DeepMind发布2800亿参数语言模型Gopher",
+       1,
+       0
+      ],
+      [
+       "OAI",
+       "OpenAI开放GPT-3微调功能",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2022-01",
+     "date": "2022 年 1 月",
+     "type": "事件",
+     "title": "OpenAI发布InstructGPT，RLHF规模化",
+     "global": "OpenAI 发布 InstructGPT，RLHF 规模化。同月谷歌发表思维链提示论文。",
+     "verdict": "胜：OpenAI。InstructGPT，RLHF 规模化。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "OpenAI发布InstructGPT，RLHF规模化",
+       2,
+       1
+      ],
+      [
+       "GOOG",
+       "谷歌发表思维链提示论文",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2022-02",
+     "date": "2022 年 2 月",
+     "type": "事件",
+     "title": "Anthropic发表大模型可预测与意外论文",
+     "global": "Anthropic 发表大模型可预测与意外论文。安全派的早期方法论。",
+     "verdict": "胜：Anthropic。大模型可预测性论文。负：无。",
+     "moves": [
+      [
+       "ANTH",
+       "Anthropic发表大模型可预测与意外论文",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2022-03",
+     "date": "2022 年 3 月",
+     "type": "事件",
+     "title": "英伟达发布Hopper架构与H100",
+     "global": "英伟达发布 Hopper 架构与 H100。同月 OpenAI 上线 GPT-3.5 系列，DeepMind 发表 Chinchilla 缩放定律，发布 GopherCite。",
+     "verdict": "胜：英伟达。Hopper 与 H100 发布。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "OpenAI上线GPT-3.5系列API模型",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "DeepMind发布GopherCite，引用证据作答",
+       0,
+       0
+      ],
+      [
+       "NVDA",
+       "英伟达发布Hopper架构与H100",
+       4,
+       2
+      ],
+      [
+       "GOOG",
+       "DeepMind发表Chinchilla缩放定律论文",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2022-04",
+     "date": "2022 年 4 月",
+     "type": "事件",
+     "title": "谷歌发布5400亿参数PaLM",
+     "global": "谷歌发布 5400 亿参数 PaLM。同月 Anthropic 完成 5.8 亿美元 B 轮，OpenAI 发布 DALL-E 2，DeepMind 发布 Flamingo。",
+     "verdict": "胜：谷歌。PaLM 5400 亿参数。负：无。",
+     "moves": [
+      [
+       "ANTH",
+       "Anthropic完成5.8亿美元B轮融资",
+       2,
+       2
+      ],
+      [
+       "GOOG",
+       "谷歌发布5400亿参数PaLM",
+       2,
+       2
+      ],
+      [
+       "OAI",
+       "OpenAI发布DALL-E 2文生图模型",
+       2,
+       1
+      ],
+      [
+       "GOOG",
+       "DeepMind发布视觉语言模型Flamingo",
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2022-05",
+     "date": "2022 年 5 月",
+     "type": "事件",
+     "title": "Meta发布OPT-175B开放大模型",
+     "global": "Meta 发布 OPT-175B 开放模型。同月 Hugging Face 完成 1 亿美元 C 轮，谷歌发布 LaMDA 2、Gato 与 Imagen。",
+     "verdict": "胜：Meta。OPT-175B 开放。负：无。",
+     "moves": [
+      [
+       "META",
+       "Meta发布OPT-175B开放大模型",
+       2,
+       1
+      ],
+      [
+       "HF",
+       "Hugging Face完成1亿美元C轮融资",
+       1,
+       3
+      ],
+      [
+       "GOOG",
+       "谷歌发布LaMDA 2与AI Test Kitchen",
+       0,
+       0
+      ],
+      [
+       "GOOG",
+       "DeepMind发布通用智能体Gato",
+       0,
+       0
+      ],
+      [
+       "GOOG",
+       "谷歌发布文生图模型Imagen",
+       1,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2022-06",
+     "date": "2022 年 6 月",
+     "type": "事件",
+     "title": "谷歌工程师称LaMDA有知觉引争议",
+     "global": "谷歌工程师称 LaMDA 有知觉，引争议。同月谷歌等发表大模型涌现能力论文，发布数学推理模型 Minerva。",
+     "verdict": "胜：无。负：谷歌。LaMDA 知觉争议。",
+     "moves": [
+      [
+       "GOOG",
+       "谷歌工程师称LaMDA有知觉引争议",
+       -2,
+       0
+      ],
+      [
+       "GOOG",
+       "谷歌等发表大模型涌现能力论文",
+       1,
+       0
+      ],
+      [
+       "GOOG",
+       "谷歌发布数学推理模型Minerva",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2022-07",
+     "date": "2022 年 7 月",
+     "type": "事件",
+     "title": "BigScience发布1760亿参数BLOOM",
+     "global": "BigScience 发布 1760 亿参数 BLOOM。同月 Midjourney 开放公测，DALL-E 2 进入百万人候补测试。",
+     "verdict": "胜：Hugging Face。BLOOM 发布。负：无。",
+     "moves": [
+      [
+       "HF",
+       "BigScience发布1760亿参数BLOOM",
+       2,
+       1
+      ],
+      [
+       "MJ",
+       "Midjourney开放公测",
+       1,
+       1
+      ],
+      [
+       "OAI",
+       "DALL-E 2进入百万人候补测试",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2022-08",
+     "date": "2022 年 8 月",
+     "type": "事件",
+     "title": "开源发布Stable Diffusion模型",
+     "global": "开源发布 Stable Diffusion 模型。文生图门槛一夜归零。",
+     "verdict": "胜：Stability AI。Stable Diffusion 开源。负：无。",
+     "moves": [
+      [
+       "STAB",
+       "开源发布Stable Diffusion模型",
+       3,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2022-09",
+     "date": "2022 年 9 月",
+     "type": "事件",
+     "title": "OpenAI开源语音识别模型Whisper",
+     "global": "OpenAI 开源语音识别模型 Whisper。同月 DeepMind 发布对话智能体 Sparrow。",
+     "verdict": "胜：OpenAI。Whisper 开源。负：无。",
+     "moves": [
+      [
+       "OAI",
+       "OpenAI开源语音识别模型Whisper",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "DeepMind发布对话智能体Sparrow",
+       0,
+       0
+      ]
+     ]
+    },
+    {
+     "code": "2022-10",
+     "date": "2022 年 10 月",
+     "type": "事件",
+     "title": "Stability AI融资1.01亿美元估值10亿",
+     "global": "Stability AI 融资 1.01 亿美元，估值 10 亿。同月白宫发布 AI 权利法案蓝图，DeepMind AlphaTensor 登 Nature。",
+     "verdict": "胜：Stability AI。融资 1.01 亿，估值 10 亿。负：无。",
+     "moves": [
+      [
+       "USGOV",
+       "白宫发布AI权利法案蓝图",
+       1,
+       1
+      ],
+      [
+       "GOOG",
+       "DeepMind的AlphaTensor登上《自然》",
+       1,
+       0
+      ],
+      [
+       "STAB",
+       "Stability AI融资1.01亿美元估值10亿",
+       2,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2022-11",
+     "date": "2022 年 11 月",
+     "type": "事件",
+     "title": "OpenAI发布ChatGPT",
+     "global": "OpenAI 发布 ChatGPT。同月 Meta 发布 Galactica（三天后撤回），Stability 发布 Stable Diffusion 2.0，OpenAI 发布 text-davinci-003。",
+     "verdict": "胜：OpenAI。ChatGPT 发布。负：Meta。Galactica 三天撤回。",
+     "moves": [
+      [
+       "META",
+       "Meta发布科学大模型Galactica",
+       0,
+       0
+      ],
+      [
+       "STAB",
+       "发布Stable Diffusion 2.0",
+       1,
+       1
+      ],
+      [
+       "OAI",
+       "OpenAI发布text-davinci-003",
+       0,
+       0
+      ],
+      [
+       "OAI",
+       "OpenAI发布ChatGPT",
+       6,
+       3
+      ]
+     ]
+    },
+    {
+     "code": "2022-12",
+     "date": "2022 年 12 月",
+     "type": "事件",
+     "title": "Anthropic发表宪法AI论文",
+     "global": "Anthropic 发表宪法 AI 论文。同月欧盟理事会通过 AI 法案总体立场，OpenAI 发布 Whisper large-v2。",
+     "verdict": "胜：Anthropic。宪法 AI 论文。负：无。",
+     "moves": [
+      [
+       "EU",
+       "欧盟理事会通过AI法案总体立场",
+       1,
+       1
+      ],
+      [
+       "OAI",
+       "OpenAI发布Whisper large-v2",
+       0,
+       0
+      ],
+      [
+       "ANTH",
+       "Anthropic发表宪法AI论文",
+       2,
+       1
+      ]
+     ]
+    }
+   ]
+  },
+  {
    "id": "S1",
    "year": "2022",
-   "start": "2022 年初",
-   "end": "2022 年底",
+   "start": "2022 年 1 月",
+   "end": "2022 年 12 月",
    "title": "开服赛季",
    "theme": "新版本上线。没人知道最强阵容是什么。",
    "patch": [
@@ -545,8 +2101,8 @@
    ],
    "rounds": [
     {
-     "code": "1-1",
-     "date": "2022 年初",
+     "code": "2022-01",
+     "date": "2022 年 1 月",
      "type": "选秀",
      "title": "开局拿牌：人人守旧阵容",
      "global": "开局选秀没有新牌可拿。所有人拿自己城池里的旧牌。搜索、广告、电商、云。四座城池。四种印钞方式。",
@@ -663,7 +2219,7 @@
      ]
     },
     {
-     "code": "1-4",
+     "code": "2022-08",
      "date": "2022 年 8 月",
      "type": "野怪",
      "title": "野怪掉落：Stable Diffusion 开源",
@@ -781,8 +2337,8 @@
      ]
     },
     {
-     "code": "2-1",
-     "date": "2022 年 11 月 30 日",
+     "code": "2022-11",
+     "date": "2022 年 11 月",
      "type": "对战",
      "title": "ChatGPT 上线：OpenAI 打出第一滴血",
      "global": "对战轮开始十秒，棋盘变了。ChatGPT 上线。它不是最强模型。它是第一个人人能用的模型。五天用户破 100 万。",
@@ -899,12 +2455,12 @@
      ]
     },
     {
-     "code": "2-5",
+     "code": "2022-12",
      "date": "2022 年 12 月",
      "type": "连胜轮",
      "title": "连胜扩大：全桌开始转阵容",
-     "global": "ChatGPT 用户冲向 1 亿。它是史上最快。连胜奖励开始发放。所有人做同一件事。停下旧项目。组大模型团队。",
-     "verdict": "胜：微软 × OpenAI，连胜 2 轮。负：所有守旧阵容的人。转阵容要花金币。不转要扣血。",
+     "global": "ChatGPT 的连胜扩大，全桌开始转阵容。微软备好大额选秀金，100 亿美元投资落袋前夜。",
+     "verdict": "胜：OpenAI。ChatGPT 连胜扩大。负：Meta。元宇宙亏损拖累全季结算。",
      "moves": [
       [
        "NVDA",
@@ -1013,17 +2569,7 @@
        "评估下注实验室",
        0,
        -1
-      ]
-     ]
-    },
-    {
-     "code": "3-2",
-     "date": "2022 年底",
-     "type": "经济轮",
-     "title": "赛季结算前：微软备好大额选秀金",
-     "global": "经济轮不交战。只算账。微软账上金币全桌最厚。OpenAI 账上金币全桌最薄。双人羁绊的成交条件成熟。",
-     "verdict": "胜：待定。交易在下赛季第一轮执行。负：Meta。元宇宙烧掉的金币，本季利息垫底。",
-     "moves": [
+      ],
       [
        "NVDA",
        "赛季末血量第二。靠卖装备",
@@ -1242,7 +2788,7 @@
    ],
    "rounds": [
     {
-     "code": "1-1",
+     "code": "2023-01",
      "date": "2023 年 1 月",
      "type": "选秀",
      "title": "选秀大轮：微软 100 亿美元锁死羁绊",
@@ -1360,7 +2906,7 @@
      ]
     },
     {
-     "code": "2-1",
+     "code": "2023-03",
      "date": "2023 年 3 月",
      "type": "对战",
      "title": "GPT-4 发布，Bard 仓促应战",
@@ -1478,8 +3024,8 @@
      ]
     },
     {
-     "code": "2-6",
-     "date": "2023 年 5–6 月",
+     "code": "2023-05",
+     "date": "2023 年 5 月",
      "type": "野怪",
      "title": "野怪轮：英伟达财报引爆卡池",
      "global": "英伟达单季指引远超预期。股价单日涨约 24%。市值冲向 1 万亿美元。全桌确认一件事。卡池就是印钞机。",
@@ -1570,12 +3116,6 @@
        -1
       ],
       [
-       "AAPL",
-       "Vision Pro 发布。与 AI 无关",
-       0,
-       -3
-      ],
-      [
        "ORCL",
        "低价云抢卡转租",
        1,
@@ -1596,7 +3136,23 @@
      ]
     },
     {
-     "code": "3-2",
+     "code": "2023-06",
+     "date": "2023 年 6 月",
+     "type": "事件",
+     "title": "苹果发布 Vision Pro：与 AI 无关",
+     "global": "苹果在 6 月 5 日 WWDC 发布 Vision Pro 头显。空间计算入场。AI 大厅的当轮争夺与它无关。",
+     "verdict": "胜：无。负：无。Vision Pro 发布与 AI 争夺无关，苹果本轮只记一笔小额动作。",
+     "moves": [
+      [
+       "AAPL",
+       "Vision Pro 发布。与 AI 无关",
+       0,
+       -3
+      ]
+     ]
+    },
+    {
+     "code": "2023-07",
      "date": "2023 年 7 月",
      "type": "对战",
      "title": "开源阵容成型：Llama 2 开源",
@@ -1710,11 +3266,23 @@
        "开源生态利好 ARM",
        1,
        1
+      ],
+      [
+       "ALI",
+       "Qwen-7B 与 7B-Chat 开源。国内开源一哥开局。",
+       3,
+       2
+      ],
+      [
+       "BYTE",
+       "豆包 App 上线。流量打法开张。",
+       2,
+       1
       ]
      ]
     },
     {
-     "code": "4-1",
+     "code": "2023-09",
      "date": "2023 年 9 月",
      "type": "经济轮",
      "title": "抢卡高峰：所有人同时搜牌",
@@ -1828,11 +3396,17 @@
        "筹备巨额 AI 基金",
        0,
        -3
+      ],
+      [
+       "TCE",
+       "混元大模型发布。微信入口待命。",
+       2,
+       1
       ]
      ]
     },
     {
-     "code": "4-5",
+     "code": "2023-11",
      "date": "2023 年 11 月",
      "type": "内战",
      "title": "内战轮：OpenAI 董事会政变",
@@ -1946,11 +3520,17 @@
        "围观。无仓位受损",
        0,
        0
+      ],
+      [
+       "ALI",
+       "Qwen-72B 与 1.8B 开源。开源阵容加厚。",
+       3,
+       2
       ]
      ]
     },
     {
-     "code": "5-1",
+     "code": "2023-12",
      "date": "2023 年 12 月",
      "type": "决战",
      "title": "决战轮：Gemini 发布，实测争议",
@@ -2064,6 +3644,12 @@
        "ARM 年底结算大涨",
        3,
        4
+      ],
+      [
+       "GOOG",
+       "Gemini 1.0 发布。追赶 OpenAI。",
+       3,
+       2
       ]
      ]
     }
@@ -2072,7 +3658,7 @@
   {
    "id": "S3",
    "year": "2024",
-   "start": "2024 年初",
+   "start": "2024 年 1 月",
    "end": "2024 年 12 月",
    "title": "杠杆赛季",
    "theme": "所有人 All in 同一套阵容。借钱上人口。",
@@ -2175,8 +3761,8 @@
    ],
    "rounds": [
     {
-     "code": "1-1",
-     "date": "2024 年初",
+     "code": "2024-01",
+     "date": "2024 年 1 月",
      "type": "经济轮",
      "title": "经济轮：四家云厂同时宣布资本开支翻倍",
      "global": "没有交战。只有公告。一家接一家。资本开支指引全部上调。市场全给掌声。连胜期的公告，只涨血不扣血。",
@@ -2293,7 +3879,23 @@
      ]
     },
     {
-     "code": "2-1",
+     "code": "2024-02",
+     "date": "2024 年 2 月",
+     "type": "事件",
+     "title": "Qwen1.5 发布：开源节奏不停",
+     "global": "阿里发布 Qwen1.5。72B 版本上线。开源节奏不停。",
+     "verdict": "胜：阿里。开源节奏不停。负：无。",
+     "moves": [
+      [
+       "ALI",
+       "Qwen1.5 发布。开源节奏不停。",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2024-03",
      "date": "2024 年 3 月",
      "type": "选秀",
      "title": "装备选秀：Blackwell B200 发布",
@@ -2411,7 +4013,7 @@
      ]
     },
     {
-     "code": "3-2",
+     "code": "2024-05",
      "date": "2024 年 5 月",
      "type": "对战",
      "title": "三方对战：GPT-4o、Claude 3、Gemini 1.5 同台",
@@ -2525,12 +4127,18 @@
        "企业单间接受益",
        1,
        1
+      ],
+      [
+       "TCE",
+       "混元 DiT 开源。文生图跟进。",
+       1,
+       1
       ]
      ]
     },
     {
-     "code": "4-1",
-     "date": "2024 年下半年",
+     "code": "2024-07",
+     "date": "2024 年 7 月",
      "type": "杠杆轮",
      "title": "杠杆轮：GPU 抵押贷款跑通",
      "global": "甲骨文带 CoreWeave 等新云厂改了经济系统。买卡借钱。拿卡抵押。再借钱买卡。循环成立。利率有人付。",
@@ -2647,7 +4255,7 @@
      ]
     },
     {
-     "code": "5-1",
+     "code": "2024-09",
      "date": "2024 年 9 月",
      "type": "对战",
      "title": "新羁绊：o1 推理模型改阵容",
@@ -2761,11 +4369,23 @@
        "无直接动作",
        0,
        0
+      ],
+      [
+       "TCE",
+       "混元 Turbo 发布。推理成本压低。",
+       2,
+       1
+      ],
+      [
+       "ALI",
+       "Qwen2.5 发布。云栖大会 100+ 模型开源。",
+       4,
+       2
       ]
      ]
     },
     {
-     "code": "6-1",
+     "code": "2024-12",
      "date": "2024 年 12 月",
      "type": "决战",
      "title": "效率证明轮：DeepSeek V3 低价成型",
@@ -2879,6 +4499,24 @@
        "评估中国效率阵容。受限",
        -1,
        0
+      ],
+      [
+       "OAI",
+       "Sora 发布。视频生成改规则。",
+       5,
+       3
+      ],
+      [
+       "GOOG",
+       "Gemini 2.0 发布。Agent 原生。",
+       3,
+       2
+      ],
+      [
+       "OAI",
+       "o3 发布。推理天花板再抬。",
+       5,
+       2
       ]
      ]
     }
@@ -2887,8 +4525,8 @@
   {
    "id": "S4",
    "year": "2025",
-   "start": "2025 年 1 月 20 日",
-   "end": "2025 年末",
+   "start": "2025 年 1 月",
+   "end": "2025 年 12 月",
    "title": "到顶赛季",
    "theme": "阵容到顶。卡池见底。电力不够。债市开始拒绝。",
    "patch": [
@@ -2986,16 +4624,36 @@
      "id": "MUSK",
      "pop": 8,
      "label": "狂人阵容"
+    },
+    {
+     "id": "KIMI",
+     "pop": 6,
+     "label": "Agent 模型出圈"
+    },
+    {
+     "id": "MANUS",
+     "pop": 5,
+     "label": "通用 Agent 黑马"
+    },
+    {
+     "id": "ZHIPU",
+     "pop": 5,
+     "label": "GLM 开源跟进"
+    },
+    {
+     "id": "MINIMAX",
+     "pop": 5,
+     "label": "Agent 模型出海"
     }
    ],
    "rounds": [
     {
-     "code": "1-1",
-     "date": "2025 年 1 月 20 日",
+     "code": "2025-01",
+     "date": "2025 年 1 月",
      "type": "对战",
      "title": "DeepSeek R1 发布：效率阵容打出三星效果",
-     "global": "R1 于 2025 年 1 月 20 日开源。纯强化学习 GRPO。AIME 79.8%。o1 是 79.2%。推理能力对标 o1。成本低一个量级。它主动改写版本答案。它先在技术圈炸开。再在一周后炸到股价。",
-     "verdict": "胜：DeepSeek。开源效率阵容升至三星。阿里通义与字节豆包同轮吃到生态分。负：规模阵容全员。先扣声望分。股价分下轮结。",
+     "global": "1 月 20 日 DeepSeek R1 发布。1 月 21 日星门计划 5000 亿美元宣布。1 月 27 日英伟达单日跌约 17%，血崩日。",
+     "verdict": "胜：DeepSeek。效率阵容打出三星效果。负：英伟达。单日跌约 17%，全桌最重的一刀。",
      "moves": [
       [
        "NVDA",
@@ -3104,17 +4762,13 @@
        "ARM 被效率阵容利好。股价稳",
        1,
        21
-      ]
-     ]
-    },
-    {
-     "code": "1-2",
-     "date": "2025 年 1 月 21 日",
-     "type": "选秀",
-     "title": "最大选秀：星门计划 5000 亿美元",
-     "global": "第二天，反手就是史上最大选秀。星门计划宣布。5000 亿美元。OpenAI、软银、甲骨文组队。人口目标直接拉满。",
-     "verdict": "胜：微软 × OpenAI 阵营的声量。实际执行人是甲骨文。负：所有人的金币纪律。刚被效率阵容教育，转头签最大单。",
-     "moves": [
+      ],
+      [
+       "BYTE",
+       "Trae 上线。AI 编程入场。",
+       3,
+       2
+      ],
       [
        "NVDA",
        "星门等于长期订单承诺",
@@ -3222,17 +4876,7 @@
        "星门金主落位。史上最大下注",
        5,
        -10
-      ]
-     ]
-    },
-    {
-     "code": "1-3",
-     "date": "2025 年 1 月 27 日",
-     "type": "决战",
-     "title": "血崩日：英伟达单日跌约 17%",
-     "global": "延迟结算到了。英伟达单日跌约 17%。市值蒸发约 6000 亿美元。创美股单日纪录。大厅安静了一周。然后所有人回去继续抢卡。",
-     "verdict": "胜：DeepSeek。触发者吃满声望。华为吃到国产替代的订单预期。负：英伟达。单轮扣血纪录。但它的订单簿没掉。这是本季最怪的一格。",
-     "moves": [
+      ],
       [
        "NVDA",
        "单日蒸发约 6000 亿美元",
@@ -3340,15 +4984,121 @@
        "星门声量撑估值",
        2,
        0
+      ],
+      [
+       "TCE",
+       "腾讯云一键部署 R1。分发跟进。",
+       1,
+       1
+      ],
+      [
+       "BIDU",
+       "文心一言 4 月起免费。抢用户。",
+       1,
+       -1
+      ],
+      [
+       "ANTH",
+       "Claude Code 有限预览上线。编程 Agent 开局。",
+       3,
+       2
+      ],
+      [
+       "ANTH",
+       "Claude 3.7 Sonnet 发布。编程口碑起。",
+       3,
+       2
+      ],
+      [
+       "MANUS",
+       "Manus 邀测上线。通用 Agent 炸场。",
+       4,
+       2
+      ],
+      [
+       "META",
+       "Llama 4 Scout 与 Maverick 发布。开源续命。",
+       3,
+       1
+      ],
+      [
+       "ALI",
+       "Qwen3 发布。开源旗舰换代。",
+       4,
+       2
+      ],
+      [
+       "GOOG",
+       "Veo 3 发布。视频带音频。",
+       3,
+       2
+      ],
+      [
+       "ANTH",
+       "Claude Opus 4 与 Sonnet 4 发布。编程最强。",
+       6,
+       3
+      ],
+      [
+       "ANTH",
+       "Claude Code 正式 GA。订阅收入起飞。",
+       4,
+       3
+      ],
+      [
+       "DPSK",
+       "R1-0528 发布。推理再进一步。",
+       3,
+       1
+      ],
+      [
+       "BYTE",
+       "豆包 Seed-1.6 发布。推理成本再降。",
+       2,
+       1
+      ],
+      [
+       "GOOG",
+       "Gemini 2.5 Pro 与 Flash GA。主力就位。",
+       3,
+       2
+      ],
+      [
+       "HUAWEI",
+       "盘古 5.5 发布。政企模型换代。",
+       2,
+       1
+      ],
+      [
+       "TCE",
+       "混元 A13B 发布。开源小模型。",
+       1,
+       1
       ]
      ]
     },
     {
-     "code": "3-2",
-     "date": "2025 年年中",
+     "code": "2025-06",
+     "date": "2025 年 6 月",
+     "type": "事件",
+     "title": "文心 4.5 开源：百度跟进开源潮",
+     "global": "百度在 6 月 30 日开源文心 4.5。跟进开源潮。",
+     "verdict": "胜：百度。开源跟进。负：无。",
+     "moves": [
+      [
+       "BIDU",
+       "文心 4.5 开源。跟进开源潮。",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2025-07",
+     "date": "2025 年 7 月",
      "type": "野怪",
      "title": "野怪轮：电力成新卡池",
-     "global": "打到中期，卡够了。电不够了。GW 级园区排队等并网。核电、地热、燃气全被签下。掉落从芯片换成电力合同。",
+     "global": "打到中期，卡够了。电不够了。GW 级园区排队等并网。核电、地热、燃气全被签下。掉落从芯片换成电力合同。同月 OpenAI 确认与甲骨文的星门大单（300 亿美元/年，4.5GW）。",
      "verdict": "胜：先签电力的人。谷歌和亚马逊的旧能源合同升值。负：xAI。速度打法撞上并网排队。",
      "moves": [
       [
@@ -3458,12 +5208,36 @@
        "无直接动作",
        0,
        0
+      ],
+      [
+       "KIMI",
+       "Kimi K2 发布。Agent 模型出圈。",
+       4,
+       2
+      ],
+      [
+       "ALI",
+       "Qwen3-Coder 发布。编程开源。",
+       3,
+       1
+      ],
+      [
+       "ZHIPU",
+       "GLM-4.5 发布。Agent 模型跟进。",
+       2,
+       1
+      ],
+      [
+       "ORCL",
+       "星门大单确认。季军声量",
+       4,
+       3
       ]
      ]
     },
     {
-     "code": "4-1",
-     "date": "2025 年 8 月起",
+     "code": "2025-08",
+     "date": "2025 年 8 月",
      "type": "对战",
      "title": "新模型轮：GPT-5 世代，回报质疑升起",
      "global": "新一代旗舰模型陆续发布。提升真实存在。惊艳感消失。同一时间，企业付费回报被反复盘问。奥特曼公开说投资者过度兴奋。",
@@ -3560,12 +5334,6 @@
        -1
       ],
       [
-       "ORCL",
-       "星门大单确认。季军声量",
-       4,
-       3
-      ],
-      [
        "TSMC",
        "先进封装订单新高",
        3,
@@ -3576,12 +5344,126 @@
        "星门后续注资承诺",
        1,
        -4
+      ],
+      [
+       "ANTH",
+       "Claude Opus 4.1 发布。编程再进一步。",
+       2,
+       1
+      ],
+      [
+       "OAI",
+       "GPT-5 发布。反响平淡。期望太高。",
+       -3,
+       -1
+      ],
+      [
+       "DPSK",
+       "DeepSeek V3.1 发布。编程场景跟进。",
+       2,
+       1
       ]
      ]
     },
     {
-     "code": "5-1",
-     "date": "2025 年末",
+     "code": "2025-09",
+     "date": "2025 年 9 月",
+     "type": "事件",
+     "title": "Claude Sonnet 4.5 发布：编程新标杆",
+     "global": "9 月 29 日 Anthropic 发布 Claude Sonnet 4.5。SWE-bench 领先。9 月 30 日 OpenAI 发布 Sora 2。视频真实感再升。",
+     "verdict": "胜：Anthropic。Sonnet 4.5 成编程新标杆。负：无。",
+     "moves": [
+      [
+       "ANTH",
+       "Claude Sonnet 4.5 发布。主力换代。",
+       3,
+       2
+      ],
+      [
+       "OAI",
+       "Sora 2 发布。视频真实感再升。",
+       3,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2025-10",
+     "date": "2025 年 10 月",
+     "type": "事件",
+     "title": "ChatGPT Atlas 发布：浏览器 Agent 入场",
+     "global": "10 月 15 日 Anthropic 发布 Claude Haiku 4.5。10 月 21 日 OpenAI 发布 ChatGPT Atlas。浏览器 Agent 入场。10 月 27 日 MiniMax 发布 M2。开源 Agent 模型跟进。",
+     "verdict": "胜：OpenAI。Atlas 把 Agent 放进浏览器。负：无。",
+     "moves": [
+      [
+       "ANTH",
+       "Claude Haiku 4.5 发布。轻量主力。",
+       2,
+       1
+      ],
+      [
+       "OAI",
+       "ChatGPT Atlas 发布。浏览器 Agent。",
+       3,
+       2
+      ],
+      [
+       "MINIMAX",
+       "MiniMax M2 发布。Agent 模型。",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2025-11",
+     "date": "2025 年 11 月",
+     "type": "事件",
+     "title": "Gemini 3 发布：十一月模型大战",
+     "global": "11 月 4 日字节 TRAE SOLO 正式上线。11 月 6 日 Kimi 发布 K2 Thinking。11 月 12 日 OpenAI 推出 GPT-5.1。11 月 18 日谷歌发布 Gemini 3 Pro 与 Antigravity。11 月 24 日 Anthropic 发布 Claude Opus 4.5。三家旗舰同月换代。",
+     "verdict": "胜：谷歌。Gemini 3 夺回旗舰声量。负：无。十一月三家同换代，无人掉队。",
+     "moves": [
+      [
+       "BYTE",
+       "TRAE SOLO GA。个人开发者工具。",
+       2,
+       1
+      ],
+      [
+       "KIMI",
+       "Kimi K2 Thinking 发布。深度思考。",
+       3,
+       1
+      ],
+      [
+       "OAI",
+       "GPT-5.1 推出。修补 GPT-5 口碑。",
+       2,
+       1
+      ],
+      [
+       "GOOG",
+       "Google Antigravity 公开预览。Agent 开发平台。",
+       3,
+       2
+      ],
+      [
+       "GOOG",
+       "Gemini 3 Pro 发布。旗舰换代。",
+       5,
+       3
+      ],
+      [
+       "ANTH",
+       "Claude Opus 4.5 发布。编程标杆再抬。",
+       4,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2025-12",
+     "date": "2025 年 12 月",
      "type": "经济轮",
      "title": "疲劳轮：循环融资被点名",
      "global": "赛季末算总账。云厂投实验室。实验室买云厂的云。云厂买英伟达的卡。钱转一圈。每个人账上都好看。媒体开始公开画这张循环图。",
@@ -3694,6 +5576,18 @@
        "下注集中风险被点名",
        -3,
        -2
+      ],
+      [
+       "DPSK",
+       "DeepSeek V3.2 发布。效率再进一步。",
+       2,
+       1
+      ],
+      [
+       "OAI",
+       "GPT-5.2 发布。旗舰修补。",
+       3,
+       1
       ]
      ]
     }
@@ -3702,8 +5596,8 @@
   {
    "id": "S5",
    "year": "2026",
-   "start": "2026 年上半年",
-   "end": "2026 年 11 月 21 日",
+   "start": "2026 年 1 月",
+   "end": "2026 年 11 月",
    "title": "结算赛季",
    "theme": "抢了三年的同一套阵容，一起被惩罚。赛季未终局。",
    "patch": [
@@ -3801,64 +5695,158 @@
      "id": "NVDA",
      "pop": 9,
      "label": "装备商·重伤"
+    },
+    {
+     "id": "KIMI",
+     "pop": 7,
+     "label": "Agent 模型出圈"
+    },
+    {
+     "id": "MANUS",
+     "pop": 6,
+     "label": "通用 Agent 黑马"
+    },
+    {
+     "id": "ZHIPU",
+     "pop": 6,
+     "label": "GLM 开源跟进"
+    },
+    {
+     "id": "MINIMAX",
+     "pop": 6,
+     "label": "Agent 模型出海"
+    },
+    {
+     "id": "OPENCLAW",
+     "pop": 4,
+     "label": "开源 Agent 框架"
+    },
+    {
+     "id": "PANW",
+     "pop": 4,
+     "label": "安全并购入场"
     }
    ],
    "rounds": [
     {
-     "code": "1-1",
-     "date": "2026 年上半年",
-     "type": "经济轮",
-     "title": "承诺轮：算力承诺堆到 9009 亿美元",
-     "global": "Anthropic 的算力承诺在招股文件里逐项列明。合计约 9009 亿美元。约 4516 亿美元在 2030 年底前到期。承诺是合同。不是意向。",
-     "verdict": "胜：英伟达和云厂。承诺等于锁死的订单。负：Anthropic 自己。人口先上。金币后付。杠杆全挂在它账上。",
+     "code": "2026-01",
+     "date": "2026 年 1 月",
+     "type": "事件",
+     "title": "Claude Cowork 研究预览上线：Agent 进文件夹",
+     "global": "1 月 12 日 Anthropic 上线 Claude Cowork 研究预览。Agent 进文件夹。1 月 27 日月之暗面发布 Kimi K2.5。Agent 再进一步。",
+     "verdict": "胜：Anthropic。Cowork 把 Agent 放进文件夹。负：无。",
      "moves": [
       [
-       "NVDA",
-       "承诺的最大收款方之一",
-       -4,
-       -28
+       "ANTH",
+       "Claude Cowork 研究预览上线。Agent 进文件夹。",
+       3,
+       2
       ],
       [
-       "OAI",
-       "同为承诺收款方。微软份额升",
-       -7,
-       -4
-      ],
+       "KIMI",
+       "Kimi K2.5 发布。Agent 再进一步。",
+       3,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2026-02",
+     "date": "2026 年 2 月",
+     "type": "事件",
+     "title": "五角大楼传召 Amodei：拒绝移除护栏",
+     "global": "2 月五角大楼传召 Amodei。威胁断供与国防生产法。Anthropic 拒绝移除护栏，被列为供应链风险。同月 Claude Opus 4.6 与 Sonnet 4.6 发布，Gemini 3.1 Pro 上线。",
+     "verdict": "胜：无。负：Anthropic。传召与断供威胁同月，护栏之争公开化。",
+     "moves": [
       [
-       "MSFT",
-       "承诺收款方。份额升",
-       -5,
-       -3
-      ],
-      [
-       "GOOG",
-       "承诺收款方。TPU 份额在内",
-       -13,
-       -12
+       "ANTH",
+       "Claude Opus 4.6 发布。旗舰换代。",
+       5,
+       3
       ],
       [
        "ANTH",
-       "9009 亿美元承诺签字方",
-       -20,
-       -5
+       "Claude Sonnet 4.6 发布。主力换代。",
+       3,
+       2
       ],
+      [
+       "GOOG",
+       "Gemini 3.1 Pro 发布。推理加强。",
+       3,
+       2
+      ],
+      [
+       "ANTH",
+       "五角大楼传召 Amodei。威胁断供与国防生产法。",
+       -3,
+       -2
+      ],
+      [
+       "ANTH",
+       "拒绝移除护栏。列为供应链风险，起诉五角大楼。",
+       -5,
+       -3
+      ]
+     ]
+    },
+    {
+     "code": "2026-03",
+     "date": "2026 年 3 月",
+     "type": "事件",
+     "title": "腾讯 WorkBuddy 公开上线：办公 Agent",
+     "global": "3 月 9 日腾讯 WorkBuddy 公开上线。办公 Agent 入场。",
+     "verdict": "胜：腾讯。办公 Agent 上线。负：无。",
+     "moves": [
+      [
+       "TCE",
+       "腾讯 WorkBuddy 公开上线。办公 Agent。",
+       3,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2026-04",
+     "date": "2026 年 4 月",
+     "type": "事件",
+     "title": "Claude Opus 4.7 发布：旗舰迭代",
+     "global": "4 月 8 日 Meta 发布 Muse Spark。4 月 16 日 Anthropic 发布 Claude Opus 4.7。4 月 24 日 DeepSeek 发布 V4 预览。",
+     "verdict": "胜：Anthropic。Opus 4.7 旗舰迭代。负：无。",
+     "moves": [
       [
        "META",
-       "自有承诺同步累积",
-       -13,
-       -10
+       "Muse Spark 发布。Meta 编程模型。",
+       3,
+       2
       ],
       [
-       "AMZN",
-       "承诺收款方之一",
-       -9,
-       -7
+       "ANTH",
+       "Claude Opus 4.7 发布。旗舰迭代。",
+       3,
+       2
       ],
+      [
+       "DPSK",
+       "DeepSeek V4 预览发布。下一代效率。",
+       3,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2026-05",
+     "date": "2026 年 5 月",
+     "type": "事件",
+     "title": "Claude Opus 4.8 发布：旗舰迭代",
+     "global": "5 月 27 日彭博报道字节在考虑最高 700 亿美元 2026 年资本开支。5 月 28 日 Anthropic 发布 Claude Opus 4.8。同月 xAI Grok Build 早期 beta 上线。",
+     "verdict": "胜：Anthropic。Opus 4.8 旗舰迭代。负：字节。资本开支计划高增。",
+     "moves": [
       [
        "MUSK",
-       "债务融资继续加码",
-       -5,
-       -4
+       "Grok Build 早期 beta 上线。终端编程 Agent。",
+       3,
+       1
       ],
       [
        "BYTE",
@@ -3867,64 +5855,122 @@
        -7
       ],
       [
-       "ALI",
-       "阿里资本开支增 60%。自由现金流流出",
-       -6,
-       -13
-      ],
-      [
-       "TCE",
-       "腾讯资本开支增 527%。自由现金流转负",
-       -8,
-       -7
-      ],
-      [
-       "BIDU",
-       "百度自由现金流转负。投入最克制",
-       -8,
-       -9
-      ],
-      [
-       "HUAWEI",
-       "昇腾订单锁死。承诺收款方",
-       -21,
-       -11
-      ],
-      [
-       "DPSK",
-       "无承诺负担。轻装",
-       -27,
-       -4
-      ],
-      [
-       "AAPL",
-       "不签巨额承诺。旁观",
-       -14,
-       -9
-      ],
-      [
-       "ORCL",
-       "承诺承建方。订单锁死",
-       -17,
-       -28
-      ],
-      [
-       "TSMC",
-       "承诺的芯片全经它手",
-       -20,
-       -15
-      ],
-      [
-       "SFTB",
-       "星门资金链被盘问",
-       -10,
-       -21
+       "ANTH",
+       "Claude Opus 4.8 发布。旗舰迭代。",
+       3,
+       2
       ]
      ]
     },
     {
-     "code": "2-1",
-     "date": "2026 年 10 月 6 日",
+     "code": "2026-06",
+     "date": "2026 年 6 月",
+     "type": "事件",
+     "title": "Claude Fable 5 发布：长篇写作模型",
+     "global": "6 月 9 日 Anthropic 发布 Claude Fable 5。长篇写作模型。",
+     "verdict": "胜：Anthropic。Fable 5 长篇写作。负：无。",
+     "moves": [
+      [
+       "ANTH",
+       "Claude Fable 5 发布。长篇写作模型。",
+       3,
+       2
+      ]
+     ]
+    },
+    {
+     "code": "2026-07",
+     "date": "2026 年 7 月",
+     "type": "事件",
+     "title": "Claude Opus 5 发布：新一代旗舰",
+     "global": "7 月 16 日月之暗面发布 Kimi K3。7 月 23 日腾讯发布 CodeBuddy NPC。7 月 24 日 Anthropic 发布 Claude Opus 5。新一代旗舰。",
+     "verdict": "胜：Anthropic。Opus 5 新一代旗舰。负：无。",
+     "moves": [
+      [
+       "KIMI",
+       "Kimi K3 发布。旗舰换代。",
+       5,
+       3
+      ],
+      [
+       "TCE",
+       "腾讯 CodeBuddy NPC 发布。编程 Agent。",
+       2,
+       1
+      ],
+      [
+       "ANTH",
+       "Claude Opus 5 发布。新一代旗舰。",
+       6,
+       3
+      ]
+     ]
+    },
+    {
+     "code": "2026-08",
+     "date": "2026 年 8 月",
+     "type": "事件",
+     "title": "DeepSeek V4-Pro GA：旗舰正式版",
+     "global": "8 月 11 日 xAI Grok Bot 早期 beta 上线。8 月 13 日 DeepSeek 发布 V4-Pro GA。8 月 26 日阿里发布 Qwen3.8-Flash-Next。8 月 31 日 OpenClaw 2.0 发布。",
+     "verdict": "胜：DeepSeek。V4-Pro 旗舰正式版。负：无。",
+     "moves": [
+      [
+       "MUSK",
+       "Grok Bot 早期 beta 上线。X 内 Agent。",
+       3,
+       1
+      ],
+      [
+       "DPSK",
+       "DeepSeek V4-Pro GA。旗舰正式版。",
+       4,
+       2
+      ],
+      [
+       "ALI",
+       "Qwen3.8-Flash-Next 发布。极速模型。",
+       2,
+       1
+      ],
+      [
+       "OPENCLAW",
+       "OpenClaw 2.0 发布。开源 Agent 框架。",
+       3,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2026-09",
+     "date": "2026 年 9 月",
+     "type": "事件",
+     "title": "软银 118.7 亿美元贷款落地：为 OpenAI 投资融资",
+     "global": "9 月 10 日 DeepSeek 发布 V4.1 Flash。9 月 14 日软银落实 118.7 亿美元两年期定期贷款，以 OpenAI 持股作抵押。9 月 18 日阿里发布 Qwen3.8-Omni-Flash。",
+     "verdict": "胜：软银。贷款落地，OpenAI 投资融资有着落。负：无。",
+     "moves": [
+      [
+       "DPSK",
+       "DeepSeek V4.1 Flash 发布。轻量旗舰。",
+       2,
+       1
+      ],
+      [
+       "SFTB",
+       "软银落实 118.7 亿美元两年期定期贷款。为 OpenAI 投资融资",
+       2,
+       -2
+      ],
+      [
+       "ALI",
+       "Qwen3.8-Omni-Flash 发布。多模态极速。",
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "code": "2026-10",
+     "date": "2026 年 10 月",
      "type": "对战",
      "title": "高点轮：英伟达 239.24 美元，全桌最后一次连胜",
      "global": "英伟达创历史高点 239.24 美元。Anthropic 将于 10 月 26 日公开递交招股文件。承诺细节公开。市场当时的读法是需求确认。没人读成风险清单。",
@@ -3968,9 +6014,9 @@
       ],
       [
        "AMZN",
-       "跟涨",
-       2,
-       1
+       "亚马逊 Q3 现金资本开支 759 亿美元。全年指引约 2200 亿美元",
+       3,
+       -6
       ],
       [
        "MUSK",
@@ -4037,17 +6083,125 @@
        "跟涨。ARM 新高",
        2,
        1
+      ],
+      [
+       "META",
+       "Muse Wonder 发布。Meta 第二代编程模型。",
+       3,
+       2
+      ],
+      [
+       "KIMI",
+       "Kimi K3.1 Pro 发布。权重公开。1.56TB。",
+       5,
+       2
       ]
      ]
     },
     {
-     "code": "3-2",
-     "date": "2026 年 11 月 5 日",
+     "code": "2026-11",
+     "date": "2026 年 11 月 1–21 日",
      "type": "事件",
-     "title": "施压轮：财长公开质问合规文化",
-     "global": "烂牌开始刷出。贝森特在战情室当面质问商务部长。矛头指向芯片走私与 Megaspeed 线。英伟达董事会收到 10 天说明要求。",
-     "verdict": "胜：无。负：英伟达。治理扣血开始。本轮扣的不是业绩。是信任项。信任项就是血量本身。",
+     "title": "选秀大轮：Anthropic 上市，BIS 新规同日生效",
+     "global": "11 月 5 日 BIS 远程接入规则公布。11 月 10 日 Anthropic 招股文件列明约 9009 亿美元算力承诺。11 月 12 日黄仁勋辞职，英伟达开盘跌约 13%。11 月 18–19 日 Anthropic 上市，BIS 新规同日生效。11 月 20 日 SEC 会计调查曝光，单日跌 14.01%。11 月 21 日结算继续。",
+     "verdict": "胜：Anthropic。上市募资到手，血量全桌第一。负：英伟达。辞职、调查、规则三张牌同月打出，血量垫底。",
      "moves": [
+      [
+       "NVDA",
+       "承诺的最大收款方之一",
+       -4,
+       -28
+      ],
+      [
+       "OAI",
+       "同为承诺收款方。微软份额升",
+       -7,
+       -4
+      ],
+      [
+       "MSFT",
+       "承诺收款方。份额升",
+       -5,
+       -3
+      ],
+      [
+       "GOOG",
+       "承诺收款方。TPU 份额在内",
+       -13,
+       -12
+      ],
+      [
+       "ANTH",
+       "9009 亿美元承诺签字方",
+       -20,
+       -5
+      ],
+      [
+       "META",
+       "自有承诺同步累积",
+       -13,
+       -10
+      ],
+      [
+       "AMZN",
+       "承诺收款方之一",
+       -9,
+       -7
+      ],
+      [
+       "MUSK",
+       "债务融资继续加码",
+       -5,
+       -4
+      ],
+      [
+       "HUAWEI",
+       "昇腾订单锁死。承诺收款方",
+       -21,
+       -11
+      ],
+      [
+       "DPSK",
+       "无承诺负担。轻装",
+       -27,
+       -4
+      ],
+      [
+       "AAPL",
+       "不签巨额承诺。旁观",
+       -14,
+       -9
+      ],
+      [
+       "ORCL",
+       "承诺承建方。订单锁死",
+       -17,
+       -28
+      ],
+      [
+       "TSMC",
+       "承诺的芯片全经它手",
+       -20,
+       -15
+      ],
+      [
+       "ALI",
+       "阿里资本开支增 60%。自由现金流流出",
+       -6,
+       -13
+      ],
+      [
+       "TCE",
+       "腾讯资本开支增 527%。自由现金流转负",
+       -8,
+       -7
+      ],
+      [
+       "BIDU",
+       "百度 Q3 资本开支 73.5 亿元。自由现金流转负",
+       -8,
+       -9
+      ],
       [
        "NVDA",
        "合规文化被公开质问",
@@ -4155,17 +6309,13 @@
        "无关本线",
        0,
        0
-      ]
-     ]
-    },
-    {
-     "code": "4-1",
-     "date": "2026 年 11 月 12 日",
-     "type": "事件",
-     "title": "辞职轮：黄仁勋辞职，英伟达开盘跌约 13%",
-     "global": "董事会 11 月 11 日接受辞职。11 月 12 日公告。开盘跌约 13%。盘中低点 148.80 美元。收 166.19 美元。成交约 7.48 亿股。主因被报道为缺乏坦诚。不是业绩。",
-     "verdict": "胜：无。负：英伟达。队长席位空缺。CFO 临时接任。它随后发帖称乐意复任。董事会明确拒绝。剧本修复完成。",
-     "moves": [
+      ],
+      [
+       "ANTH",
+       "Claude Fable 5.2 发布。写作模型迭代。",
+       2,
+       1
+      ],
       [
        "NVDA",
        "CEO 辞职。单轮重扣",
@@ -4174,9 +6324,9 @@
       ],
       [
        "OAI",
-       "最大客户之一。供应担忧",
-       -3,
-       -1
+       "GPT-6.2 Astra 与 Sol 发布。ChatGPT Work 与 Codex 同日上线",
+       4,
+       1
       ],
       [
        "MSFT",
@@ -4222,9 +6372,9 @@
       ],
       [
        "ALI",
-       "阿里港股当日承压",
-       -2,
-       0
+       "广州首个真武国产万卡智算集群投产运营。计划扩至 10 万卡",
+       3,
+       -1
       ],
       [
        "TCE",
@@ -4273,22 +6423,18 @@
        "被带跌。下注波动大",
        -3,
        0
-      ]
-     ]
-    },
-    {
-     "code": "5-1",
-     "date": "2026 年 11 月 18–19 日",
-     "type": "选秀",
-     "title": "选秀大轮：Anthropic 上市，BIS 新规同日生效",
-     "global": "史上最大选秀开池。Anthropic 定价 11 月 18 日。数字分阶段写。基础发行 813.4 亿美元。绿鞋全额行使后 IPO 总额约 935 亿美元。260 亿美元私募是单独交易。定价日口径合计约 1073 亿美元。约 1195 亿美元仅在绿鞋行使后成立。毛募资合计约 1195 亿美元时，净额约 1170 亿美元。创始人出售 2364 万股，约 19.6 亿美元。不归公司。11 月 19 日首日交易。同日，BIS 远程接入规则刊登生效。地图规则中途改写。",
-     "verdict": "胜：Anthropic。选秀抢到最大一笔金币。负：公开市场。钱被大额抽走。且市场已连跌一周。这不是顶部抽血。是在下跌里抽血。",
-     "moves": [
+      ],
+      [
+       "ALI",
+       "Qwen4-Max 上线。旗舰换代。",
+       4,
+       2
+      ],
       [
        "NVDA",
-       "连跌第七日。收 145.98 一线",
-       -8,
-       -2
+       "FT 调查：Aivres–Megaspeed 芯片通道。Speedmatrix 申报自 Aivres 进口约 46 亿美元",
+       -10,
+       -3
       ],
       [
        "OAI",
@@ -4304,9 +6450,9 @@
       ],
       [
        "GOOG",
-       "股东受益。股价被带跌对冲",
-       -1,
-       2
+       "Google 发布 Gemini 4 Neon。中端编码与分析模型",
+       3,
+       1
       ],
       [
        "ANTH",
@@ -4328,9 +6474,9 @@
       ],
       [
        "MUSK",
-       "后续 IPO 排队者窗口变窄",
-       -4,
-       -2
+       "xAI Grok 4.8 开始向部分 Bot 用户软发布",
+       2,
+       -1
       ],
       [
        "BYTE",
@@ -4340,7 +6486,7 @@
       ],
       [
        "ALI",
-       "阿里港股承压。海外云受限最直接",
+       "纽约时报调查：阿里是 Megaspeed 客户与资金支持方",
        -5,
        -2
       ],
@@ -4391,17 +6537,61 @@
        "后续 IPO 窗口变窄。退出变难",
        -4,
        -1
-      ]
-     ]
-    },
-    {
-     "code": "6-1",
-     "date": "2026 年 11 月 20 日",
-     "type": "决战",
-     "title": "决战轮：SEC 会计调查曝光，单日跌 14.01%",
-     "global": "路透社报道 SEC 调查英伟达会计做法。英伟达收 125.53 美元。跌 14.01%。盘中创 52 周新低。成交 6.26 亿股。纳斯达克同日跌 5.28%。抹去全年涨幅。",
-     "verdict": "胜：无。本轮没有胜者。全桌扣血。负：英伟达最重。自 11 月 11 日跌约 27.7%。自高点跌约 47.5%。当周跌约 23%。为 2008 年 10 月以来最差一周。",
-     "moves": [
+      ],
+      [
+       "OAI",
+       "加州起诉 OpenAI。智能体失控，公共妨害。",
+       -4,
+       -1
+      ],
+      [
+       "OAI",
+       "OpenAI 上线四家外部安全评估。嵌入式评估试点。",
+       1,
+       0
+      ],
+      [
+       "DPSK",
+       "DeepSeek 完成约 1000 亿元融资。投后估值 6155 亿元。",
+       4,
+       3
+      ],
+      [
+       "OAI",
+       "俄勒冈州索赔 20.35 亿美元。ChatGPT 危害未成年人。",
+       -3,
+       -1
+      ],
+      [
+       "GOOG",
+       "Isomorphic Labs 募资 50 亿美元。AI 制药。",
+       3,
+       2
+      ],
+      [
+       "ALI",
+       "Qwen 3.5 免费应用上线。一周下载 1000 万次。",
+       4,
+       2
+      ],
+      [
+       "PANW",
+       "Palo Alto 45 亿美元收购 Applied Compute。AI 基建并购。",
+       2,
+       0
+      ],
+      [
+       "MUSK",
+       "作家起诉 xAI。Grok 生成非自愿性化图像。",
+       -3,
+       -1
+      ],
+      [
+       "GOOG",
+       "Genie 4 发布。交互式世界生成。",
+       3,
+       2
+      ],
       [
        "NVDA",
        "SEC 调查报道。恐慌卖出",
@@ -4494,32 +6684,22 @@
       ],
       [
        "ORCL",
-       "债务担忧带跌",
-       -5,
-       -1
+       "甲骨文宣布 OpenAI 基建合同融资全部落实。约 3000 亿美元、4.5GW",
+       3,
+       2
       ],
       [
        "TSMC",
-       "大盘带跌。相对抗跌",
-       -2,
-       -1
+       "台积电执行 BIS 规则：叫停 16nm 及以下中国客户订单。无许可证改用 28nm/40nm",
+       -4,
+       -2
       ],
       [
        "SFTB",
        "大盘带跌。愿景基金承压",
        -4,
        -1
-      ]
-     ]
-    },
-    {
-     "code": "6-2",
-     "date": "2026 年 11 月 21 日",
-     "type": "结算中",
-     "title": "结算中：程序继续跑，终局未定",
-     "global": "董事会拒绝黄仁勋复任。众议院要求 12 月 1 日闭门访谈。参议院听证排到 12 月。调查继续。没有人宣布赛季结束。所有人等下一个公开信号。",
-     "verdict": "胜负未定。证伪条件有三件。云厂下调资本开支指引。合同被重谈或取消。信用利差与租赁违约出现。三件出现，崩溃成立。三件不出现，定性是重新定价。",
-     "moves": [
+      ],
       [
        "NVDA",
        "盘后回升至 130.01。仍未止跌确认",
@@ -4627,6 +6807,171 @@
        "等星门执行进度",
        -1,
        0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "S6",
+   "year": 2026,
+   "start": "2026 年 11 月 22 日",
+   "end": "2026 年 11 月",
+   "title": "限速赛季",
+   "theme": "新赛季开局。OpenAI 提议行业共同限速。困惑度成新标尺。",
+   "patch": [
+    "版本改动：限速提案上线。行业第一次讨论共同发展上限。",
+    "新标尺出现：困惑度。预训练困惑度成衡量模型能力的公开标尺。",
+    "赛季规则：轮次按月划分。每月一轮。"
+   ],
+   "meta": [
+    {
+     "id": "ANTH",
+     "pop": 8,
+     "label": "上市后安全派"
+    },
+    {
+     "id": "BYTE",
+     "pop": 8,
+     "label": "流量守成"
+    },
+    {
+     "id": "GOOG",
+     "pop": 9,
+     "label": "自研全栈"
+    },
+    {
+     "id": "HUAWEI",
+     "pop": 8,
+     "label": "国产替代"
+    },
+    {
+     "id": "AAPL",
+     "pop": 7,
+     "label": "终端城池"
+    },
+    {
+     "id": "DPSK",
+     "pop": 5,
+     "label": "效率路线"
+    },
+    {
+     "id": "ALI",
+     "pop": 8,
+     "label": "开支承压"
+    },
+    {
+     "id": "MSFT",
+     "pop": 9,
+     "label": "双人羁绊"
+    },
+    {
+     "id": "TCE",
+     "pop": 7,
+     "label": "开支激增"
+    },
+    {
+     "id": "TSMC",
+     "pop": 9,
+     "label": "产能为王"
+    },
+    {
+     "id": "AMZN",
+     "pop": 8,
+     "label": "云托管"
+    },
+    {
+     "id": "OAI",
+     "pop": 8,
+     "label": "限速提案方"
+    },
+    {
+     "id": "BIDU",
+     "pop": 6,
+     "label": "搜索承压"
+    },
+    {
+     "id": "META",
+     "pop": 8,
+     "label": "开源阵容"
+    },
+    {
+     "id": "ORCL",
+     "pop": 9,
+     "label": "杠杆承压"
+    },
+    {
+     "id": "SFTB",
+     "pop": 6,
+     "label": "资本承压"
+    },
+    {
+     "id": "MUSK",
+     "pop": 8,
+     "label": "狂人阵容"
+    },
+    {
+     "id": "NVDA",
+     "pop": 9,
+     "label": "装备商·重伤"
+    },
+    {
+     "id": "KIMI",
+     "pop": 7,
+     "label": "Agent 模型出圈"
+    },
+    {
+     "id": "MANUS",
+     "pop": 6,
+     "label": "通用 Agent 黑马"
+    },
+    {
+     "id": "ZHIPU",
+     "pop": 6,
+     "label": "GLM 开源跟进"
+    },
+    {
+     "id": "MINIMAX",
+     "pop": 6,
+     "label": "Agent 模型出海"
+    },
+    {
+     "id": "OPENCLAW",
+     "pop": 4,
+     "label": "开源 Agent 框架"
+    },
+    {
+     "id": "PANW",
+     "pop": 4,
+     "label": "安全并购入场"
+    }
+   ],
+   "rounds": [
+    {
+     "code": "1-1",
+     "date": "2026 年 11 月 22–30 日",
+     "type": "事件",
+     "title": "限速提案：Pachocki 提议以困惑度设行业上限",
+     "global": "OpenAI 首席科学家 Jakub Pachocki 于 11 月 22 日在 openai.com 发布《Perplexity and Intelligence》。提议行业以困惑度为共同标尺，设首道发展上限。GPT-3.5 对数困惑度约 0.99，GPT-4 约 0.91，当前模型低于 0.8。0.68 至 0.70 区间预计出现变革性能力。Altman 公开支持，称这是 OpenAI 一段时间以来发布的最重要的东西。",
+     "verdict": "胜：OpenAI。安全领导力动作。提议行业共同限速，抢占规则制定先手。负：无。提案无约束力，无其他实验室公开加入。0.68 至 0.70 只是预测窗口，不是已采用的截止值。",
+     "moves": [
+      [
+       "OAI",
+       "Pachocki 发布《Perplexity and Intelligence》。提议以困惑度设行业共同发展上限。",
+       3,
+       1
+      ],
+      [
+       "NVDA",
+       "黄仁勋复任 CEO。董事会 11 天后逆转，股价涨 31%。",
+       6,
+       3
+      ],
+      [
+       "NVDA",
+       "BIS 将 Megaspeed 及 6 家关联实体列入实体清单。许可推定拒绝，13 个月无新增终结。",
+       -5,
+       -2
       ]
      ]
     }
@@ -4768,7 +7113,15 @@
   ],
   "SFTB": [
    "星门计划"
-  ]
+  ],
+  "HF": [],
+  "STAB": [],
+  "MJ": [],
+  "AI21": [],
+  "UCB": [],
+  "EU": [],
+  "USGOV": [],
+  "ACM": []
  },
  "formulaInputs": {
   "provided": [
@@ -4913,8 +7266,8 @@
    "oldOpening": 84,
    "prevEnd": 78,
    "breakpoint": 6,
-   "seasonEnd": 74,
-   "newSum": -4
+   "seasonEnd": 77,
+   "newSum": -1
   },
   {
    "season": "S2",
@@ -4927,8 +7280,8 @@
    "oldOpening": 83,
    "prevEnd": 60,
    "breakpoint": 23,
-   "seasonEnd": 66,
-   "newSum": 6
+   "seasonEnd": 68,
+   "newSum": 8
   },
   {
    "season": "S2",
@@ -5109,8 +7462,8 @@
    "oldOpening": 76,
    "prevEnd": 72,
    "breakpoint": 4,
-   "seasonEnd": 74,
-   "newSum": 2
+   "seasonEnd": 76,
+   "newSum": 4
   },
   {
    "season": "S2",
@@ -5123,8 +7476,8 @@
    "oldOpening": 67,
    "prevEnd": 50,
    "breakpoint": 17,
-   "seasonEnd": 55,
-   "newSum": 5
+   "seasonEnd": 56,
+   "newSum": 6
   },
   {
    "season": "S2",
@@ -5137,8 +7490,8 @@
    "oldOpening": 73,
    "prevEnd": 75,
    "breakpoint": -2,
-   "seasonEnd": 76,
-   "newSum": 1
+   "seasonEnd": 82,
+   "newSum": 7
   },
   {
    "season": "S2",
@@ -5151,8 +7504,8 @@
    "oldOpening": 71,
    "prevEnd": 58,
    "breakpoint": 13,
-   "seasonEnd": 60,
-   "newSum": 2
+   "seasonEnd": 64,
+   "newSum": 6
   },
   {
    "season": "S2",
@@ -5165,8 +7518,8 @@
    "oldOpening": 61,
    "prevEnd": 52,
    "breakpoint": 9,
-   "seasonEnd": 54,
-   "newSum": 2
+   "seasonEnd": 55,
+   "newSum": 3
   },
   {
    "season": "S2",
@@ -5333,8 +7686,8 @@
    "oldOpening": 79,
    "prevEnd": 94,
    "breakpoint": -15,
-   "seasonEnd": 86,
-   "newSum": -8
+   "seasonEnd": 96,
+   "newSum": 2
   },
   {
    "season": "S3",
@@ -5347,8 +7700,8 @@
    "oldOpening": 82,
    "prevEnd": 45,
    "breakpoint": 37,
-   "seasonEnd": 60,
-   "newSum": 15
+   "seasonEnd": 65,
+   "newSum": 20
   },
   {
    "season": "S3",
@@ -5387,10 +7740,10 @@
    "moveFrom": -11,
    "moveTo": 15,
    "oldOpening": 92,
-   "prevEnd": 66,
+   "prevEnd": 68,
    "breakpoint": 26,
-   "seasonEnd": 74,
-   "newSum": 8
+   "seasonEnd": 78,
+   "newSum": 10
   },
   {
    "season": "S3",
@@ -5555,9 +7908,9 @@
    "moveFrom": -8,
    "moveTo": 9,
    "oldOpening": 72,
-   "prevEnd": 55,
+   "prevEnd": 56,
    "breakpoint": 17,
-   "seasonEnd": 62,
+   "seasonEnd": 63,
    "newSum": 7
   },
   {
@@ -5569,10 +7922,10 @@
    "moveFrom": 2,
    "moveTo": -4,
    "oldOpening": 70,
-   "prevEnd": 76,
+   "prevEnd": 82,
    "breakpoint": -6,
-   "seasonEnd": 80,
-   "newSum": 4
+   "seasonEnd": 92,
+   "newSum": 10
   },
   {
    "season": "S3",
@@ -5583,10 +7936,10 @@
    "moveFrom": -9,
    "moveTo": 1,
    "oldOpening": 70,
-   "prevEnd": 60,
+   "prevEnd": 64,
    "breakpoint": 10,
-   "seasonEnd": 58,
-   "newSum": -2
+   "seasonEnd": 65,
+   "newSum": 1
   },
   {
    "season": "S3",
@@ -5597,10 +7950,10 @@
    "moveFrom": 1,
    "moveTo": 0,
    "oldOpening": 70,
-   "prevEnd": 71,
+   "prevEnd": 73,
    "breakpoint": -1,
-   "seasonEnd": 74,
-   "newSum": 3
+   "seasonEnd": 79,
+   "newSum": 6
   },
   {
    "season": "S3",
@@ -5611,10 +7964,10 @@
    "moveFrom": -7,
    "moveTo": 5,
    "oldOpening": 66,
-   "prevEnd": 54,
+   "prevEnd": 55,
    "breakpoint": 12,
-   "seasonEnd": 56,
-   "newSum": 2
+   "seasonEnd": 59,
+   "newSum": 4
   },
   {
    "season": "S3",
@@ -5779,10 +8132,10 @@
    "moveFrom": -4,
    "moveTo": 3,
    "oldOpening": 93,
-   "prevEnd": 86,
+   "prevEnd": 96,
    "breakpoint": 7,
-   "seasonEnd": 76,
-   "newSum": -10
+   "seasonEnd": 94,
+   "newSum": -2
   },
   {
    "season": "S4",
@@ -5793,10 +8146,10 @@
    "moveFrom": 0,
    "moveTo": 5,
    "oldOpening": 65,
-   "prevEnd": 60,
+   "prevEnd": 65,
    "breakpoint": 5,
-   "seasonEnd": 55,
-   "newSum": -5
+   "seasonEnd": 65,
+   "newSum": 0
   },
   {
    "season": "S4",
@@ -5835,10 +8188,10 @@
    "moveFrom": -1,
    "moveTo": -3,
    "oldOpening": 80,
-   "prevEnd": 82,
+   "prevEnd": 88,
    "breakpoint": -2,
-   "seasonEnd": 86,
-   "newSum": 4
+   "seasonEnd": 106,
+   "newSum": 18
   },
   {
    "season": "S4",
@@ -5849,10 +8202,10 @@
    "moveFrom": 0,
    "moveTo": 5,
    "oldOpening": 79,
-   "prevEnd": 74,
+   "prevEnd": 78,
    "breakpoint": 5,
-   "seasonEnd": 78,
-   "newSum": 4
+   "seasonEnd": 91,
+   "newSum": 13
   },
   {
    "season": "S4",
@@ -5865,8 +8218,8 @@
    "oldOpening": 84,
    "prevEnd": 85,
    "breakpoint": -1,
-   "seasonEnd": 88,
-   "newSum": 3
+   "seasonEnd": 115,
+   "newSum": 30
   },
   {
    "season": "S4",
@@ -5879,8 +8232,8 @@
    "oldOpening": 54,
    "prevEnd": 52,
    "breakpoint": 2,
-   "seasonEnd": 60,
-   "newSum": 8
+   "seasonEnd": 76,
+   "newSum": 24
   },
   {
    "season": "S4",
@@ -5893,8 +8246,8 @@
    "oldOpening": 88,
    "prevEnd": 84,
    "breakpoint": 4,
-   "seasonEnd": 82,
-   "newSum": -2
+   "seasonEnd": 85,
+   "newSum": 1
   },
   {
    "season": "S4",
@@ -5907,8 +8260,8 @@
    "oldOpening": 67,
    "prevEnd": 60,
    "breakpoint": 7,
-   "seasonEnd": 58,
-   "newSum": -2
+   "seasonEnd": 59,
+   "newSum": -1
   },
   {
    "season": "S4",
@@ -6031,10 +8384,10 @@
    "moveFrom": 6,
    "moveTo": -1,
    "oldOpening": 75,
-   "prevEnd": 82,
+   "prevEnd": 84,
    "breakpoint": -7,
-   "seasonEnd": 84,
-   "newSum": 2
+   "seasonEnd": 93,
+   "newSum": 9
   },
   {
    "season": "S4",
@@ -6045,10 +8398,10 @@
    "moveFrom": 3,
    "moveTo": 2,
    "oldOpening": 61,
-   "prevEnd": 62,
+   "prevEnd": 63,
    "breakpoint": -1,
-   "seasonEnd": 60,
-   "newSum": -2
+   "seasonEnd": 65,
+   "newSum": 2
   },
   {
    "season": "S4",
@@ -6059,10 +8412,10 @@
    "moveFrom": 6,
    "moveTo": 0,
    "oldOpening": 74,
-   "prevEnd": 80,
+   "prevEnd": 92,
    "breakpoint": -6,
-   "seasonEnd": 86,
-   "newSum": 6
+   "seasonEnd": 105,
+   "newSum": 13
   },
   {
    "season": "S4",
@@ -6073,10 +8426,10 @@
    "moveFrom": 3,
    "moveTo": 12,
    "oldOpening": 67,
-   "prevEnd": 58,
+   "prevEnd": 65,
    "breakpoint": 9,
-   "seasonEnd": 64,
-   "newSum": 6
+   "seasonEnd": 74,
+   "newSum": 9
   },
   {
    "season": "S4",
@@ -6087,10 +8440,10 @@
    "moveFrom": 4,
    "moveTo": 3,
    "oldOpening": 73,
-   "prevEnd": 74,
+   "prevEnd": 79,
    "breakpoint": -1,
-   "seasonEnd": 80,
-   "newSum": 6
+   "seasonEnd": 87,
+   "newSum": 8
   },
   {
    "season": "S4",
@@ -6101,10 +8454,10 @@
    "moveFrom": 2,
    "moveTo": 7,
    "oldOpening": 61,
-   "prevEnd": 56,
+   "prevEnd": 59,
    "breakpoint": 5,
-   "seasonEnd": 58,
-   "newSum": 2
+   "seasonEnd": 63,
+   "newSum": 4
   },
   {
    "season": "S4",
@@ -6117,8 +8470,8 @@
    "oldOpening": 71,
    "prevEnd": 68,
    "breakpoint": 3,
-   "seasonEnd": 70,
-   "newSum": 2
+   "seasonEnd": 73,
+   "newSum": 5
   },
   {
    "season": "S4",
@@ -6145,8 +8498,8 @@
    "oldOpening": 70,
    "prevEnd": 78,
    "breakpoint": -8,
-   "seasonEnd": 85,
-   "newSum": 7
+   "seasonEnd": 87,
+   "newSum": 9
   },
   {
    "season": "S4",
@@ -6159,8 +8512,8 @@
    "oldOpening": 53,
    "prevEnd": 55,
    "breakpoint": -2,
-   "seasonEnd": 60,
-   "newSum": 5
+   "seasonEnd": 61,
+   "newSum": 6
   },
   {
    "season": "S4",
@@ -6173,8 +8526,8 @@
    "oldOpening": 69,
    "prevEnd": 72,
    "breakpoint": -3,
-   "seasonEnd": 92,
-   "newSum": 20
+   "seasonEnd": 99,
+   "newSum": 27
   },
   {
    "season": "S4",
@@ -6187,8 +8540,8 @@
    "oldOpening": 21,
    "prevEnd": 20,
    "breakpoint": 1,
-   "seasonEnd": 28,
-   "newSum": 8
+   "seasonEnd": 31,
+   "newSum": 11
   },
   {
    "season": "S4",
@@ -6243,8 +8596,8 @@
    "oldOpening": 77,
    "prevEnd": 84,
    "breakpoint": -7,
-   "seasonEnd": 38,
-   "newSum": -46
+   "seasonEnd": 36,
+   "newSum": -48
   },
   {
    "season": "S5",
@@ -6257,8 +8610,8 @@
    "oldOpening": 58,
    "prevEnd": 90,
    "breakpoint": -32,
-   "seasonEnd": 55,
-   "newSum": -35
+   "seasonEnd": 54,
+   "newSum": -36
   },
   {
    "season": "S5",
@@ -6269,10 +8622,10 @@
    "moveFrom": 2,
    "moveTo": -7,
    "oldOpening": 67,
-   "prevEnd": 76,
+   "prevEnd": 94,
    "breakpoint": -9,
-   "seasonEnd": 60,
-   "newSum": -16
+   "seasonEnd": 79,
+   "newSum": -15
   },
   {
    "season": "S5",
@@ -6283,9 +8636,9 @@
    "moveFrom": 3,
    "moveTo": -4,
    "oldOpening": 48,
-   "prevEnd": 55,
+   "prevEnd": 65,
    "breakpoint": -7,
-   "seasonEnd": 48,
+   "seasonEnd": 58,
    "newSum": -7
   },
   {
@@ -6325,10 +8678,10 @@
    "moveFrom": 2,
    "moveTo": -13,
    "oldOpening": 71,
-   "prevEnd": 86,
+   "prevEnd": 106,
    "breakpoint": -15,
-   "seasonEnd": 72,
-   "newSum": -14
+   "seasonEnd": 105,
+   "newSum": -1
   },
   {
    "season": "S5",
@@ -6339,10 +8692,10 @@
    "moveFrom": 3,
    "moveTo": -12,
    "oldOpening": 63,
-   "prevEnd": 78,
+   "prevEnd": 91,
    "breakpoint": -15,
-   "seasonEnd": 70,
-   "newSum": -8
+   "seasonEnd": 88,
+   "newSum": -3
   },
   {
    "season": "S5",
@@ -6353,10 +8706,10 @@
    "moveFrom": -3,
    "moveTo": -20,
    "oldOpening": 71,
-   "prevEnd": 88,
+   "prevEnd": 115,
    "breakpoint": -17,
-   "seasonEnd": 74,
-   "newSum": -14
+   "seasonEnd": 121,
+   "newSum": 6
   },
   {
    "season": "S5",
@@ -6367,10 +8720,10 @@
    "moveFrom": -10,
    "moveTo": -5,
    "oldOpening": 65,
-   "prevEnd": 60,
+   "prevEnd": 76,
    "breakpoint": 5,
-   "seasonEnd": 85,
-   "newSum": 25
+   "seasonEnd": 113,
+   "newSum": 37
   },
   {
    "season": "S5",
@@ -6381,10 +8734,10 @@
    "moveFrom": -1,
    "moveTo": -13,
    "oldOpening": 70,
-   "prevEnd": 82,
+   "prevEnd": 85,
    "breakpoint": -12,
-   "seasonEnd": 58,
-   "newSum": -24
+   "seasonEnd": 67,
+   "newSum": -18
   },
   {
    "season": "S5",
@@ -6395,10 +8748,10 @@
    "moveFrom": -4,
    "moveTo": -10,
    "oldOpening": 52,
-   "prevEnd": 58,
+   "prevEnd": 59,
    "breakpoint": -6,
-   "seasonEnd": 45,
-   "newSum": -13
+   "seasonEnd": 50,
+   "newSum": -9
   },
   {
    "season": "S5",
@@ -6411,8 +8764,8 @@
    "oldOpening": 68,
    "prevEnd": 79,
    "breakpoint": -11,
-   "seasonEnd": 64,
-   "newSum": -15
+   "seasonEnd": 65,
+   "newSum": -14
   },
   {
    "season": "S5",
@@ -6425,8 +8778,8 @@
    "oldOpening": 59,
    "prevEnd": 68,
    "breakpoint": -9,
-   "seasonEnd": 62,
-   "newSum": -6
+   "seasonEnd": 55,
+   "newSum": -13
   },
   {
    "season": "S5",
@@ -6439,8 +8792,8 @@
    "oldOpening": 60,
    "prevEnd": 62,
    "breakpoint": -2,
-   "seasonEnd": 50,
-   "newSum": -12
+   "seasonEnd": 59,
+   "newSum": -3
   },
   {
    "season": "S5",
@@ -6453,8 +8806,8 @@
    "oldOpening": 37,
    "prevEnd": 35,
    "breakpoint": 2,
-   "seasonEnd": 28,
-   "newSum": -7
+   "seasonEnd": 30,
+   "newSum": -5
   },
   {
    "season": "S5",
@@ -6495,8 +8848,8 @@
    "oldOpening": 65,
    "prevEnd": 84,
    "breakpoint": -19,
-   "seasonEnd": 56,
-   "newSum": -28
+   "seasonEnd": 64,
+   "newSum": -20
   },
   {
    "season": "S5",
@@ -6509,8 +8862,8 @@
    "oldOpening": 40,
    "prevEnd": 70,
    "breakpoint": -30,
-   "seasonEnd": 40,
-   "newSum": -30
+   "seasonEnd": 43,
+   "newSum": -27
   },
   {
    "season": "S5",
@@ -6521,9 +8874,9 @@
    "moveFrom": -1,
    "moveTo": -9,
    "oldOpening": 76,
-   "prevEnd": 84,
+   "prevEnd": 93,
    "breakpoint": -8,
-   "seasonEnd": 74,
+   "seasonEnd": 83,
    "newSum": -10
   },
   {
@@ -6535,9 +8888,9 @@
    "moveFrom": -5,
    "moveTo": -7,
    "oldOpening": 58,
-   "prevEnd": 60,
+   "prevEnd": 65,
    "breakpoint": -2,
-   "seasonEnd": 52,
+   "seasonEnd": 57,
    "newSum": -8
   },
   {
@@ -6549,10 +8902,10 @@
    "moveFrom": -3,
    "moveTo": -6,
    "oldOpening": 83,
-   "prevEnd": 86,
+   "prevEnd": 105,
    "breakpoint": -3,
-   "seasonEnd": 68,
-   "newSum": -18
+   "seasonEnd": 104,
+   "newSum": -1
   },
   {
    "season": "S5",
@@ -6563,10 +8916,10 @@
    "moveFrom": -7,
    "moveTo": -13,
    "oldOpening": 58,
-   "prevEnd": 64,
+   "prevEnd": 74,
    "breakpoint": -6,
-   "seasonEnd": 48,
-   "newSum": -16
+   "seasonEnd": 63,
+   "newSum": -11
   },
   {
    "season": "S5",
@@ -6577,10 +8930,10 @@
    "moveFrom": -4,
    "moveTo": -8,
    "oldOpening": 76,
-   "prevEnd": 80,
+   "prevEnd": 87,
    "breakpoint": -4,
-   "seasonEnd": 66,
-   "newSum": -14
+   "seasonEnd": 78,
+   "newSum": -9
   },
   {
    "season": "S5",
@@ -6591,10 +8944,10 @@
    "moveFrom": -6,
    "moveTo": -7,
    "oldOpening": 57,
-   "prevEnd": 58,
+   "prevEnd": 63,
    "breakpoint": -1,
-   "seasonEnd": 50,
-   "newSum": -8
+   "seasonEnd": 58,
+   "newSum": -5
   },
   {
    "season": "S5",
@@ -6605,9 +8958,9 @@
    "moveFrom": -2,
    "moveTo": -8,
    "oldOpening": 64,
-   "prevEnd": 70,
+   "prevEnd": 73,
    "breakpoint": -6,
-   "seasonEnd": 58,
+   "seasonEnd": 61,
    "newSum": -12
   },
   {
@@ -6633,9 +8986,9 @@
    "moveFrom": 2,
    "moveTo": -21,
    "oldOpening": 62,
-   "prevEnd": 85,
+   "prevEnd": 87,
    "breakpoint": -23,
-   "seasonEnd": 72,
+   "seasonEnd": 74,
    "newSum": -13
   },
   {
@@ -6647,9 +9000,9 @@
    "moveFrom": 2,
    "moveTo": -11,
    "oldOpening": 47,
-   "prevEnd": 60,
+   "prevEnd": 61,
    "breakpoint": -13,
-   "seasonEnd": 52,
+   "seasonEnd": 53,
    "newSum": -8
   },
   {
@@ -6661,10 +9014,10 @@
    "moveFrom": 1,
    "moveTo": -27,
    "oldOpening": 64,
-   "prevEnd": 92,
+   "prevEnd": 99,
    "breakpoint": -28,
-   "seasonEnd": 70,
-   "newSum": -22
+   "seasonEnd": 90,
+   "newSum": -9
   },
   {
    "season": "S5",
@@ -6675,10 +9028,10 @@
    "moveFrom": 0,
    "moveTo": -4,
    "oldOpening": 24,
-   "prevEnd": 28,
+   "prevEnd": 31,
    "breakpoint": -4,
-   "seasonEnd": 24,
-   "newSum": -4
+   "seasonEnd": 34,
+   "newSum": 3
   },
   {
    "season": "S5",
@@ -6691,8 +9044,8 @@
    "oldOpening": 68,
    "prevEnd": 90,
    "breakpoint": -22,
-   "seasonEnd": 66,
-   "newSum": -24
+   "seasonEnd": 64,
+   "newSum": -26
   },
   {
    "season": "S5",
@@ -6705,8 +9058,8 @@
    "oldOpening": 64,
    "prevEnd": 82,
    "breakpoint": -18,
-   "seasonEnd": 68,
-   "newSum": -14
+   "seasonEnd": 67,
+   "newSum": -15
   },
   {
    "season": "S5",
@@ -6715,12 +9068,12 @@
    "playerName": "软银",
    "field": "hp",
    "moveFrom": -2,
-   "moveTo": -10,
+   "moveTo": 2,
    "oldOpening": 64,
    "prevEnd": 72,
-   "breakpoint": -8,
-   "seasonEnd": 52,
-   "newSum": -20
+   "breakpoint": 4,
+   "seasonEnd": 64,
+   "newSum": -8
   },
   {
    "season": "S5",
@@ -6729,55 +9082,118 @@
    "playerName": "软银",
    "field": "gold",
    "moveFrom": -2,
-   "moveTo": -21,
+   "moveTo": -2,
    "oldOpening": 41,
    "prevEnd": 60,
-   "breakpoint": -19,
-   "seasonEnd": 38,
-   "newSum": -22
+   "breakpoint": 0,
+   "seasonEnd": 57,
+   "newSum": -3
   }
  ],
  "roundRV": {
-  "S1:1-1": "RV-2022.1",
-  "S1:1-4": "RV-2022.1",
-  "S1:2-1": "RV-2022.2",
-  "S1:2-5": "RV-2022.2",
-  "S1:3-2": "RV-2022.2",
-  "S2:1-1": "RV-2022.2",
-  "S2:2-1": "RV-2022.2",
-  "S2:2-6": "RV-2022.2",
-  "S2:3-2": "RV-2022.2",
-  "S2:4-1": "RV-2022.2",
-  "S2:4-5": "RV-2023.2",
-  "S2:5-1": "RV-2023.2",
-  "S3:1-1": "RV-2023.2",
-  "S3:2-1": "RV-2023.2",
-  "S3:3-2": "RV-2024.1",
-  "S3:4-1": "RV-2024.1",
-  "S3:5-1": "RV-2024.1",
-  "S3:6-1": "RV-2024.1",
-  "S4:1-1": "RV-2025.1",
-  "S4:1-2": "RV-2025.1",
-  "S4:1-3": "RV-2025.1",
-  "S4:3-2": "RV-2025.2",
-  "S4:4-1": "RV-2025.2",
-  "S4:5-1": "RV-2025.2",
-  "S5:1-1": "RV-2025.2",
-  "S5:2-1": "RV-2026.1",
-  "S5:3-2": "RV-2026.1",
-  "S5:4-1": "RV-2026.1",
-  "S5:5-1": "RV-2026.2",
-  "S5:6-1": "RV-2026.2",
-  "S5:6-2": "RV-2026.2"
+  "S1:2022-01": "RV-2022.1",
+  "S1:2022-08": "RV-2022.1",
+  "S1:2022-11": "RV-2022.2",
+  "S1:2022-12": "RV-2022.2",
+  "S2:2023-01": "RV-2022.2",
+  "S2:2023-03": "RV-2022.2",
+  "S2:2023-05": "RV-2022.2",
+  "S2:2023-06": "RV-2022.2",
+  "S2:2023-07": "RV-2022.2",
+  "S2:2023-09": "RV-2022.2",
+  "S2:2023-11": "RV-2023.2",
+  "S2:2023-12": "RV-2023.2",
+  "S3:2024-01": "RV-2023.2",
+  "S3:2024-02": "RV-2023.2",
+  "S3:2024-03": "RV-2023.2",
+  "S3:2024-05": "RV-2024.1",
+  "S3:2024-07": "RV-2024.1",
+  "S3:2024-09": "RV-2024.1",
+  "S3:2024-12": "RV-2024.1",
+  "S4:2025-01": "RV-2025.1",
+  "S4:2025-07": "RV-2025.2",
+  "S4:2025-06": "RV-2025.2",
+  "S4:2025-08": "RV-2025.2",
+  "S4:2025-09": "RV-2025.2",
+  "S4:2025-10": "RV-2025.2",
+  "S4:2025-11": "RV-2025.2",
+  "S4:2025-12": "RV-2025.2",
+  "S5:2026-11": "RV-2026.2",
+  "S5:2026-05": "RV-2025.2",
+  "S5:2026-09": "RV-2026.1",
+  "S5:2026-01": "RV-2025.2",
+  "S5:2026-02": "RV-2025.2",
+  "S5:2026-03": "RV-2025.2",
+  "S5:2026-04": "RV-2025.2",
+  "S5:2026-06": "RV-2025.2",
+  "S5:2026-07": "RV-2025.2",
+  "S5:2026-08": "RV-2026.1",
+  "S5:2026-10": "RV-2026.1",
+  "S0:2018-06": "RV-2018.1",
+  "S0:2018-07": "RV-2018.1",
+  "S0:2018-08": "RV-2018.1",
+  "S0:2018-09": "RV-2018.1",
+  "S0:2018-10": "RV-2018.1",
+  "S0:2018-11": "RV-2018.1",
+  "S0:2018-12": "RV-2018.1",
+  "S0:2019-01": "RV-2019.1",
+  "S0:2019-02": "RV-2019.1",
+  "S0:2019-03": "RV-2019.1",
+  "S0:2019-04": "RV-2019.1",
+  "S0:2019-05": "RV-2019.1",
+  "S0:2019-06": "RV-2019.1",
+  "S0:2019-07": "RV-2019.1",
+  "S0:2019-08": "RV-2019.1",
+  "S0:2019-09": "RV-2019.1",
+  "S0:2019-10": "RV-2019.1",
+  "S0:2019-11": "RV-2019.1",
+  "S0:2019-12": "RV-2019.1",
+  "S0:2020-01": "RV-2020.1",
+  "S0:2020-02": "RV-2020.1",
+  "S0:2020-03": "RV-2020.1",
+  "S0:2020-04": "RV-2020.1",
+  "S0:2020-05": "RV-2020.1",
+  "S0:2020-06": "RV-2020.1",
+  "S0:2020-07": "RV-2020.1",
+  "S0:2020-08": "RV-2020.1",
+  "S0:2020-09": "RV-2020.1",
+  "S0:2020-10": "RV-2020.1",
+  "S0:2020-11": "RV-2020.1",
+  "S0:2020-12": "RV-2020.1",
+  "S0:2021-01": "RV-2021.1",
+  "S0:2021-02": "RV-2021.1",
+  "S0:2021-03": "RV-2021.1",
+  "S0:2021-04": "RV-2021.1",
+  "S0:2021-05": "RV-2021.1",
+  "S0:2021-06": "RV-2021.1",
+  "S0:2021-07": "RV-2021.1",
+  "S0:2021-08": "RV-2021.1",
+  "S0:2021-09": "RV-2021.1",
+  "S0:2021-10": "RV-2021.1",
+  "S0:2021-11": "RV-2021.1",
+  "S0:2021-12": "RV-2021.1",
+  "S0:2022-01": "RV-2022.1",
+  "S0:2022-02": "RV-2022.1",
+  "S0:2022-03": "RV-2022.1",
+  "S0:2022-04": "RV-2022.1",
+  "S0:2022-05": "RV-2022.1",
+  "S0:2022-06": "RV-2022.1",
+  "S0:2022-07": "RV-2022.1",
+  "S0:2022-08": "RV-2022.1",
+  "S0:2022-09": "RV-2022.1",
+  "S0:2022-10": "RV-2022.1",
+  "S0:2022-11": "RV-2022.2",
+  "S0:2022-12": "RV-2022.2",
+  "S6:1-1": "RV-2026-11"
  },
  "roundEvidence": {
-  "S1:1-1": {
+  "S1:2022-01": {
    "status": "opinion",
    "items": [],
    "moves": {},
-   "note": "开局选秀轮，无单一公开事件；全部动作为模型分。"
+   "note": ""
   },
-  "S1:1-4": {
+  "S1:2022-08": {
    "status": "verified",
    "items": [
     {
@@ -6789,7 +9205,7 @@
    "moves": {},
    "note": ""
   },
-  "S1:2-1": {
+  "S1:2022-11": {
    "status": "verified",
    "items": [
     {
@@ -6809,7 +9225,7 @@
    },
    "note": ""
   },
-  "S1:2-5": {
+  "S1:2022-12": {
    "status": "verified",
    "items": [
     {
@@ -6821,13 +9237,7 @@
    "moves": {},
    "note": ""
   },
-  "S1:3-2": {
-   "status": "opinion",
-   "items": [],
-   "moves": {},
-   "note": "经济轮，无交战；'微软账上金币最厚'为模型内比较，非财报口径。"
-  },
-  "S2:1-1": {
+  "S2:2023-01": {
    "status": "verified",
    "items": [
     {
@@ -6857,9 +9267,9 @@
      }
     ]
    },
-   "note": "本轮其余大动作（NVDA、GOOG、META、AMZN、MUSK、TSMC）无逐动作证据：S2 首轮增量含跨季对账断点（见验证章），数值为对账后的模型分，非单一事件分。"
+   "note": ""
   },
-  "S2:2-1": {
+  "S2:2023-03": {
    "status": "verified",
    "items": [
     {
@@ -6871,7 +9281,7 @@
    "moves": {},
    "note": ""
   },
-  "S2:2-6": {
+  "S2:2023-05": {
    "status": "verified",
    "items": [
     {
@@ -6891,7 +9301,13 @@
    },
    "note": ""
   },
-  "S2:3-2": {
+  "S2:2023-06": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S2:2023-07": {
    "status": "verified",
    "items": [
     {
@@ -6903,7 +9319,7 @@
    "moves": {},
    "note": ""
   },
-  "S2:4-1": {
+  "S2:2023-09": {
    "status": "verified",
    "items": [
     {
@@ -6915,7 +9331,7 @@
    "moves": {},
    "note": ""
   },
-  "S2:4-5": {
+  "S2:2023-11": {
    "status": "verified",
    "items": [
     {
@@ -6927,7 +9343,7 @@
    "moves": {},
    "note": ""
   },
-  "S2:5-1": {
+  "S2:2023-12": {
    "status": "verified",
    "items": [
     {
@@ -6939,13 +9355,19 @@
    "moves": {},
    "note": ""
   },
-  "S3:1-1": {
+  "S3:2024-01": {
    "status": "opinion",
    "items": [],
    "moves": {},
-   "note": "经济轮：四家云厂资本开支指引上调为多家财报电话会口径的合成判断；本轮未逐家挂证据。"
+   "note": ""
   },
-  "S3:2-1": {
+  "S3:2024-02": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S3:2024-03": {
    "status": "verified",
    "items": [
     {
@@ -6957,7 +9379,7 @@
    "moves": {},
    "note": ""
   },
-  "S3:3-2": {
+  "S3:2024-05": {
    "status": "verified",
    "items": [
     {
@@ -6969,7 +9391,7 @@
    "moves": {},
    "note": ""
   },
-  "S3:4-1": {
+  "S3:2024-07": {
    "status": "verified",
    "items": [
     {
@@ -6981,7 +9403,7 @@
    "moves": {},
    "note": ""
   },
-  "S3:5-1": {
+  "S3:2024-09": {
    "status": "verified",
    "items": [
     {
@@ -6993,7 +9415,7 @@
    "moves": {},
    "note": ""
   },
-  "S3:6-1": {
+  "S3:2024-12": {
    "status": "verified",
    "items": [
     {
@@ -7013,13 +9435,23 @@
    },
    "note": ""
   },
-  "S4:1-1": {
+  "S4:2025-01": {
    "status": "verified",
    "items": [
     {
      "kind": "url",
      "ref": "https://venturebeat.com/ai/open-source-deepseek-r1-uses-pure-reinforcement-learning-to-match-openai-o1-at-95-less-cost",
      "label": "DeepSeek-R1 发布：AIME 2024 得 79.8%，o1-1217 为 79.2%；MATH-500 得 97.3%，o1 为 96.4%。发布 2025-01-20。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://builtin.com/articles/stargate-project",
+     "label": "星门计划 2025-01-21 在白宫宣布：四年 5000 亿美元，首批 1000 亿美元；OpenAI、软银、甲骨文、MGX 组队；马斯克当天在 X 称'他们根本没有这笔钱'，称软银 secured 资金远不到 100 亿美元。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.thedailystar.net/business/global-economy/america/news/nvidia-loses-600b-value-amid-rout-tech-stocks-3810881",
+     "label": "2025-01-27 英伟达跌约 17%，市值蒸发约 5890 亿美元，创美股单日纪录；触发点为 DeepSeek 低成本模型。"
     }
    ],
    "moves": {
@@ -7029,33 +9461,8 @@
       "ref": "https://venturebeat.com/ai/open-source-deepseek-r1-uses-pure-reinforcement-learning-to-match-openai-o1-at-95-less-cost",
       "label": "R1 发布：AIME 79.8% 对 o1 的 79.2%；DPSK ΔHP +11 为模型分。"
      }
-    ]
-   },
-   "note": "本轮 ORCL、SFTB 的大动作无逐动作证据：为模型分，非单一事件分。"
-  },
-  "S4:1-2": {
-   "status": "verified",
-   "items": [
-    {
-     "kind": "url",
-     "ref": "https://builtin.com/articles/stargate-project",
-     "label": "星门计划 2025-01-21 在白宫宣布：四年 5000 亿美元，首批 1000 亿美元；OpenAI、软银、甲骨文、MGX 组队；马斯克当天在 X 称'他们根本没有这笔钱'，称软银 secured 资金远不到 100 亿美元。"
-    }
-   ],
-   "moves": {},
-   "note": ""
-  },
-  "S4:1-3": {
-   "status": "verified",
-   "items": [
-    {
-     "kind": "url",
-     "ref": "https://www.thedailystar.net/business/global-economy/america/news/nvidia-loses-600b-value-amid-rout-tech-stocks-3810881",
-     "label": "2025-01-27 英伟达跌约 17%，市值蒸发约 5890 亿美元，创美股单日纪录；触发点为 DeepSeek 低成本模型。"
-    }
-   ],
-   "moves": {
-    "0:NVDA": [
+    ],
+    "37:NVDA": [
      {
       "kind": "url",
       "ref": "https://www.thedailystar.net/business/global-economy/america/news/nvidia-loses-600b-value-amid-rout-tech-stocks-3810881",
@@ -7065,7 +9472,7 @@
    },
    "note": ""
   },
-  "S4:3-2": {
+  "S4:2025-07": {
    "status": "verified",
    "items": [
     {
@@ -7077,7 +9484,13 @@
    "moves": {},
    "note": ""
   },
-  "S4:4-1": {
+  "S4:2025-06": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S4:2025-08": {
    "status": "verified",
    "items": [
     {
@@ -7089,45 +9502,43 @@
    "moves": {},
    "note": ""
   },
-  "S4:5-1": {
+  "S4:2025-09": {
    "status": "opinion",
    "items": [],
    "moves": {},
-   "note": "疲劳轮：'循环融资'为媒体与审计章的定性判断；OpenAI 2026-03 轮中的供应商融资见审计章，但属 S5 年份，不作本轮证据。本轮无单一硬指针。"
+   "note": ""
   },
-  "S5:1-1": {
+  "S4:2025-10": {
    "status": "opinion",
    "items": [],
    "moves": {},
-   "note": "本轮其余大动作（NVDA、GOOG、META、HUAWEI、DPSK、AAPL、ORCL、TSMC、SFTB）无逐动作证据：S5 首轮增量含跨季对账断点（S5 英伟达金币、Anthropic 血量硬错误均记入首轮，见验证章），数值为对账后的模型分。"
+   "note": ""
   },
-  "S5:2-1": {
+  "S4:2025-11": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S4:2025-12": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-11": {
    "status": "verified",
    "items": [
     {
      "kind": "url",
-     "ref": "https://financefeeds.com/nvidia-nvda-stock-216-tuesday-spacex-40-billion-gpu-debt-anthropic-ipo-rally-bull-243-bear-190/",
-     "label": "英伟达 2026-10-06 收盘 239.24 美元创纪录，盘中高点 243.37 美元；Anthropic 将于 10 月 26 日公开递交招股文件。"
-    }
-   ],
-   "moves": {},
-   "note": ""
-  },
-  "S5:3-2": {
-   "status": "verified",
-   "items": [
+     "ref": "https://www.japantimes.co.jp/business/2026/09/14/companies/softbank-loan-openai/",
+     "label": "软银落实 118.7 亿美元两年期定期贷款（2026-09-14，彭博）：约 20 家银行承诺，原目标 100 亿美元，超额认购；以 OpenAI 持股作抵押，用于 OpenAI 投资。"
+    },
     {
      "kind": "url",
      "ref": "https://www.firstpost.com/explainers/nvidia-scandal-why-is-trump-commerce-secretary-howard-lutnick-under-fire-14060250.html",
      "label": "Axios 报道：2026-11-05 白宫战情室会议上，财长贝森特当面质问商务部长 Lutnick 为何未将 Megaspeed 列入实体清单；商务部发言人否认有过该对话。'质问'本身有信源争议，页面按报道口径记。"
-    }
-   ],
-   "moves": {},
-   "note": ""
-  },
-  "S5:4-1": {
-   "status": "verified",
-   "items": [
+    },
     {
      "kind": "edgar",
      "ref": "0001045810-26-000082",
@@ -7137,22 +9548,17 @@
      "kind": "url",
      "ref": "https://www.financialexpress.com/market/global-markets/nvidia-loses-2-6-trillion-slips-behind-alphabet-as-shares-suffer-7th-straight-weekly-loss/4390357/",
      "label": "2026-11-12 英伟达开盘跌约 14%，收跌 4.34% 至 166.19 美元；盘中低点 148.80 美元。"
-    }
-   ],
-   "moves": {
-    "0:NVDA": [
-     {
-      "kind": "edgar",
-      "ref": "0001045810-26-000082",
-      "label": "CEO 辞职：董事会 11-11 接受辞职；NVDA ΔHP −16 为模型分。"
-     }
-    ]
-   },
-   "note": ""
-  },
-  "S5:5-1": {
-   "status": "verified",
-   "items": [
+    },
+    {
+     "kind": "url",
+     "ref": "https://openai.com/index/introducing-gpt-6-2-astra-sol/",
+     "label": "OpenAI 发布 GPT-6.2 Astra 与 Sol（2026-11-17）：旗舰模型更新，ChatGPT Work 与 Codex 同日上线；Astra API 价降 20%。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://news.dayoo.com/finance/202611/16/171077_55024197.htm",
+     "label": "广州首个真武国产万卡智算集群投产运营（2026-11-16）：中国电信广东公司联合阿里云智能集团主办，黄埔区上线发布；计划扩至 10 万卡，TokenHub 平台同步发布。"
+    },
     {
      "kind": "edgar",
      "ref": "0001628280-26-074944",
@@ -7167,10 +9573,97 @@
      "kind": "url",
      "ref": "https://www.kdlg.org/as-heard-on-npr/2026-11-18/anthropic-ipo-raises-record-81-3-billion-on-strong-ai-demand",
      "label": "Anthropic 2026-11-18 定价 83 美元，售股 9.8 亿股，募资约 813 亿美元，创最大 IPO 纪录；11-19 首日交易。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.neoteo.com/en/nvidia-chips-megaspeed-and-the-military-linked-ai-lab",
+     "label": "纽约时报调查（2026-11-18）：阿里是 Megaspeed 的客户与资金支持方；Megaspeed 几年间购买逾 40 亿美元英伟达芯片。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/",
+     "label": "Google 发布 Gemini 4 Neon（2026-11-18）：Gemini 4 家族中端模型，介于 Carbon 与 Hydrogen 之间；1M 上下文，$3/$15。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://fourweekmba.com/ai-ft-maps-4-6b-chip-route-nvidia-says-it-blocked-megaspeed/",
+     "label": "FT 调查（2026-11-20）：浪潮未列清单的美国子公司 Aivres 持续与英伟达交易；Megaspeed 马来西亚子公司 Speedmatrix 申报自 Aivres 进口约 46 亿美元货物；英伟达称 2025 年已将 Megaspeed 列入内部禁售名单。（FT 原文付费墙，本条为转述）"
+    },
+    {
+     "kind": "url",
+     "ref": "https://explainx.ai/blog/grok-4-8-soft-rollout-rl-cpp-stack-november-2026",
+     "label": "xAI Grok 4.8 软发布（2026-11-18，马斯克 X 帖文）：已向部分 Grok Bot 用户软发布，全面发布还需一到两周打磨；无 xAI 官方新闻稿、无 API 发布、无基准成绩。（本条为马斯克帖文转述）"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.thedailystar.net/news/world/news/nvidias-accounting-focus-us-sec-investigation-sources-say-4329306",
+     "label": "路透 2026-11-20 报道：SEC 正查英伟达会计做法（两名知情人士）；WSJ 11-17 先报 SEC 在查，未写方向。SEC 与英伟达均未确认。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.fool.com/investing/2026/11/20/here-is-why-nvidia-stock-crashed-on-friday/",
+     "label": "2026-11-20 英伟达收 125.53 美元，跌 14.01%；当周跌约 23%，为 2008 年以来最差一周。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.taiwannews.com.tw/news/6478978",
+     "label": "台积电叫停 16nm 及以下中国客户订单（2026-11-20，路透引述知情人士）：无许可证暂停，改用 28nm/40nm、无 HBM 或先进封装；BIS 远程规则 11-19 生效后执行收紧。（Nikkei Asia 同日跟进）"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.oracle.com/news/announcement/oracle-statement-2026-11-20/",
+     "label": "甲骨文官方声明（2026-11-20）：OpenAI 基建合同融资已全部落实；五年约 3000 亿美元、4.5GW；最后一次融资约 100 亿美元股票 + 100 亿美元债务。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://www.zacks.com/stock/news/3031254/baidu-q3-earnings-miss-ai-cloud-strength-offsets-ad-weakness",
+     "label": "百度 Q3 2026 财报（2026-11-16）：资本开支 73.5 亿元，同比增 116%，自由现金流 -45.7 亿元。"
     }
    ],
    "moves": {
-    "4:ANTH": [
+    "15:BIDU": [
+     {
+      "kind": "url",
+      "ref": "https://www.zacks.com/stock/news/3031254/baidu-q3-earnings-miss-ai-cloud-strength-offsets-ad-weakness",
+      "label": "百度 Q3 资本开支 73.5 亿元；自由现金流 -45.7 亿元。"
+     }
+    ],
+    "35:NVDA": [
+     {
+      "kind": "edgar",
+      "ref": "0001045810-26-000082",
+      "label": "CEO 辞职：董事会 11-11 接受辞职；NVDA ΔHP −16 为模型分。"
+     }
+    ],
+    "36:OAI": [
+     {
+      "kind": "url",
+      "ref": "https://openai.com/index/introducing-gpt-6-2-astra-sol/",
+      "label": "OpenAI 发布 GPT-6.2 Astra 与 Sol（2026-11-17）：旗舰模型更新，ChatGPT Work 与 Codex 同日上线；Astra API 价降 20%。"
+     }
+    ],
+    "44:ALI": [
+     {
+      "kind": "url",
+      "ref": "https://news.dayoo.com/finance/202611/16/171077_55024197.htm",
+      "label": "广州首个真武国产万卡智算集群投产运营（2026-11-16）：中国电信广东公司联合阿里云智能集团主办，黄埔区上线发布；计划扩至 10 万卡，TokenHub 平台同步发布。"
+     }
+    ],
+    "54:NVDA": [
+     {
+      "kind": "url",
+      "ref": "https://fourweekmba.com/ai-ft-maps-4-6b-chip-route-nvidia-says-it-blocked-megaspeed/",
+      "label": "FT 调查（2026-11-20）：浪潮未列清单的美国子公司 Aivres 持续与英伟达交易；Megaspeed 马来西亚子公司 Speedmatrix 申报自 Aivres 进口约 46 亿美元货物；英伟达称 2025 年已将 Megaspeed 列入内部禁售名单。（FT 原文付费墙，本条为转述）"
+     }
+    ],
+    "57:GOOG": [
+     {
+      "kind": "url",
+      "ref": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/",
+      "label": "Google 发布 Gemini 4 Neon（2026-11-18）：Gemini 4 家族中端模型，介于 Carbon 与 Hydrogen 之间；1M 上下文，$3/$15。"
+     }
+    ],
+    "58:ANTH": [
      {
       "kind": "edgar",
       "ref": "0001628280-26-074944",
@@ -7181,40 +9674,814 @@
       "ref": "https://www.kdlg.org/as-heard-on-npr/2026-11-18/anthropic-ipo-raises-record-81-3-billion-on-strong-ai-demand",
       "label": "2026-11-18 定价 83 美元，募资约 813 亿美元。"
      }
-    ]
-   },
-   "note": ""
-  },
-  "S5:6-1": {
-   "status": "verified",
-   "items": [
-    {
-     "kind": "url",
-     "ref": "https://www.thedailystar.net/news/world/news/nvidias-accounting-focus-us-sec-investigation-sources-say-4329306",
-     "label": "路透 2026-11-20 报道：SEC 正查英伟达会计做法（两名知情人士）；WSJ 11-17 先报 SEC 在查，未写方向。SEC 与英伟达均未确认。"
-    },
-    {
-     "kind": "url",
-     "ref": "https://www.fool.com/investing/2026/11/20/here-is-why-nvidia-stock-crashed-on-friday/",
-     "label": "2026-11-20 英伟达收 125.53 美元，跌 14.01%；当周跌约 23%，为 2008 年以来最差一周。"
-    }
-   ],
-   "moves": {
-    "0:NVDA": [
+    ],
+    "61:MUSK": [
+     {
+      "kind": "url",
+      "ref": "https://explainx.ai/blog/grok-4-8-soft-rollout-rl-cpp-stack-november-2026",
+      "label": "xAI Grok 4.8 软发布（2026-11-18，马斯克 X 帖文）：已向部分 Grok Bot 用户软发布，全面发布还需一到两周打磨；无 xAI 官方新闻稿、无 API 发布、无基准成绩。（本条为马斯克帖文转述）"
+     }
+    ],
+    "63:ALI": [
+     {
+      "kind": "url",
+      "ref": "https://www.neoteo.com/en/nvidia-chips-megaspeed-and-the-military-linked-ai-lab",
+      "label": "纽约时报调查：阿里是 Megaspeed 客户与资金支持方。"
+     }
+    ],
+    "81:NVDA": [
      {
       "kind": "url",
       "ref": "https://www.thedailystar.net/news/world/news/nvidias-accounting-focus-us-sec-investigation-sources-say-4329306",
       "label": "SEC 调查报道触发当日大跌；NVDA ΔHP −18 为模型分。"
      }
+    ],
+    "96:ORCL": [
+     {
+      "kind": "url",
+      "ref": "https://www.oracle.com/news/announcement/oracle-statement-2026-11-20/",
+      "label": "甲骨文官方声明（2026-11-20）：OpenAI 基建合同融资已全部落实；五年约 3000 亿美元、4.5GW；最后一次融资约 100 亿美元股票 + 100 亿美元债务。"
+     }
+    ],
+    "97:TSMC": [
+     {
+      "kind": "url",
+      "ref": "https://www.taiwannews.com.tw/news/6478978",
+      "label": "台积电叫停 16nm 及以下中国客户订单（2026-11-20，路透引述知情人士）：无许可证暂停，改用 28nm/40nm、无 HBM 或先进封装；BIS 远程规则 11-19 生效后执行收紧。（Nikkei Asia 同日跟进）"
+     }
     ]
    },
    "note": ""
   },
-  "S5:6-2": {
-   "status": "pending",
+  "S5:2026-05": {
+   "status": "opinion",
    "items": [],
    "moves": {},
-   "note": "结算中：终局未定；证伪条件三件（云厂下调资本开支指引、合同被重谈或取消、信用利差与租赁违约出现）尚未触发。待下一公开信号。"
+   "note": ""
+  },
+  "S5:2026-09": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.japantimes.co.jp/business/2026/09/14/companies/softbank-loan-openai/",
+     "label": "软银落实 118.7 亿美元两年期定期贷款（2026-09-14，彭博）：约 20 家银行承诺，原目标 100 亿美元，超额认购；以 OpenAI 持股作抵押，用于 OpenAI 投资。"
+    }
+   ],
+   "moves": {
+    "1:SFTB": [
+     {
+      "kind": "url",
+      "ref": "https://www.japantimes.co.jp/business/2026/09/14/companies/softbank-loan-openai/",
+      "label": "软银落实 118.7 亿美元两年期定期贷款（2026-09-14，彭博）：约 20 家银行承诺，原目标 100 亿美元，超额认购；以 OpenAI 持股作抵押，用于 OpenAI 投资。"
+     }
+    ]
+   },
+   "note": ""
+  },
+  "S5:2026-01": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-02": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-03": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-04": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-06": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-07": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-08": {
+   "status": "opinion",
+   "items": [],
+   "moves": {},
+   "note": ""
+  },
+  "S5:2026-10": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://financefeeds.com/nvidia-nvda-stock-216-tuesday-spacex-40-billion-gpu-debt-anthropic-ipo-rally-bull-243-bear-190/",
+     "label": "英伟达 2026-10-06 收盘 239.24 美元创纪录，盘中高点 243.37 美元；Anthropic 将于 10 月 26 日公开递交招股文件。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://gloom.sh/stocks/amzn/transcripts/q3-2026",
+     "label": "亚马逊 Q3 财报电话会（2026-10-29）：Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元，多数投向 AWS；2027 年将显著增加。"
+    }
+   ],
+   "moves": {
+    "6:AMZN": [
+     {
+      "kind": "url",
+      "ref": "https://gloom.sh/stocks/amzn/transcripts/q3-2026",
+      "label": "亚马逊 Q3 财报电话会（2026-10-29）：Q3 现金资本开支 759 亿美元，全年指引约 2200 亿美元，多数投向 AWS；2027 年将显著增加。"
+     }
+    ]
+   },
+   "note": ""
+  },
+  "S0:2018-06": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/GPT-1",
+     "label": "GPT-1发布，生成式预训练范式确立"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2018-07": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://gigazine.net/gsc_news/en/20180719-openai-five-benchmark",
+     "label": "OpenAI Five宣布8月对阵前职业队"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2018-08": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://nvidianews.nvidia.com/news/nvidia-reinvents-computer-graphics-with-turing-architecture?pStoreID=fedex",
+     "label": "英伟达发布Turing架构GPU"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2018-09": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://huggingface.co/papers/1809.11096",
+     "label": "DeepMind发布BigGAN，大规模GAN训练"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2018-10": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://doi.org/10.48550/arXiv.1810.04805",
+     "label": "谷歌发布BERT论文，双向预训练"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2018-11": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.googblogs.com/open-sourcing-bert-state-of-the-art-pre-training-for-natural-language-processing/",
+     "label": "谷歌开源BERT代码与预训练模型"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2018-12": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/AlphaFold（仅核实到月，CASP13于2018年12月举行）",
+     "label": "DeepMind AlphaFold赢得CASP13"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。标题事件仅核实到月，未编造具体日。"
+  },
+  "S0:2019-01": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.newscientist.com/article/2191910-deepmind-ai-thrashes-human-professionals-at-video-game-starcraft-ii/",
+     "label": "AlphaStar首胜星际争霸2职业选手"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-02": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/GPT-2",
+     "label": "GPT-2发布，仅放124M版防滥用"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-03": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.guidetoartificialintelligence.com/en/learn/what-is-openai-lp-capped-profit/",
+     "label": "OpenAI改制为上限利润公司"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-04": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.technologyreview.com/2019/04/05/136188/google-has-now-cancelled-its-ai-ethics-board-after-a-backlash-from-staff/",
+     "label": "谷歌解散AI伦理委员会ATEAC"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-05": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://openai.com/index/gpt-2-6-month-follow-up/（仅核实到月；OpenAI自家时间线4月与5月说法不一，日不确定）",
+     "label": "GPT-2分阶段放出355M版"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。标题事件仅核实到月，未编造具体日。"
+  },
+  "S0:2019-06": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/1906.08237",
+     "label": "谷歌与CMU发布XLNet，超BERT"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-07": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.geekwire.com/2019/microsoft-invests-1-billion-openai-vows-build-ai-technology-platform-unprecedented-scale/",
+     "label": "微软向OpenAI投资10亿美元"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-08": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://openai.com/index/gpt-2-6-month-follow-up/",
+     "label": "GPT-2放出774M版并发布分阶段报告"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-09": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/1909.08053v2",
+     "label": "英伟达发布Megatron-LM，83亿参数"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-10": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/T5_(language_model",
+     "label": "谷歌发布T5，统一文本到文本框架"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-11": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/1911.08265v1",
+     "label": "DeepMind发布MuZero，无规则自学规划"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2019-12": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://aiwiki.ai/wiki/stylegan",
+     "label": "英伟达发布StyleGAN2，画质再提升"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-01": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/2001.08361",
+     "label": "Scaling Laws论文发布，揭示规模定律"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-02": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.microsoft.com/en-us/research/blog/turing-nlg-a-17-billion-parameter-language-model-by-microsoft/",
+     "label": "微软发布170亿参数Turing-NLG"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-03": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://syncedreview.com/2020/03/05/google-deepmind-releases-structure-predictions-for-coronavirus-linked-proteins/amp/",
+     "label": "DeepMind发布新冠病毒蛋白结构预测"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-04": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://ai.meta.com/blog/state-of-the-art-open-source-chatbot/",
+     "label": "Facebook开源94亿参数聊天机器人Blender"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-05": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/2005.14165",
+     "label": "GPT-3论文发布，1750亿参数少样本学习"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-06": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/GPT-3",
+     "label": "GPT-3 API开启私人内测"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-07": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.googblogs.com/announcing-scann-efficient-vector-similarity-search/",
+     "label": "谷歌开源向量检索库ScaNN"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-08": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/2020_in_artificial_intelligence",
+     "label": "DeepMind更新新冠蛋白AlphaFold预测"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-09": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://blogs.microsoft.com/blog/2020/09/22/microsoft-teams-up-with-openai-to-exclusively-license-gpt-3-language-model/",
+     "label": "微软独家授权GPT-3模型"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-10": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/2010.11929",
+     "label": "谷歌发布视觉Transformer论文ViT"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。标题事件仅核实到月，未编造具体日。"
+  },
+  "S0:2020-11": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://deepmind.google/science/alphafold/",
+     "label": "DeepMind AlphaFold 2赢得CASP14"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2020-12": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.nature.com/articles/s41586-020-03051-4",
+     "label": "DeepMind MuZero论文登Nature，无规则学棋"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-01": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://openai.com/index/dall-e/",
+     "label": "OpenAI发布文生图模型DALL-E"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-02": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://techcrunch.com/2021/02/19/google-fires-top-ai-ethics-researcher-margaret-mitchell/",
+     "label": "谷歌解雇AI伦理团队负责人Mitchell"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-03": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.digitaltrends.com/web/facebook-seer-image-recognition-ai/",
+     "label": "Facebook发布自监督视觉模型SEER"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-04": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A52021PC0206",
+     "label": "欧盟委员会公布人工智能法案草案"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-05": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://blog.google/innovation-and-ai/technology/developers-tools/io21-helpful-google/",
+     "label": "谷歌I/O发布对话模型LaMDA"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-06": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://techcrunch.com/2021/06/29/github-previews-new-ai-tool-that-makes-coding-suggestions/",
+     "label": "GitHub Copilot开启技术预览"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-07": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/AlphaFold",
+     "label": "AlphaFold 2论文与数据库在Nature发表"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-08": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.ai21.com/blog/announcing-ai21-studio-and-jurassic-1/",
+     "label": "AI21发布1780亿参数Jurassic-1"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-09": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/2109.01652",
+     "label": "谷歌FLAN论文，指令微调提升零样本能力"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-10": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://about.fb.com/news/2021/10/facebook-company-is-now-meta/",
+     "label": "Facebook公司更名为Meta"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-11": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://openai.com/index/api-no-waitlist/",
+     "label": "OpenAI取消GPT-3 API等候名单"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2021-12": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/2112.11446",
+     "label": "DeepMind发布2800亿参数语言模型Gopher"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-01": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://aiwiki.ai/wiki/instructgpt",
+     "label": "OpenAI发布InstructGPT，RLHF规模化"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-02": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://arxiv.org/abs/2202.07785v2",
+     "label": "Anthropic发表大模型可预测与意外论文"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-03": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://nvidianews.nvidia.com/news/nvidia-announces-hopper-architecture-the-next-generation-of-accelerated-computing?nvid=nv-int-cwmfg-641230",
+     "label": "英伟达发布Hopper架构与H100"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-04": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/Pathways_Language_Model",
+     "label": "谷歌发布5400亿参数PaLM"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-05": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://ar5iv.labs.arxiv.org/html/2205.01068v1",
+     "label": "Meta发布OPT-175B开放大模型"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-06": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/LaMDA",
+     "label": "谷歌工程师称LaMDA有知觉引争议"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-07": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/BLOOM_(language_model",
+     "label": "BigScience发布1760亿参数BLOOM"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-08": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/Stable_Diffusion",
+     "label": "开源发布Stable Diffusion模型"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-09": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://techcrunch.com/2022/09/21/openai-open-sources-whisper-a-multilingual-speech-recognition-system/",
+     "label": "OpenAI开源语音识别模型Whisper"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-10": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://techcrunch.com/2022/10/17/stability-ai-the-startup-behind-stable-diffusion-raises-101m/",
+     "label": "Stability AI融资1.01亿美元估值10亿"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-11": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://en.wikipedia.org/wiki/Chat_GPT",
+     "label": "OpenAI发布ChatGPT"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S0:2022-12": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback?ref=codependentai.co",
+     "label": "Anthropic发表宪法AI论文"
+    }
+   ],
+   "moves": {},
+   "note": "前传赛季月轮；Δ 均为模型分；来源见本轮事件。"
+  },
+  "S6:1-1": {
+   "status": "verified",
+   "items": [
+    {
+     "kind": "url",
+     "ref": "https://openai.com/index/perplexity-and-intelligence/",
+     "label": "OpenAI 首席科学家 Jakub Pachocki 2026-11-22 发布《Perplexity and Intelligence》，提议以困惑度为共同标尺设行业首道发展上限；GPT-3.5 对数困惑度约 0.99，GPT-4 约 0.91，当前模型低于 0.8，0.68-0.70 区间预计出现变革性能力。"
+    },
+    {
+     "kind": "url",
+     "ref": "https://techcrunch.com/2026/11/22/openais-chief-scientist-has-thoughts-on-how-to-limit-ai-development/",
+     "label": "TechCrunch 2026-11-22 转述：Altman 称这是 OpenAI 一段时间以来发布的最重要的东西。"
+    }
+   ],
+   "moves": {},
+   "note": ""
   }
  },
  "roundEvidenceMeta": {
@@ -7417,7 +10684,7 @@
   },
   "accounting": {
    "title": "赛季记账规则，全页统一（形式化验证的记账基准）：",
-   "carry": "跨季承接。S1 以冻结开局表为准（见验证章附表）。S2–S5 的开局血量与开局金币等于上一季的赛季末数值。不存在与上季季末断裂的开局值。卡池与估值按结算面板重置。血量与金币不重置。",
+   "carry": "跨季承接。S0 以 100 血 / 0 金开局。S1 以冻结开局表为准（见验证章附表），不承接 S0 季末（前传与正赛双轨，S0 与 S1 在 2022 年日历重叠）。S2–S6 的开局血量与开局金币等于上一季的赛季末数值。除 S0→S1 冻结开局断点外，不存在与上季季末断裂的开局值。卡池与估值按结算面板重置。血量与金币不重置。",
    "seasonEndHp": {
     "label": "赛季末血量",
     "expression": "开局血量 + 全季各轮血量增减之和"
@@ -7433,11 +10700,11 @@
    "netNote": "金币增减是净额。已含每轮收入公式的入账。",
    "hpRange": {
     "min": 0,
-    "max": 100,
-    "expression": "0–100"
+    "max": 140,
+    "expression": "0–140"
    },
    "goldMin": 0,
-   "note": "对账基准是赛季末排名数值。排名不动。只重算逐轮增量一侧。旧开局表与上季季末断裂的差额（跨季断点）已并入各季首轮增量。逐项清单见验证章。验证章逐项复算。"
+   "note": "对账基准是赛季末排名数值。排名不动。只重算逐轮增量一侧。旧开局表与上季季末断裂的差额（跨季断点）已并入各季首轮增量。逐项清单见验证章。验证章逐项复算。2026-11-23 补全 73 条模型发布与产品动作后重算：S2–S5 季末与排名随之更新，血量量程放宽至 0–140（实测最高 134）。2026-11-23 按月重组：新增 S0 前传赛季（55 轮 106 条），S1–S5 按月重组（Δ 未动），S5 季末与 S6 开局不变；血量量程仍为 0–140（实测最高 135，S0 OpenAI 季末）。"
   }
  },
  "forecast": {

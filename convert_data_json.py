@@ -10,7 +10,7 @@ it, then ./run.sh.
 Machine extraction path used: local file copy (cp) of the page's
 assets/data.json from the artifact workspace
 ~/workspace/ts-spaces/jin-chan-chan-fu-pan-ai-da-ting-2022-2026/assets/data.json
-into ~/workspace/verification/data.json. No hand transcription of the 558
+into ~/workspace/verification/data.json. No hand transcription of the 751
 increments, no rank-back-computation, no fabricated data. The source file's
 sha256 is recorded in the provenance output and in the raw trace header.
 
@@ -20,44 +20,59 @@ Gu-approved page changes):
   span, recorded throughout. Exact dates convert directly. "YYYY 年 M 月"
   -> YYYYMM01. Ranges take the start day. "年初" -> YYYY0101. "年底"/"年末"
   -> YYYY1201. "上半年" -> YYYY0101. "下半年" -> YYYY0701. "年中" -> YYYY0601.
-  "M 月起" -> YYYYMM01. Consequence: S5:5-1 ("2026 年 11 月 18-19 日")
-  -> 20261118, which resolves to RV-2026.1 while the page's roundRV records
+  "M 月起" -> YYYYMM01. Consequence: S5 2026-11 ("2026 年 11 月 1–21 日")
+  -> 20261101, which resolves to RV-2026.1 while the page's roundRV records
   RV-2026.2 for that round. That is a real C5 round_rv discrepancy (the
-  round straddles the rule-change day); it is reported, not papered over.
-  S3:6-1 ("2024 年 12 月") -> 20241201, one day before RV-2024-12 takes
-  effect (20241202), so it resolves to RV-2024.1 and matches roundRV. The
-  page's month-granularity date cannot distinguish pre/post Dec 2.
+  round straddles the rule-change day); it is reported, not papered over,
+  and the round-span entry in rules/round-spans.json accepts the recorded
+  version (cross-span rule, 2026-11-21). S3 2024-12 ("2024 年 12 月")
+  -> 20241201, one day before RV-2024-12 takes effect (20241202), so it
+  resolves to RV-2024.1 and matches roundRV. The page's month-granularity
+  date cannot distinguish pre/post Dec 2. The four event moves (r1,
+  huang_resign, anthropic_ipo, sec_probe) carry their own true dates
+  (see EVENT_KINDS): the monthly round's earliest day would predate the
+  event and trip the C5 min-date check.
 - Rule table: rules.json is the base. Its ids are translated to the page's
   naming (RV-2022-10->RV-2022.2, RV-2023-10->RV-2023.2,
-  RV-2025-01->RV-2025.1, RV-2026-11->RV-2026.2). Four page versions missing
-  from rules.json are added: RV-2022.1 (pre-control, eff 20220101),
-  RV-2024.1 (eff 20240404, page patch chapter: S3 2024-04-04 BIS revision),
-  RV-2025.2 (eff 20250513, rules.json RV-2025-01 effective_to; page:
-  diffusion rule rescinded 2025-05), RV-2026.1 (eff 20260724, INFERENCE:
+  RV-2025-01->RV-2025.1, RV-2026-11->RV-2026.2). Eight page versions missing
+  from rules.json are added: RV-2018.1..RV-2021.1 (one per prequel year,
+  eff Jan 1 each year, from the page's S0 roundRV), RV-2022.1 (pre-control,
+  eff 20220101), RV-2024.1 (eff 20240404, page patch chapter: S3 2024-04-04
+  BIS revision), RV-2025.2 (eff 20250513, rules.json RV-2025-01 effective_to;
+  page: diffusion rule rescinded 2025-05), RV-2026.1 (eff 20260724, INFERENCE:
   the DHS exclusion 2026-07-24 is the only rule event in that window; the
   page gives no separate version date). RV-2024-12 and RV-2026-07 keep
-  their rules.json ids (no page name). Params are the baseline everywhere
+  their rules.json ids (no page name). A roundRV value of "RV-2026-11"
+  (S6 1-1 records the rules.json id, not the page name) is translated to
+  RV-2026.2 via ROUND_RV_TRANSLATION. Params are the baseline everywhere
   (hp 0-100, penalty floor(borrowed*0.5) on hp, no bans, no unavailable
   cards) except RV-2026.2, which bans overseas_rental (from rules.json).
   effective_to is exclusive (check.py resolve_rules: date >= effective_to
   means the rule no longer applies) and is set to the day before the next
-  global rule takes effect. Moves' rules_version is taken verbatim from
-  data.json roundRV.
-- Moves: player id is the data.json players order mapped to int 0-17
-  (verified identical to the fixture order). hp_start/gold_start are
-  derived by the capped chain (hp capped [0,100] per round, gold uncapped),
-  first round from openings, later rounds from the previous round's end.
-  population = the season-end pop for that player (seasons[].meta; the
-  page has no per-round population). win_streak = 0, roster_stars = 0
-  (pipeline convention for unknown; formulaInputs.gaps keeps them
-  un-verified). borrowed = 0, penalty = 0, liability = false on every move
-  and season_state (no per-move/per-season borrowing is recorded in
-  data.json; the leverage-penalty mechanism is therefore NOT independently
-  verified by this run). action_kind = the round-type slug, except the
-  four unambiguous event actions listed in EVENT_KINDS. semantic_kind =
-  the substantive action thread (ordered text rules in
-  classify_semantic; unclassifiable -> unknown, never force-fit).
-  action_kind is unchanged by the semantic layer.
+  global rule takes effect. Moves' rules_version is taken from data.json
+  roundRV (translated).
+- Moves: player id is the data.json players order mapped to int 0-31
+  (verified identical to the fixture order for the first 18; the 14
+  later players are appended after them, so ids 0-17 are unchanged).
+  hp_start/gold_start are derived by the capped chain (hp capped [0,100]
+  per round, gold uncapped), first round from openings, later rounds from
+  the previous round's end. A season's chain runs only over its own
+  active players (openings keys); S0->S1 is an intentional breakpoint
+  (the S1 openings are frozen starts, not the S0 ends), so no
+  cross-season chain is assumed there. population = the season-end pop
+  for that player (seasons[].meta; the page has no per-round population).
+  win_streak = 0, roster_stars = 0 (pipeline convention for unknown;
+  formulaInputs.gaps keeps them un-verified). borrowed = 0, penalty = 0,
+  liability = false on every move and season_state (no per-move/per-season
+  borrowing is recorded in data.json; the leverage-penalty mechanism is
+  therefore NOT independently verified by this run). action_kind = the
+  round-type slug, except the four unambiguous event actions listed in
+  EVENT_KINDS (located by exact action text: the monthly rebuild puts
+  several events in one round). Each move's date is its round's earliest
+  day, except the four event moves, which carry their own true dates
+  (EVENT_KINDS). semantic_kind = the substantive action thread (ordered
+  text rules in classify_semantic; unclassifiable -> unknown, never
+  force-fit). action_kind is unchanged by the semantic layer.
 - season_state / rankings / hp_series are computed from openings +
   increments (never copied from a second source). Rankings sort by hp_end
   desc, ties by players-array order (page meta.derived).
@@ -94,10 +109,11 @@ Gu-approved page changes):
   players without a card. They are listed in the provenance gaps.
 
 Self-checks (fail loudly, exit non-zero, no silent pass):
-- 558 moves / 31 rounds / 18 players per season.
+- 751 moves / 94 rounds / 32 players over 7 seasons (S0-S6).
 - Every round has a roundRV entry and resolves to a base rule.
-- Cross-season continuity: openings S2-S5 equal the computed prior
-  season ends (breakpoint 0).
+- Cross-season continuity: openings S2-S6 equal the computed prior
+  season ends (breakpoint 0: S1 openings are frozen starts, not the
+  S0 ends, by design).
 - Reconciliation: every one of the 137 entries matches the computed
   season end and new sum.
 - FACTS figures all appear in the page text.
@@ -123,7 +139,9 @@ from pathlib import Path
 
 PLAYERS = ["NVDA", "OAI", "MSFT", "GOOG", "ANTH", "META", "AMZN", "MUSK",
            "AAPL", "ORCL", "BYTE", "ALI", "TCE", "BIDU", "HUAWEI", "DPSK",
-           "TSMC", "SFTB"]
+           "TSMC", "SFTB", "KIMI", "MANUS", "ZHIPU", "MINIMAX",
+           "OPENCLAW", "PANW", "HF", "STAB", "MJ", "AI21", "UCB", "EU",
+           "USGOV", "ACM"]
 PID = {code: i for i, code in enumerate(PLAYERS)}
 
 TYPE_SLUG = {"选秀": "draft", "野怪": "wild", "对战": "battle",
@@ -131,16 +149,34 @@ TYPE_SLUG = {"选秀": "draft", "野怪": "wild", "对战": "battle",
              "决战": "final", "杠杆轮": "leverage", "事件": "event",
              "结算中": "settlement"}
 
-# (season, round_code, player_code, action_kind, why this move is that action)
+# (season, round_code, player_code, exact action text, action_kind,
+#  true date YYYYMMDD, why this move is that action)
+# The monthly rebuild puts several event moves in one round (S5 2026-11
+# holds huang_resign, anthropic_ipo and sec_probe; two of them are NVDA),
+# so (season, round, player) no longer identifies an event move: the
+# exact action text does. The true date is the event's own date,
+# recovered from the old per-round data.json (2026-11-21 snapshot):
+# the monthly round's earliest-day date would predate the event and
+# trip the C5 min-date check (e.g. the round is dated 20261101 but the
+# resignation was announced 20261112). All four true dates are >= the
+# FACTS min-dates (r1 20250120, huang_resign 20261111, anthropic_ipo
+# 20261118, sec_probe 20261117).
 EVENT_KINDS = [
-    ("S4", "1-1", "DPSK", "r1",
-     "move text: R1 发布。AIME 79.8% 对 o1 的 79.2%"),
-    ("S5", "4-1", "NVDA", "huang_resign",
-     "move text: CEO 辞职。单轮重扣"),
-    ("S5", "5-1", "ANTH", "anthropic_ipo",
-     "move text: 分阶段募资到手。绿鞋后合计口径见本轮说明"),
-    ("S5", "6-1", "NVDA", "sec_probe",
-     "move text: SEC 调查报道。恐慌卖出"),
+    ("S4", "2025-01", "DPSK", "R1 发布。AIME 79.8% 对 o1 的 79.2%",
+     "r1", 20250120,
+     "move text: R1 发布。AIME 79.8% 对 o1 的 79.2% (old S4 1-1, "
+     "2025 年 1 月 20 日)"),
+    ("S5", "2026-11", "NVDA", "CEO 辞职。单轮重扣",
+     "huang_resign", 20261112,
+     "move text: CEO 辞职。单轮重扣 (old S5 4-1, 2026 年 11 月 12 日)"),
+    ("S5", "2026-11", "ANTH",
+     "分阶段募资到手。绿鞋后合计口径见本轮说明",
+     "anthropic_ipo", 20261118,
+     "move text: 分阶段募资到手。绿鞋后合计口径见本轮说明 "
+     "(old S5 5-1, 2026 年 11 月 18–19 日)"),
+    ("S5", "2026-11", "NVDA", "SEC 调查报道。恐慌卖出",
+     "sec_probe", 20261120,
+     "move text: SEC 调查报道。恐慌卖出 (old S5 6-1, 2026 年 11 月 20 日)"),
 ]
 
 # ---------------------------------------------------------------- semantic kinds
@@ -172,9 +208,10 @@ EVENT_KINDS = [
 # Rules are ordered, first match wins. Each rule is a substring test on
 # the move's action text, with the player/round scopes noted. The rules
 # were written from a full keyword probe of the 558 move texts
-# (2026-11-21, current data.json); the per-rule hit lists are in
-# design/semantic-kinds.md. Deliberate exclusions (verified by the same
-# probe): "100 亿美元" scoped to MSFT/OAI (ORCL S5 5-1 "债务包约 100 亿
+# (2026-11-21, old data.json); the per-rule hit lists are in
+# design/semantic-kinds.md. The 2026-11-24 re-probe on the 751-move
+# data re-froze the legacy counts (see EXPECTED_LEGACY_COUNTS).
+# Deliberate exclusions (verified by the same probe): "100 亿美元" scoped to MSFT/OAI (ORCL S5 5-1 "债务包约 100 亿
 # 美元未配售曝光" is Oracle debt, not the Microsoft investment);
 # "上市" scoped to ANTH (SFTB S1 2-1 "ARM 上市筹备" is Arm's IPO);
 # "IPO"/"上市" exclude "未上市" (MUSK's "未上市" moves are about not
@@ -207,15 +244,34 @@ SEMANTIC_VOCABULARY = [
 ]
 SEMANTIC_UNKNOWN = "unknown"
 
-# Frozen counts of the 15 legacy kinds on the 2026-11-21 data.json
-# (sha256 07995677...). Regression guard: the second-expansion rules
-# may only classify from the unknown pool, never steal a legacy hit.
-# If any count moves, a new rule (or a data change) stole a hit.
+# Frozen counts of the 15 legacy kinds on the 2026-11-24 data.json
+# (751 moves, 7 seasons S0-S6, sha256 to be recorded in provenance).
+# Re-frozen 2026-11-24: the monthly rebuild changed the counts three
+# ways, each verified move by move (see the re-probe notes in
+# design/semantic-kinds.md):
+# - 11 old S5 moves were dropped by the rebuild (among them the SFTB
+#   "星门资金链被盘问" stargate hit and the MUSK "后续 IPO 排队者窗口
+#   变窄" anthropic_ipo hit): stargate 15 -> 14, anthropic_ipo 8 -> 7
+#   (after the 承诺 scope fix below).
+# - New genuine hits from the added moves: S0 "OpenAI发布ChatGPT"
+#   (chatgpt), S4 "ChatGPT Atlas 发布" / "俄勒冈州索赔...ChatGPT..."
+#   / "GPT-6.2 Astra 与 Sol 发布。ChatGPT Work..." (chatgpt),
+#   S4 "R1-0528 发布" / "腾讯云一键部署 R1" (r1), S4 "DeepSeek V3.1
+#   发布" / "DeepSeek V3.2 发布" (v3), S5 four MUSK Grok/xAI moves
+#   (spacex_xai), S5 "台积电执行 BIS 规则" (bis_rule), S6 "BIS 将
+#   Megaspeed 及 6 家关联实体列入实体清单" (bis_rule).
+# - The two round-code scopes moved with the rebuild: S4 DeepSeek
+#   scope 1-1 -> 2025-01 (TCE "元宝接入 DeepSeek", ORCL "DeepSeek
+#   冲击下企业单未丢" stay r1), S5 ANTH 承诺 scope 1-1 -> 2026-11
+#   (the "9009 亿美元承诺签字方" move re-sorted into the IPO month).
+# Regression guard, as before: the second-expansion rules may only
+# classify from the unknown pool, never steal a legacy hit. If any
+# count moves, a new rule (or a data change) stole a hit.
 EXPECTED_LEGACY_COUNTS = {
-    "stargate": 15, "anthropic_ipo": 8, "msft_invest": 7,
-    "blackwell": 6, "r1": 6, "musk_table": 6, "colossus": 4,
-    "spacex_xai": 4, "doubao_price_war": 4, "bis_rule": 4,
-    "chatgpt": 3, "v3": 2, "overseas_rental": 2,
+    "stargate": 14, "anthropic_ipo": 7, "msft_invest": 7,
+    "blackwell": 6, "r1": 8, "musk_table": 6, "colossus": 4,
+    "spacex_xai": 8, "doubao_price_war": 4, "bis_rule": 6,
+    "chatgpt": 7, "v3": 4, "overseas_rental": 2,
     "huang_resign": 1, "sec_probe": 1,
 }
 
@@ -236,7 +292,7 @@ def classify_semantic(action, player, season, round_code):
         return "spacex_xai"
     if "马斯克" in t or (player == "MUSK" and "推特" in t):
         return "musk_table"
-    if "R1" in t or (season == "S4" and round_code == "1-1"
+    if "R1" in t or (season == "S4" and round_code == "2025-01"
                      and "DeepSeek" in t):
         return "r1"
     if "V3" in t:
@@ -254,7 +310,7 @@ def classify_semantic(action, player, season, round_code):
         return "anthropic_ipo"
     if player == "ANTH" and "募资" in t:
         return "anthropic_ipo"
-    if (player == "ANTH" and season == "S5" and round_code == "1-1"
+    if (player == "ANTH" and season == "S5" and round_code == "2026-11"
             and "承诺" in t):
         return "anthropic_ipo"
     if ((player in ("MSFT", "OAI") and "100 亿美元" in t)
@@ -336,7 +392,24 @@ FACT_STRINGS = {
 
 # (rule_id, version, name, effective_from, effective_to, trigger,
 #  trigger_type, applies_to_players, banned_action_kinds, note)
+# Prequel rules RV-2018.1..RV-2021.1 (added 2026-11-24): the page's
+# roundRV records one rule version per prequel year (S0 rounds), and
+# the trace needs a base rule in effect for every move date. Baseline
+# params, same as RV-2022.1 ("管制前"); they are page versions, not
+# rules.json entries, like RV-2022.1/RV-2024.1/RV-2025.2/RV-2026.1.
 RULES_SPEC = [
+    ("RV-2018.1", "2018-01", "管制前（S0 前传）", 20180101, 20190101,
+     "2018 年：尚无针对先进 AI 芯片的出口管制", "none", None, [],
+     "page roundRV: S0 2018 rounds; not in rules.json"),
+    ("RV-2019.1", "2019-01", "管制前（S0 前传）", 20190101, 20200101,
+     "2019 年：尚无针对先进 AI 芯片的出口管制", "none", None, [],
+     "page roundRV: S0 2019 rounds; not in rules.json"),
+    ("RV-2020.1", "2020-01", "管制前（S0 前传）", 20200101, 20210101,
+     "2020 年：尚无针对先进 AI 芯片的出口管制", "none", None, [],
+     "page roundRV: S0 2020 rounds; not in rules.json"),
+    ("RV-2021.1", "2021-01", "管制前（S0 前传）", 20210101, 20220101,
+     "2021 年：尚无针对先进 AI 芯片的出口管制", "none", None, [],
+     "page roundRV: S0 2021 rounds; not in rules.json"),
     ("RV-2022.1", "2022-01", "管制前", 20220101, 20221007,
      "2022 年初：尚无针对先进 AI 芯片的出口管制", "none", None, [],
      "page patch chapter: S1 pre-2022-10-07; not in rules.json"),
@@ -377,6 +450,15 @@ OVERLAY_SPEC = ("RV-2026-07", "2026-07", "DHS 排除令 #2026-01", 20260724,
                 "procurement_exclusion", [15], [],
                 "rules.json RV-2026-07 (DHS overlay, applies to HUAWEI=15)")
 
+# rules.json ids -> page names, applied to roundRV values before they
+# are recorded on moves. The S6 1-1 round records the rules.json id
+# "RV-2026-11" where every other round records the page name
+# "RV-2026.2"; without the translation the recorded version would
+# match no rule in the trace and C5/Lean ruleVersionAccepted would
+# fail. A roundRV value that is neither a page name nor a known
+# rules.json id fails loudly (see main()).
+ROUND_RV_TRANSLATION = {"RV-2026-11": "RV-2026.2"}
+
 # Pipeline actor vocabulary (fixture shape). The page displays six seats
 # (BIS·财政部·国安会 as one seat); DHS is a separate actor in the page's
 # patch text. No rule_actions are copied from the fixture.
@@ -409,7 +491,7 @@ GAPS = [
     "borrowed principal (leverage penalty input): no source; "
     "season_state.borrowed = 0, penalty = 0, liability = false; the "
     "leverage-penalty mechanism is NOT independently verified by this run",
-    "key-card coverage: 8 of 18 players have no card in playerCards; "
+    "key-card coverage: 13 of 32 players have no card in playerCards; "
     "no source assigns them one",
     "event/policy cards (4, cost null) and the dateless 昇腾 card are not "
     "in trace key_cards (not pool cards / no date); they remain in the "
@@ -418,7 +500,8 @@ GAPS = [
     "goal_checks are empty: the page's rule chapter is prose, never "
     "structurally extracted; C10-C12 therefore check nothing (0 rows)",
     "known real doc numbers not yet attached to any rule_action: "
-    "87 FR 62186, 2026-23529, 91 FR 66346 (for the future rule-action "
+    "87 FR 62186, 2026-23529, 91 FR 66346, 2026-23999 (Megaspeed "
+    "entity listing, 2026-11-23) (for the future rule-action "
     "extraction task)",
     "page in-page fnv1a (8d90a977 per MEMORY, v13) could not be reproduced "
     "from the raw data.json bytes (raw c56c2078, compact-utf8 9d393414, "
@@ -545,18 +628,28 @@ def main():
     # --- players --------------------------------------------------------
     if [p["id"] for p in data["players"]] != PLAYERS:
         fail("data.json players order changed; int-id mapping needs review")
+    openings = data["openings"]
+    first_season, last_season = {}, {}
+    for si0, s0 in enumerate(data["seasons"]):
+        for pcode in openings[s0["id"]]["hp"]:
+            first_season.setdefault(pcode, si0)
+            last_season[pcode] = si0
     players = [{"id": PID[p["id"]], "name": p["name"], "key": p["id"],
-                "first_season": 1, "last_season": 5}
+                "first_season": first_season[p["id"]],
+                "last_season": last_season[p["id"]]}
                for p in data["players"]]
     pname = {PID[p["id"]]: p["name"] for p in data["players"]}
 
     # --- seasons, rounds, moves, chains ---------------------------------
     seasons = data["seasons"]
     round_rv = data.get("roundRV", {})
-    if len(round_rv) != 31:
-        fail(f"roundRV has {len(round_rv)} entries, expected 31")
-    openings = data["openings"]
-    event_map = {(s, c, p): k for (s, c, p, k, _why) in EVENT_KINDS}
+    if len(round_rv) != 94:
+        fail(f"roundRV has {len(round_rv)} entries, expected 94")
+    # translate rules.json ids to page names (S6 1-1 records RV-2026-11)
+    round_rv = {k: ROUND_RV_TRANSLATION.get(v, v)
+                for k, v in round_rv.items()}
+    event_map = {(s, c, p, t): (k, d)
+                 for (s, c, p, t, k, d, _why) in EVENT_KINDS}
 
     # rules for the trace
     formulas = data["formulas"]
@@ -593,6 +686,11 @@ def main():
                   "trigger": otrig, "trigger_type": ottype,
                   "applies_to_players": oapplies,
                   "params": base_params(obanned), "note": onote})
+    # every translated roundRV value must name a rule in the trace
+    known_rule_ids = {r["rule_id"] for r in rules}
+    for k, v in round_rv.items():
+        if v not in known_rule_ids:
+            fail(f"roundRV {k} records unknown rule version {v!r}")
 
     out_seasons, moves = [], []
     season_state, rankings, hp_series = [], [], []
@@ -600,11 +698,12 @@ def main():
     season_open = {}          # (season_no, pid) -> (hp_start, gold_start)
     gold_negative_log = []
     rv_mismatch_log = []
-    for si, s in enumerate(seasons, start=1):
+    for si, s in enumerate(seasons, start=0):
         sid = s["id"]
         if sid != "S%d" % si:
             fail(f"seasons out of order: {sid} at position {si}")
         pop = {e["id"]: e["pop"] for e in s["meta"]}
+        active_pids = sorted(PID[c] for c in openings[sid]["hp"])
         sdate = parse_cn_date(s.get("start"))
         edate = parse_cn_date(s.get("end"))
         if sdate is None or edate is None:
@@ -612,6 +711,7 @@ def main():
                  f"{s.get('start')!r} / {s.get('end')!r}")
         rounds = s["rounds"]
         last_rv = None
+        season_moves = 0
         for ri, r in enumerate(rounds, start=1):
             key = "%s:%s" % (sid, r["code"])
             if key not in round_rv:
@@ -633,25 +733,30 @@ def main():
             if r["type"] not in TYPE_SLUG:
                 fail(f"{key}: unknown round type {r['type']!r}")
             kind = TYPE_SLUG[r["type"]]
-            if len(r["moves"]) != 18:
-                fail(f"{key}: {len(r['moves'])} moves, expected 18")
+            # monthly rounds hold a variable number of moves (S0: 1-5,
+            # S1-S5: 1-117 per round); no fixed per-round count. Every
+            # move's player must be active in the season (openings).
             for (pcode, action, hpd, gd) in r["moves"]:
+                if pcode not in openings[sid]["hp"]:
+                    fail(f"{key}: move for {pcode}, not active in {sid}")
                 pid = PID[pcode]
+                ev = event_map.get((sid, r["code"], pcode, action))
+                mdate = ev[1] if ev else rdate
                 moves.append({"season": si, "round_index": ri,
                               "round_label": r["code"], "player": pid,
                               "hp_delta": hpd, "gold_delta": gd,
-                              "action_kind": event_map.get(
-                                  (sid, r["code"], pcode), kind),
+                              "action_kind": ev[0] if ev else kind,
                               "semantic_kind": classify_semantic(
                                   action, pcode, sid, r["code"]),
-                              "action": action, "date": rdate,
+                              "action": action, "date": mdate,
                               "hp_start": None, "gold_start": None,
                               "population": pop[pcode], "win_streak": 0,
                               "roster_stars": 0, "borrowed": 0,
                               "liability": False,
                               "rules_version": round_rv[key]})
+                season_moves += 1
         # chain per player (openings -> capped hp, uncapped gold)
-        for pid in range(18):
+        for pid in active_pids:
             pcode = PLAYERS[pid]
             cur_hp = openings[sid]["hp"][pcode]
             cur_gold = openings[sid]["gold"][pcode]
@@ -675,19 +780,24 @@ def main():
         out_seasons.append({"season": si, "name": sid,
                             "start_date": sdate, "end_date": edate,
                             "rounds": len(rounds),
-                            "active_players": list(range(18)),
+                            "moves": season_moves,
+                            "active_players": active_pids,
                             "rules_version": last_rv})
         # rankings: hp_end desc, ties by players-array order
-        order = sorted(range(18),
+        order = sorted(active_pids,
                        key=lambda pid: (-season_ends[(si, pid)][0], pid))
         for rank, pid in enumerate(order, start=1):
             rankings.append({"season": si, "player": pid, "rank": rank,
                              "hp_end": season_ends[(si, pid)][0],
                              "gold_end": season_ends[(si, pid)][1]})
-    for pid in range(18):
+    # hp series: one point per season in which the player is active
+    active_seasons = {pid: [si for si in range(7)
+                            if pid in out_seasons[si]["active_players"]]
+                      for pid in range(32)}
+    for pid in range(32):
         hp_series.append({"player": pid,
                           "points": [season_ends[(si, pid)][0]
-                                     for si in range(1, 6)]})
+                                     for si in active_seasons[pid]]})
 
     # --- semantic-kind consistency --------------------------------------
     # The four EVENT_KINDS moves must classify to their event kind (the
@@ -695,11 +805,12 @@ def main():
     # vocabulary. Distribution is logged, not failed (unknown is a
     # legitimate outcome: unclassifiable moves are not force-fit).
     sem_dist = Counter(m["semantic_kind"] for m in moves)
-    for (s, c, p, k, _why) in EVENT_KINDS:
+    for (s, c, p, text, k, _date, _why) in EVENT_KINDS:
         got = next((m["semantic_kind"] for m in moves
                     if m["season"] == int(s[1:])
                     and m["round_label"] == c
-                    and PLAYERS[m["player"]] == p), None)
+                    and PLAYERS[m["player"]] == p
+                    and m["action"] == text), None)
         if got != k:
             fail(f"semantic kind mismatch: {s} {c} {p} classified "
                  f"{got!r}, expected event kind {k!r}")
@@ -713,14 +824,24 @@ def main():
                  f"{got}, expected {want} (a new rule stole a legacy hit "
                  f"or the source data changed)")
 
-    if len(moves) != 558:
-        fail(f"moves total {len(moves)}, expected 558")
+    if len(moves) != 751:
+        fail(f"moves total {len(moves)}, expected 751")
 
-    # --- cross-season continuity (openings S2-S5 == prior season ends) --
-    for si in range(2, 6):
+    # --- cross-season continuity (openings S2-S6 == prior season ends) --
+    # S1 is excluded on purpose: the S0->S1 breakpoint is intentional
+    # (S1 openings are frozen starts, not the S0 ends).
+    joins = []  # (season, player): joins with no prior-season end
+    for si in range(2, 7):
         sid = "S%d" % si
-        for pid in range(18):
+        prev_sid = "S%d" % (si - 1)
+        for pid in range(32):
             pcode = PLAYERS[pid]
+            if pcode not in openings[sid]["hp"]:
+                continue
+            if pcode not in openings[prev_sid]["hp"]:
+                # joins this season: fresh start, no prior end to match
+                joins.append({"season": sid, "player": pcode})
+                continue
             if openings[sid]["hp"][pcode] != season_ends[(si - 1, pid)][0]:
                 fail(f"cross-season break: {sid} {pcode} hp opening "
                      f"{openings[sid]['hp'][pcode]} != "
@@ -845,18 +966,26 @@ def main():
                    "note": "machine copy (cp) of page assets/data.json; "
                            "no hand transcription, no rank back-computation"},
         "page_version": "v13 (per parent handoff 2026-11-21 19:48 CST)",
-        "counts": {"moves": len(moves), "rounds": 31, "players": 18,
-                   "seasons": 5, "holdings": len(holdings),
+        "counts": {"moves": len(moves),
+                   "rounds": sum(s["rounds"] for s in out_seasons),
+                   "players": 32, "seasons": 7,
+                   "holdings": len(holdings),
                    "key_cards": len(key_cards),
                    "key_cards_in_source": len(data["keyCards"]),
                    "reconciliation_checked": rec_checked},
         "facts_cross_check": fact_checks,
         "roundRV_vs_resolved_rule_mismatches": rv_mismatch_log,
+        "roundRV_translated": {k: v for k, v in
+                               data.get("roundRV", {}).items()
+                               if ROUND_RV_TRANSLATION.get(v, v) != v},
+        "season_joins": joins,
         "gold_negative_mid_chain": gold_negative_log,
         "excluded_holdings": excluded_holdings,
         "excluded_key_cards": excluded_cards,
-        "event_kinds": [{"season": s, "round": c, "player": p, "kind": k,
-                         "why": w} for (s, c, p, k, w) in EVENT_KINDS],
+        "event_kinds": [{"season": s, "round": c, "player": p,
+                         "action": t, "kind": k, "true_date": d,
+                         "why": w}
+                        for (s, c, p, t, k, d, w) in EVENT_KINDS],
         "semantic_kinds": {
             "vocabulary": SEMANTIC_VOCABULARY,
             "unknown_marker": SEMANTIC_UNKNOWN,

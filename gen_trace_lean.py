@@ -245,8 +245,13 @@ def main():
     a("")
     seasons = []
     for s in trace["seasons"]:
+        # SeasonInfo is (season, rounds, moves, activePlayers); moves
+        # is the converter-recorded season move total. Old traces
+        # without it fall back to rounds * players (the old shape).
+        moves_n = s.get("moves", s["rounds"] * len(s["active_players"]))
         seasons.append(
-            f"⟨{s['season']}, {s['rounds']}, {s['active_players']}⟩")
+            f"⟨{s['season']}, {s['rounds']}, {moves_n}, "
+            f"{s['active_players']}⟩")
     a(f"def traceSeasons : List SeasonInfo := [{', '.join(seasons)}]")
     a("")
     rules = []
@@ -396,22 +401,38 @@ def main():
       f"[{', '.join(f'({lean_str(c)}, {d})' for c, d in card_min)}]")
     a("")
     # --- dynamics initial states --------------------------------------
-    first_season = min(s["season"] for s in trace["seasons"])
+    # One initial state per (player, season) segment (one per
+    # season_state row): the season opening, the base rule in effect
+    # at the season's start date, and the season start as the date
+    # (so rule.effectiveFrom <= date holds for dynInvariant).
+    # Segments, not whole player trajectories: the S0->S1 breakpoint
+    # is intentional (S1 openings are frozen starts, not the S0
+    # ends), so a single continuous trajectory per player does not
+    # exist. checkDynamics runs each segment from its own opening.
     global_rules = [r for r in trace["rules"]
                     if not r.get("applies_to_players")]
-    first_rule = min(global_rules,
-                     key=lambda r: to_date(r["effective_from"]))
+    season_start = {s["season"]: s["start_date"]
+                    for s in trace["seasons"]}
+
+    def base_rule_at(date):
+        cands = [r for r in global_rules
+                 if to_date(r["effective_from"]) <= date
+                 and (not r.get("effective_to")
+                      or date < to_date(r["effective_to"]))]
+        if not cands:
+            raise ValueError(f"no base rule in effect at {date}")
+        return max(cands, key=lambda r: to_date(r["effective_from"]))
+
     inits = []
-    for p in players:
-        st = next(s for s in trace["season_state"]
-                  if s["season"] == first_season
-                  and s["player"] == p["id"])
+    for st in trace["season_state"]:
+        start_date = season_start[st["season"]]
+        start_rule = base_rule_at(start_date)
         inits.append(
-            f"⟨{p['id']}, {st['hp_start']}, {st['gold_start']}, "
-            f"false, false, {rule_id[first_rule['rule_id']]}, "
-            f"{to_date(first_rule['effective_from'])}, {first_season}⟩")
-    a("-- dynamics: one initial state per player (first season start, "
-      "earliest global rule in effect).")
+            f"⟨{st['player']}, {st['hp_start']}, {st['gold_start']}, "
+            f"false, false, {rule_id[start_rule['rule_id']]}, "
+            f"{start_date}, {st['season']}⟩")
+    a("-- dynamics: one initial state per (player, season) segment "
+      "(the season opening, base rule in effect at the season start).")
     a(f"def traceDynInit : List DState := [{', '.join(inits)}]")
     a("")
     a("end Jjc")
@@ -425,12 +446,13 @@ def main():
 
     if args.modular:
         out_dir = Path(args.out).parent
-        # per-player expected move counts (active seasons only)
+        # per-player actual move counts (monthly structure: a player
+        # may act several times in one round or not at all, so the
+        # old rounds-in-active-seasons count is not the move count).
         per_player = {}
         for p in players:
             per_player[p["id"]] = sum(
-                s["rounds"] for s in trace["seasons"]
-                if p["id"] in s["active_players"])
+                1 for m in trace["moves"] if m["player"] == p["id"])
         pl = ["-- MACHINE GENERATED from trace.json. Do not edit by hand.",
               "import Verification.Model",
               "import Verification.Trace", "",
@@ -462,11 +484,14 @@ def main():
               "namespace Jjc", ""]
         for s in trace["seasons"]:
             sid = s["season"]
+            moves_n = s.get("moves", s["rounds"]
+                            * len(s["active_players"]))
             sl.append(f"-- season {sid}: counts + ledger on this season only.")
             sl.append(
                 f"theorem counts_season_{sid} : checkCounts "
                 f"(traceMoves.filter fun m => m.season == {sid}) "
-                f"[⟨{sid}, {s['rounds']}, {s['active_players']}⟩] "
+                f"[⟨{sid}, {s['rounds']}, {moves_n}, "
+                f"{s['active_players']}⟩] "
                 f"= true := by native_decide")
             sl.append(
                 f"theorem ledger_season_{sid} : checkLedger traceRules "
