@@ -29,35 +29,35 @@
         },
         {
           "excerpt": "Bessent 10 天通牒约 11-25 到期。",
-          "published_at": null,
-          "publisher": "美国财政部 (Bessent)",
+          "published_at": "2026-11-15",
+          "publisher": "美国财政部（Bessent）",
           "retrieved_at": "2026-11-22",
-          "source_url": null,
-          "verification_result": "unverified"
+          "source_url": "https://casrai.org/news/bessent-nvidia-outside-ceo-2026",
+          "verification_result": "verified"
         },
         {
-          "excerpt": "FT 11-20 调查 Aivres–Megaspeed 46 亿美元通道。",
-          "published_at": "2026-11-20",
+          "excerpt": "FT 11-21 调查 Aivres–Megaspeed 46 亿美元通道。",
+          "published_at": "2026-11-21",
           "publisher": "Financial Times",
           "retrieved_at": "2026-11-22",
-          "source_url": "Financial Times, 2026-11-20 (Aivres–Megaspeed investigation)",
+          "source_url": "https://www.ft.com/content/f3ad8a81-3890-4a8a-8853-ff0a94b08ba9",
           "verification_result": "verified"
         },
         {
           "excerpt": "众议院 12-01 闭门访谈、参议院作证。",
-          "published_at": null,
+          "published_at": "2026-11-12",
           "publisher": "美国众议院 / 参议院",
           "retrieved_at": "2026-11-22",
-          "source_url": null,
-          "verification_result": "unverified"
+          "source_url": "https://www.nacionale.com/en/articles/will-jensen-huang-testify-under-oath-closed-door-congress-what-it-means",
+          "verification_result": "verified"
         },
         {
           "excerpt": "英伟达 2025-06 起内部禁售名单含 Megaspeed。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-11-16",
+          "publisher": "美国商务部 / 司法部（联合声明）",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://www.channelnewsasia.com/business/us-megaspeed-probe-jensen-huang-nvidia-2024-6557971?cid=internal_sharetool_iphone_17112026_cna",
+          "verification_result": "verified"
         },
         {
           "excerpt": "路透 SEC 会计调查报道。",
@@ -89,7 +89,7 @@
       "rule_version": "RV-2026-11",
       "status": "resolved",
       "type": "policy_regulatory",
-      "world_state_version": "data.json 751 条动作、32 名玩家、94 轮（2026-11-24）"
+      "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
     },
     {
       "agent": "roleplay",
@@ -104,22 +104,22 @@
       "evidence_snapshot": [
         {
           "excerpt": "Azure AI 需求强劲。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-10-28",
+          "publisher": "微软",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://www.businesstimes.com.sg/companies-markets/microsofts-cloud-growth-cash-flow-offer-respite-ai-spending-fears",
+          "verification_result": "verified"
         },
         {
           "excerpt": "微软资本开支为 AI 基建持续上升。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-10-28",
+          "publisher": "微软",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://www.businesstimes.com.sg/companies-markets/microsofts-cloud-growth-cash-flow-offer-respite-ai-spending-fears",
+          "verification_result": "verified"
         },
         {
-          "excerpt": "微软是 OpenAI 主要投资方（星门项目）。",
+          "excerpt": "微软是 OpenAI 主要投资方。",
           "published_at": "2026-11-22",
           "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
           "retrieved_at": "2026-11-22",
@@ -128,19 +128,19 @@
         },
         {
           "excerpt": "FY26 Q1 财报 Azure 增长强劲。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-10-28",
+          "publisher": "微软",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://www.businesstimes.com.sg/companies-markets/microsofts-cloud-growth-cash-flow-offer-respite-ai-spending-fears",
+          "verification_result": "verified"
         },
         {
           "excerpt": "微软在建数据中心。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-07-29",
+          "publisher": "微软",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://www.zacks.com/stock/news/2983729/microsofts-ai-datacenter-expansion-a-game-changer-for-the-stock",
+          "verification_result": "verified"
         }
       ],
       "forecast_id": "S6-FC-02",
@@ -164,7 +164,7 @@
       "rule_version": "RV-2026-11",
       "status": "open",
       "type": "infra_capex",
-      "world_state_version": "data.json 751 条动作、32 名玩家、94 轮（2026-11-24）"
+      "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
     },
     {
       "agent": "roleplay",
@@ -180,18 +180,18 @@
         {
           "excerpt": "Gemini 4 Neon 11-18 发布。",
           "published_at": "2026-11-18",
-          "publisher": "谷歌 (Google DeepMind)",
+          "publisher": "谷歌（Google DeepMind）",
           "retrieved_at": "2026-11-22",
-          "source_url": "Google, 2026-11-18 (Gemini 4 Neon release)",
-          "verification_result": "unverified"
+          "source_url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/?utm_source=deepmind.google&utm_medium=referral&utm_campaign=gdm&utm_content=",
+          "verification_result": "verified"
         },
         {
           "excerpt": "OpenAI GPT-6.2 11-17 发布。",
           "published_at": "2026-11-17",
           "publisher": "OpenAI",
           "retrieved_at": "2026-11-22",
-          "source_url": "OpenAI, 2026-11-17 (GPT-6.2 release)",
-          "verification_result": "unverified"
+          "source_url": "https://community.openai.com/t/gpt-6-2-astra-and-sol-are-now-available/1417531?ref=apidog.com",
+          "verification_result": "verified"
         },
         {
           "excerpt": "谷歌与 OpenAI 模型发布节奏竞逐。",
@@ -231,7 +231,7 @@
       "rule_version": "RV-2026-11",
       "status": "open",
       "type": "model_release",
-      "world_state_version": "data.json 751 条动作、32 名玩家、94 轮（2026-11-24）"
+      "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
     },
     {
       "agent": "roleplay",
@@ -246,35 +246,35 @@
       "evidence_snapshot": [
         {
           "excerpt": "台积电 2nm 为下一代制程、在爬坡。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-10-15",
+          "publisher": "台积电（TSMC）",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2026-10/eba4fac72873bf546b669bd2b5d973df5c93215d/TSMC%203Q26%20Transcript.pdf",
+          "verification_result": "verified"
         },
         {
           "excerpt": "CoWoS 先进封装是瓶颈。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-07-16",
+          "publisher": "台积电（TSMC）",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://siliconanalysts.com/analysis/foundry-allocation-status-q1-2026",
+          "verification_result": "verified"
         },
         {
           "excerpt": "台积电 11-20 叫停 16nm 及以下中国客户订单。",
           "published_at": "2026-11-20",
-          "publisher": "台积电 (TSMC)",
+          "publisher": "Reuters",
           "retrieved_at": "2026-11-22",
-          "source_url": "TSMC, 2026-11-20 (suspension of <=16nm orders for China customers)",
-          "verification_result": "unverified"
+          "source_url": "https://www.businesstimes.com.sg/international/global/tsmc-reportedly-tightens-china-ai-chip-curbs-new-us-rules-close-manufacturing-loophole",
+          "verification_result": "verified"
         },
         {
           "excerpt": "亚利桑那厂在扩。",
-          "published_at": "2026-11-22",
-          "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+          "published_at": "2026-10-15",
+          "publisher": "台积电（TSMC）",
           "retrieved_at": "2026-11-22",
-          "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
-          "verification_result": "unverified"
+          "source_url": "https://azbigmedia.com/business/tsmc-arizona-accelerates-production-timeline-as-earnings-soar/",
+          "verification_result": "verified"
         },
         {
           "excerpt": "AI 需求拉动先进制程。",
@@ -306,7 +306,7 @@
       "rule_version": "RV-2026-11",
       "status": "open",
       "type": "chip_supply",
-      "world_state_version": "data.json 751 条动作、32 名玩家、94 轮（2026-11-24）"
+      "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
     }
   ],
   "meta": {
@@ -320,7 +320,7 @@
     "source_date": "2026-11-22",
     "source_document": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
     "source_method": "~/workspace/verification-v1-round10/design/method-roleplay.md",
-    "updated": "2026-11-24"
+    "updated": "2026-11-25"
   },
   "resolutions": [
     {
@@ -443,7 +443,7 @@
       },
       "created_at": "2026-11-22",
       "forecast_id": "S6-FC-01",
-      "superseded_by": null,
+      "superseded_by": 2,
       "supersedes": null,
       "version": 1
     },
@@ -526,7 +526,7 @@
       },
       "created_at": "2026-11-22",
       "forecast_id": "S6-FC-02",
-      "superseded_by": null,
+      "superseded_by": 2,
       "supersedes": null,
       "version": 1
     },
@@ -601,7 +601,7 @@
       },
       "created_at": "2026-11-22",
       "forecast_id": "S6-FC-03",
-      "superseded_by": null,
+      "superseded_by": 2,
       "supersedes": null,
       "version": 1
     },
@@ -684,9 +684,349 @@
       },
       "created_at": "2026-11-22",
       "forecast_id": "S6-FC-04",
-      "superseded_by": null,
+      "superseded_by": 2,
       "supersedes": null,
       "version": 1
+    },
+    {
+      "change": "世界状态版本修正为信息截止时间的 trace（2026-11-22，558 条动作），原值误写 2026-11-24 的 751 条世界；证据 E3、E5、E6 补来源并标已核实；E4 日期 11-20 改为 11-21 并补 FT 来源，标已核实。",
+      "content": {
+        "agent": "roleplay",
+        "assumptions": [
+          "无。原文未列出独立假设。"
+        ],
+        "author": "roleplay-run-2026-11-22",
+        "counter_evidence": [
+          "无。原文未列出反证据。"
+        ],
+        "created_at": "2026-11-22",
+        "evidence_snapshot": [
+          {
+            "excerpt": "BIS 远程接入规则 11-16 发布、11-19 生效。",
+            "published_at": "2026-11-16",
+            "publisher": "美国商务部产业安全局 (BIS) / Federal Register",
+            "retrieved_at": "2026-11-22",
+            "source_url": "Federal Register document 2026-23529 (91 FR 74970)",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "Megaspeed 未列入实体清单。",
+            "published_at": null,
+            "publisher": "BIS (entity list)",
+            "retrieved_at": "2026-11-22",
+            "source_url": null,
+            "verification_result": "unverified"
+          },
+          {
+            "excerpt": "Bessent 10 天通牒约 11-25 到期。",
+            "published_at": "2026-11-15",
+            "publisher": "美国财政部（Bessent）",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://casrai.org/news/bessent-nvidia-outside-ceo-2026",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "FT 11-21 调查 Aivres–Megaspeed 46 亿美元通道。",
+            "published_at": "2026-11-21",
+            "publisher": "Financial Times",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.ft.com/content/f3ad8a81-3890-4a8a-8853-ff0a94b08ba9",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "众议院 12-01 闭门访谈、参议院作证。",
+            "published_at": "2026-11-12",
+            "publisher": "美国众议院 / 参议院",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.nacionale.com/en/articles/will-jensen-huang-testify-under-oath-closed-door-congress-what-it-means",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "英伟达 2025-06 起内部禁售名单含 Megaspeed。",
+            "published_at": "2026-11-16",
+            "publisher": "美国商务部 / 司法部（联合声明）",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.channelnewsasia.com/business/us-megaspeed-probe-jensen-huang-nvidia-2024-6557971?cid=internal_sharetool_iphone_17112026_cna",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "路透 SEC 会计调查报道。",
+            "published_at": null,
+            "publisher": "Reuters",
+            "retrieved_at": "2026-11-22",
+            "source_url": "Reuters (SEC accounting investigation report)",
+            "verification_result": "unverified"
+          }
+        ],
+        "forecast_id": "S6-FC-01",
+        "forecast_type": "external_event",
+        "information_cutoff": "2026-11-22",
+        "method_version": "method-roleplay.md（round10，含第 2.5 步防呆）",
+        "model_version": "roleplay",
+        "participants": [
+          {
+            "persona": "Colette Kress",
+            "persona_role": "英伟达临时 CEO",
+            "player": "NVDA",
+            "role_in_forecast": "角色扮演 persona"
+          }
+        ],
+        "probability": 0.6,
+        "proposition": "2026-12-31 前美国商务部将 Megaspeed 列入实体清单。",
+        "reasoning_summary": "角色自由文字：BIS 的远程接入规则已经生效，Megaspeed 的事闹得很大，Bessent 在盯着，众议院要 12 月 1 日闭门谈。英伟达内部早就把 Megaspeed 列入禁售名单，合规不能出岔子。这轮最可能的事是商务部把 Megaspeed 列入实体清单，把口子彻底堵上。防呆检查（第 2.5 步）：这轮最可能做的事（BIS 列入实体清单）与决策者最在意的事（芯片不再被转手、过国会审查）是同一件，都是堵住 Megaspeed 转手口子。正常把握。映射（第 3 步）：BIS 的远程接入规则、列入实体清单、合规指向 policy_regulatory。",
+        "resolution_criteria": "发生：美国商务部（BIS）在 2026-12-31（含当日）前将 Megaspeed 列入实体清单。未发生：截至 2026-12-31，BIS 未将 Megaspeed 列入实体清单。",
+        "resolution_deadline": "2026-12-31",
+        "rule_version": "RV-2026-11",
+        "status": "resolved",
+        "type": "policy_regulatory",
+        "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
+      },
+      "created_at": "2026-11-25",
+      "forecast_id": "S6-FC-01",
+      "superseded_by": null,
+      "supersedes": 1,
+      "version": 2
+    },
+    {
+      "change": "世界状态版本修正为信息截止时间的 trace（2026-11-22，558 条动作）；证据 E1、E2、E4、E5 补来源并标已核实；E3 删除与事实不符的星门项目括号，仍标未核实。",
+      "content": {
+        "agent": "roleplay",
+        "assumptions": [
+          "无。原文未列出独立假设。"
+        ],
+        "author": "roleplay-run-2026-11-22",
+        "counter_evidence": [
+          "无。原文未列出反证据。"
+        ],
+        "created_at": "2026-11-22",
+        "evidence_snapshot": [
+          {
+            "excerpt": "Azure AI 需求强劲。",
+            "published_at": "2026-10-28",
+            "publisher": "微软",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.businesstimes.com.sg/companies-markets/microsofts-cloud-growth-cash-flow-offer-respite-ai-spending-fears",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "微软资本开支为 AI 基建持续上升。",
+            "published_at": "2026-10-28",
+            "publisher": "微软",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.businesstimes.com.sg/companies-markets/microsofts-cloud-growth-cash-flow-offer-respite-ai-spending-fears",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "微软是 OpenAI 主要投资方。",
+            "published_at": "2026-11-22",
+            "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+            "retrieved_at": "2026-11-22",
+            "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
+            "verification_result": "unverified"
+          },
+          {
+            "excerpt": "FY26 Q1 财报 Azure 增长强劲。",
+            "published_at": "2026-10-28",
+            "publisher": "微软",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.businesstimes.com.sg/companies-markets/microsofts-cloud-growth-cash-flow-offer-respite-ai-spending-fears",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "微软在建数据中心。",
+            "published_at": "2026-07-29",
+            "publisher": "微软",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.zacks.com/stock/news/2983729/microsofts-ai-datacenter-expansion-a-game-changer-for-the-stock",
+            "verification_result": "verified"
+          }
+        ],
+        "forecast_id": "S6-FC-02",
+        "forecast_type": "state",
+        "information_cutoff": "2026-11-22",
+        "method_version": "method-roleplay.md（round10，含第 2.5 步防呆）",
+        "model_version": "roleplay",
+        "participants": [
+          {
+            "persona": "Amy Hood",
+            "persona_role": "微软 CFO",
+            "player": "MSFT",
+            "role_in_forecast": "角色扮演 persona"
+          }
+        ],
+        "probability": 0.7,
+        "proposition": "2027-01-31 前微软在 FY26 Q2 财报中确认资本开支同比上升。",
+        "reasoning_summary": "角色自由文字：Azure 的 AI 需求还在涨，客户要更多的算力。这季度的资本开支已经很高了，但需求没见顶。2026 年的重点是把算力建起来，不能让 AWS 和谷歌把客户抢走。下一季财报会确认资本开支继续往上走，告诉市场要为 AI 需求继续投钱。防呆检查（第 2.5 步）：这轮最可能做的事（确认资本开支继续上升）与决策者最在意的事（满足 AI 需求、不丢客户给 AWS/谷歌）是同一件，都是为需求投算力。正常把握。映射（第 3 步）：资本开支继续往上走、为 AI 需求继续投钱指向 infra_capex。",
+        "resolution_criteria": "发生：微软在 2027-01-31（含当日）前发布的 FY26 Q2 财报中确认资本开支同比上升。未发生：截至 2027-01-31，微软未在 FY26 Q2 财报中确认资本开支同比上升。",
+        "resolution_deadline": "2027-01-31",
+        "rule_version": "RV-2026-11",
+        "status": "open",
+        "type": "infra_capex",
+        "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
+      },
+      "created_at": "2026-11-25",
+      "forecast_id": "S6-FC-02",
+      "superseded_by": null,
+      "supersedes": 1,
+      "version": 2
+    },
+    {
+      "change": "世界状态版本修正为信息截止时间的 trace（2026-11-22，558 条动作）；证据 E1、E2 补来源并标已核实。",
+      "content": {
+        "agent": "roleplay",
+        "assumptions": [
+          "无。原文未列出独立假设。"
+        ],
+        "author": "roleplay-run-2026-11-22",
+        "counter_evidence": [
+          "无。原文未列出反证据。"
+        ],
+        "created_at": "2026-11-22",
+        "evidence_snapshot": [
+          {
+            "excerpt": "Gemini 4 Neon 11-18 发布。",
+            "published_at": "2026-11-18",
+            "publisher": "谷歌（Google DeepMind）",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-neon/?utm_source=deepmind.google&utm_medium=referral&utm_campaign=gdm&utm_content=",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "OpenAI GPT-6.2 11-17 发布。",
+            "published_at": "2026-11-17",
+            "publisher": "OpenAI",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://community.openai.com/t/gpt-6-2-astra-and-sol-are-now-available/1417531?ref=apidog.com",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "谷歌与 OpenAI 模型发布节奏竞逐。",
+            "published_at": "2026-11-22",
+            "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+            "retrieved_at": "2026-11-22",
+            "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
+            "verification_result": "unverified"
+          },
+          {
+            "excerpt": "Gemini 定期出新模型。",
+            "published_at": "2026-11-22",
+            "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+            "retrieved_at": "2026-11-22",
+            "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
+            "verification_result": "unverified"
+          }
+        ],
+        "forecast_id": "S6-FC-03",
+        "forecast_type": "active_action",
+        "information_cutoff": "2026-11-22",
+        "method_version": "method-roleplay.md（round10，含第 2.5 步防呆）",
+        "model_version": "roleplay",
+        "participants": [
+          {
+            "persona": "Demis Hassabis",
+            "persona_role": "谷歌 DeepMind CEO",
+            "player": "GOOG",
+            "role_in_forecast": "角色扮演 persona"
+          }
+        ],
+        "probability": 0.65,
+        "proposition": "2027-02-28 前谷歌发布新一代 Gemini 旗舰模型。",
+        "reasoning_summary": "角色自由文字：Gemini 4 Neon 刚发布，OpenAI 前一天发了 GPT-6.2，节奏很紧。下一代模型已经在训了，能力上要再往上走一档。2027 年初是关键窗口，不能让 OpenAI 拉开差距。这轮会把下一代 Gemini 旗舰推出来，告诉市场在前沿模型上没掉队。防呆检查（第 2.5 步）：这轮最可能做的事（发布下一代 Gemini 旗舰）与决策者最在意的事（守住前沿、不让 OpenAI 拉开差距）是同一件。正常把握。映射（第 3 步）：下一代 Gemini 旗舰推出来指向 model_release。",
+        "resolution_criteria": "发生：谷歌在 2027-02-28（含当日）前发布新一代 Gemini 旗舰模型。未发生：截至 2027-02-28，谷歌未发布新一代 Gemini 旗舰模型。",
+        "resolution_deadline": "2027-02-28",
+        "rule_version": "RV-2026-11",
+        "status": "open",
+        "type": "model_release",
+        "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
+      },
+      "created_at": "2026-11-25",
+      "forecast_id": "S6-FC-03",
+      "superseded_by": null,
+      "supersedes": 1,
+      "version": 2
+    },
+    {
+      "change": "世界状态版本修正为信息截止时间的 trace（2026-11-22，558 条动作）；证据 E1、E2、E3、E4 补来源并标已核实。",
+      "content": {
+        "agent": "roleplay",
+        "assumptions": [
+          "无。原文未列出独立假设。"
+        ],
+        "author": "roleplay-run-2026-11-22",
+        "counter_evidence": [
+          "无。原文未列出反证据。"
+        ],
+        "created_at": "2026-11-22",
+        "evidence_snapshot": [
+          {
+            "excerpt": "台积电 2nm 为下一代制程、在爬坡。",
+            "published_at": "2026-10-15",
+            "publisher": "台积电（TSMC）",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2026-10/eba4fac72873bf546b669bd2b5d973df5c93215d/TSMC%203Q26%20Transcript.pdf",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "CoWoS 先进封装是瓶颈。",
+            "published_at": "2026-07-16",
+            "publisher": "台积电（TSMC）",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://siliconanalysts.com/analysis/foundry-allocation-status-q1-2026",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "台积电 11-20 叫停 16nm 及以下中国客户订单。",
+            "published_at": "2026-11-20",
+            "publisher": "Reuters",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://www.businesstimes.com.sg/international/global/tsmc-reportedly-tightens-china-ai-chip-curbs-new-us-rules-close-manufacturing-loophole",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "亚利桑那厂在扩。",
+            "published_at": "2026-10-15",
+            "publisher": "台积电（TSMC）",
+            "retrieved_at": "2026-11-22",
+            "source_url": "https://azbigmedia.com/business/tsmc-arizona-accelerates-production-timeline-as-earnings-soar/",
+            "verification_result": "verified"
+          },
+          {
+            "excerpt": "AI 需求拉动先进制程。",
+            "published_at": "2026-11-22",
+            "publisher": "roleplay source document (roleplay-s6-forecasts.md)",
+            "retrieved_at": "2026-11-22",
+            "source_url": "~/workspace/jin-chan-chan-3d-board/design/roleplay-s6-forecasts.md",
+            "verification_result": "unverified"
+          }
+        ],
+        "forecast_id": "S6-FC-04",
+        "forecast_type": "active_action",
+        "information_cutoff": "2026-11-22",
+        "method_version": "method-roleplay.md（round10，含第 2.5 步防呆）",
+        "model_version": "roleplay",
+        "participants": [
+          {
+            "persona": "C.C. Wei",
+            "persona_role": "台积电董事长兼 CEO",
+            "player": "TSMC",
+            "role_in_forecast": "角色扮演 persona"
+          }
+        ],
+        "probability": 0.7,
+        "proposition": "2027-02-28 前台积电确认 2nm 制程进入量产。",
+        "reasoning_summary": "角色自由文字：2nm 的量产已经在路上了，客户都在等。CoWoS 还是瓶颈，产能得继续扩。11 月 20 日停了 16nm 及以下中国客户的订单，合规要收紧，但先进制程的需求没受影响。这轮会在法说会上确认 2nm 量产进度符合预期，告诉市场先进制程的供给跟得上 AI 需求。防呆检查（第 2.5 步）：这轮最可能做的事（确认 2nm 量产进度）与决策者最在意的事（2nm 顺利爬坡、满足 AI 对先进制程的需求）是同一件。正常把握。映射（第 3 步）：2nm 量产、先进制程的供给指向 chip_supply。",
+        "resolution_criteria": "发生：台积电在 2027-02-28（含当日）前确认 2nm 制程进入量产。未发生：截至 2027-02-28，台积电未确认 2nm 制程进入量产。",
+        "resolution_deadline": "2027-02-28",
+        "rule_version": "RV-2026-11",
+        "status": "open",
+        "type": "chip_supply",
+        "world_state_version": "traces/trace-2026-11-22.json@a07f1d0e"
+      },
+      "created_at": "2026-11-25",
+      "forecast_id": "S6-FC-04",
+      "superseded_by": null,
+      "supersedes": 1,
+      "version": 2
     }
   ]
 }

@@ -26,6 +26,9 @@ schema defined in design/forecast-ledger-schema.md (schema_version 1.0):
 With --git, the script also checks git history: every version-chain
 record that appears in any committed copy of the ledger must still
 appear unchanged in the current ledger. History may not be rewritten.
+The comparison ignores superseded_by: that field is a forward pointer
+that legitimately changes from null to N+1 when version N+1 is
+appended. Every other field of a version record is immutable.
 
 Usage:
   python3 scripts/validate_ledger.py [ledger.json] [--git] [--quiet]
@@ -107,6 +110,18 @@ def parse_time(value):
 
 def is_number(value):
     return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def canonical_version(entry):
+    """Canonical JSON of a version record, ignoring superseded_by.
+
+    superseded_by is a forward pointer, not version content: it
+    changes from null to N+1 when version N+1 is appended. The git
+    history check compares this form, so appending a version does
+    not read as rewriting history. Every other field is immutable.
+    """
+    rest = {k: v for k, v in entry.items() if k != "superseded_by"}
+    return json.dumps(rest, sort_keys=True, ensure_ascii=False)
 
 
 class Checker:
@@ -327,8 +342,10 @@ def check_git_history(checker, ledger_path, current_versions):
     """Verify no version-chain record in git history was rewritten.
 
     current_versions maps (forecast_id, version) to the canonical JSON
-    of the version record. Every committed copy of the ledger is read
-    and each of its version records must still exist unchanged.
+    of the version record, ignoring superseded_by (see
+    canonical_version). Every committed copy of the ledger is read
+    and each of its version records must still exist unchanged, apart
+    from the superseded_by pointer.
     """
     root = os.path.dirname(os.path.dirname(os.path.abspath(ledger_path)))
     rel = os.path.relpath(os.path.abspath(ledger_path), root)
@@ -382,7 +399,7 @@ def check_git_history(checker, ledger_path, current_versions):
                     "version record from git history is missing from "
                     "the current ledger",
                 )
-            elif current != json.dumps(entry, sort_keys=True, ensure_ascii=False):
+            elif current != canonical_version(entry):
                 checker.error(
                     f"git:{commit[:8]}", f"versions:{key[0]}#{key[1]}",
                     "version record from git history was rewritten",
@@ -477,9 +494,7 @@ def validate(data, ledger_path, use_git):
             if key in current_versions:
                 checker.error(ref, "version", f"duplicate version record: {key!r}")
             else:
-                current_versions[key] = json.dumps(
-                    entry, sort_keys=True, ensure_ascii=False,
-                )
+                current_versions[key] = canonical_version(entry)
         if not isinstance(ver, int) or isinstance(ver, bool) or ver < 1:
             checker.error(ref, "version", "must be an integer >= 1")
         for name in ("supersedes", "superseded_by"):
