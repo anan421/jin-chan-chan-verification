@@ -124,5 +124,5 @@ S_T = max(T_C) − min(T_C)；M_TC = (T_C1 + T_C2 + T_C3) / 3。
 - 不改 live 模型（rules/payoff-model.json、predict.py、backtest.py、data.json、trace、testset-v7.json、待审池，一字不动）。
 - 不合 main，不推 GitHub。分支 loop/vision-1-round11-baseline。
 - 跑轮次时不在 MEMORY.md 里写与在跑题集相关的事后结论。
-- 预测员文件里日期只有月份时写 YYYYMM，不拼凑确切日。
+- 预测员文件里日期只有月份时写 YYYYMM，日期只有年份时写 YYYY，不拼凑确切日。汇总事实没有自身日期时 `date` 写 `null`，不写轮次日期。
 - 报告用 plain 语言（只说猜中几次、哪类题上强、哪类题上弱、基线站不站得住）。

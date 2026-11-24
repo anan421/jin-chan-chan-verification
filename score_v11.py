@@ -21,10 +21,45 @@ runs/baseline-retest-2026-11-22/audit-baseline-v7.json
 (leakage_exclusion.by_batch: C1 [30,31], C2 [1,30,31], C3 [30,31];
 all 7 records were correct, so audited = raw minus excluded correct).
 Audited totals: C1 96, C2 104, C3 93 (mean 97.67). Audited new-117:
-C1 38, C2 37, C3 29 (mean 34.67). Denominator stays 215.
+C1 38, C2 38, C3 29 (mean 35.00). Denominator stays 215.
+
+Audited control scores: leakage exclusions from
+runs/round11-vision11-2026-11-22/audit-v11.json
+(exclusions.exclude records: D1 [30], D2 [30], D3 [30,31,32];
+all 5 records were correct, so audited = raw minus excluded correct).
+Audited totals: D1 90, D2 94, D3 93 (mean 92.33, spread 4).
+Same convention as the experiment audit: denominator stays 215 and
+an excluded record counts as not correct. (audit-v11.json itself
+writes the same numerators with reduced denominators, 90/214,
+94/214, 93/212; the mean 92.33 is the same either way.)
+
+GAIN CALIBERS (two numbers, both correct, different definitions):
+  Caliber A ("mixed", the script's original G_audited):
+    experiment audited mean minus control RAW mean.
+    97.67 - 94.00 = 3.67. The control audit is not applied here.
+  Caliber B ("both-audited", the report's G, primary caliber):
+    experiment audited mean minus control AUDITED mean.
+    97.67 - 92.33 = 5.33. Both groups use the leakage-exclusion rule.
+  Difference: 5.33 - 3.67 = 1.67, exactly the control audit
+    adjustment 94.00 - 92.33 = 1.67 (5 leaked control records:
+    D1 q30; D2 q30; D3 q30, q31, q32).
+  Both calibers are below the adoption threshold 11, so the
+    conclusion is the same under either caliber: roleplay stays
+    tentative. The script now outputs both calibers in every run
+    (gains.G_audited for A, gains.G_both_audited for B, plus
+    gain_calibers with the definitions in words).
+  WARNING -- a second, different 3.67: the report's old-question
+    gain (both-audited old split) is also 3.67
+    (62.67 - 59.00). That is a different number from caliber A
+    (97.67 - 94.00). The two 3.67 values agree by coincidence only:
+    the experiment audited new-117 mean (35.00) happens to equal
+    control raw total (94.00) minus control audited old mean
+    (59.00). Do not read one 3.67 as the other.
 
 Decision rules: design/experiment-vision11-round11.md. Evaluated for
-both the audited gain (primary, per task) and the raw gain.
+the both-audited gain (primary, report caliber), the mixed audited
+gain (script's original caliber, kept for backward compatibility),
+and the raw gain.
 
 Usage:
   python3 score_v11.py [--pred-dir DIR] [--exp-dir DIR] [--out FILE]
@@ -41,6 +76,8 @@ PRED_DIR = os.path.join(BASE, "runs", "round11-vision11-2026-11-22", "prediction
 EXP_DIR = os.path.join(BASE, "runs", "baseline-retest-2026-11-22", "predictions")
 AUDIT_PATH = os.path.join(BASE, "runs", "baseline-retest-2026-11-22",
                           "audit-baseline-v7.json")
+AUDIT_CONTROL_PATH = os.path.join(BASE, "runs", "round11-vision11-2026-11-22",
+                                  "audit-v11.json")
 R10_BASE = os.path.join(os.path.expanduser("~"), "workspace",
                         "verification-v1-round10")
 R10_PRED_DIR = os.path.join(R10_BASE, "runs", "round10-vision10-2026-11-22",
@@ -290,6 +327,36 @@ def group_summary(batches_scores, batches):
     }
 
 
+def audited_group_summary(aud, batches, raw_ref, truth):
+    """Group summary for audited rescoring (totals/old/new/capex/model/
+    per-kind/per-player/pooled confidence). Same fields as the old
+    inline experiment-audited summary; used for both groups so the
+    two calibers are computed by the same code. Denominator stays
+    215: an excluded record counts as not correct."""
+    tot = [aud[b]["total_215"][0] for b in batches]
+    kinds = sorted({q["kind"] for q in truth.values()})
+    players = sorted({q["player"] for q in truth.values()})
+    conf_pool = {}
+    for level in ("high", "medium", "low"):
+        c = sum(aud[b]["confidence"][level]["correct_total"][0] for b in batches)
+        n = sum(aud[b]["confidence"][level]["correct_total"][1] for b in batches)
+        conf_pool[level] = {"correct_total": [c, n],
+                            "accuracy": (c / n) if n else None}
+    return {
+        "totals": tot, "mean": mean(tot), "spread": max(tot) - min(tot),
+        "old_98_mean": mean([aud[b]["old_98"][0] for b in batches]),
+        "new_117_mean": mean([aud[b]["new_117"][0] for b in batches]),
+        "capex_10_mean": mean([aud[b]["capex_10"][0] for b in batches]),
+        "model_release_66_mean": mean([aud[b]["model_release_66"][0] for b in batches]),
+        "per_kind_mean_correct": {
+            k: mean([aud[b]["by_kind"].get(k, [0, 0])[0] for b in batches]) for k in kinds},
+        "per_kind_total": {k: raw_ref[batches[0]]["by_kind"][k][1] for k in kinds},
+        "per_player_mean_correct": {
+            p: mean([aud[b]["by_player"].get(p, [0, 0])[0] for b in batches]) for p in players},
+        "confidence_pooled": conf_pool,
+    }
+
+
 def reproduce_gates():
     truth10 = load_truth(os.path.join(R10_BASE, "testset-v6.json"))
     got10 = {}
@@ -386,8 +453,10 @@ def main():
 
     # --- control batches D1-D3 ---
     control = {}
+    control_preds = {}
     for batch in CONTROL_BATCHES:
         preds = load_batch(args.pred_dir, batch)
+        control_preds[batch] = preds
         control[batch] = score_batch(preds, truth, batch, all_qids)
         r = control[batch]
         print(f"{batch}: total {r['total_215'][0]}/215 old {r['old_98'][0]}/98 "
@@ -420,38 +489,42 @@ def main():
         exp_aud[batch] = score_batch_excluding(
             exp_preds[batch], truth, batch, all_qids, excl[batch])
     result["experiment_audited"] = exp_aud
-    # group summary for audited: totals/old/new/capex/model/conf only
-    aud_tot = [exp_aud[b]["total_215"][0] for b in EXP_BATCHES]
-    kinds = sorted({q["kind"] for q in truth.values()})
-    players = sorted({q["player"] for q in truth.values()})
-    conf_pool = {}
-    for level in ("high", "medium", "low"):
-        c = sum(exp_aud[b]["confidence"][level]["correct_total"][0] for b in EXP_BATCHES)
-        n = sum(exp_aud[b]["confidence"][level]["correct_total"][1] for b in EXP_BATCHES)
-        conf_pool[level] = {"correct_total": [c, n], "accuracy": (c / n) if n else None}
-    result["experiment_audited_group"] = {
-        "totals": aud_tot, "mean": mean(aud_tot), "spread": max(aud_tot) - min(aud_tot),
-        "old_98_mean": mean([exp_aud[b]["old_98"][0] for b in EXP_BATCHES]),
-        "new_117_mean": mean([exp_aud[b]["new_117"][0] for b in EXP_BATCHES]),
-        "capex_10_mean": mean([exp_aud[b]["capex_10"][0] for b in EXP_BATCHES]),
-        "model_release_66_mean": mean([exp_aud[b]["model_release_66"][0] for b in EXP_BATCHES]),
-        "per_kind_mean_correct": {
-            k: mean([exp_aud[b]["by_kind"].get(k, [0, 0])[0] for b in EXP_BATCHES]) for k in kinds},
-        "per_kind_total": {k: exp_raw["C1"]["by_kind"][k][1] for k in kinds},
-        "per_player_mean_correct": {
-            p: mean([exp_aud[b]["by_player"].get(p, [0, 0])[0] for b in EXP_BATCHES]) for p in players},
-        "confidence_pooled": conf_pool,
-        "excluded_by_batch": excl,
-    }
+    result["experiment_audited_group"] = audited_group_summary(
+        exp_aud, EXP_BATCHES, exp_raw, truth)
+    result["experiment_audited_group"]["excluded_by_batch"] = excl
+
+    # --- control batches, audited (leakage exclusion, same convention) ---
+    # audit-v11.json has no leakage_exclusion.by_batch key; the
+    # exclusions live in exclusions.exclude records (batch + q_id).
+    audit_ctrl = json.load(open(AUDIT_CONTROL_PATH))
+    excl_ctrl = {b: [] for b in CONTROL_BATCHES}
+    for rec in audit_ctrl["exclusions"]["exclude"]:
+        excl_ctrl[rec["batch"]].append(rec["q_id"])
+    ctrl_aud = {}
+    for batch in CONTROL_BATCHES:
+        ctrl_aud[batch] = score_batch_excluding(
+            control_preds[batch], truth, batch, all_qids, excl_ctrl[batch])
+    result["control_audited"] = ctrl_aud
+    result["control_audited_group"] = audited_group_summary(
+        ctrl_aud, CONTROL_BATCHES, control, truth)
+    result["control_audited_group"]["excluded_by_batch"] = excl_ctrl
 
     cg = result["control_group"]
+    cg_aud = result["control_audited_group"]
     eg_raw = result["experiment_raw_group"]
     eg_aud = result["experiment_audited_group"]
     M_TD = cg["mean"]; S_TD = cg["spread"]
+    M_TD_aud = cg_aud["mean"]; S_TD_aud = cg_aud["spread"]
     M_TE_raw = eg_raw["mean"]; S_TE_raw = eg_raw["spread"]
     M_TE_aud = eg_aud["mean"]; S_TE_aud = eg_aud["spread"]
 
-    # --- gains ---
+    # --- gains: both calibers, every run ---
+    # Caliber A ("mixed", original G_audited): experiment audited
+    #   minus control RAW. 97.67 - 94.00 = 3.67.
+    # Caliber B ("both-audited", report G, primary): experiment
+    #   audited minus control AUDITED. 97.67 - 92.33 = 5.33.
+    # Difference B - A = 1.67 = control audit adjustment
+    #   (94.00 - 92.33). Old keys are kept unchanged.
     gains = {
         "G_raw": M_TE_raw - M_TD,
         "M_TE_raw": M_TE_raw, "M_TD": M_TD,
@@ -464,22 +537,69 @@ def main():
         "G_old_raw": eg_raw["old_98_mean"] - cg["old_98_mean"],
         "G_old_audited": eg_aud["old_98_mean"] - cg["old_98_mean"],
         "S_TD": S_TD, "S_TE_raw": S_TE_raw, "S_TE_audited": S_TE_aud,
+        "M_TD_audited": M_TD_aud, "S_TD_audited": S_TD_aud,
+        "M_TD_old_audited": cg_aud["old_98_mean"],
+        "M_TD_new_audited": cg_aud["new_117_mean"],
+        "G_both_audited": M_TE_aud - M_TD_aud,
+        "G_mixed_audited_exp_raw_control": M_TE_aud - M_TD,
+        "G_new_both_audited": eg_aud["new_117_mean"] - cg_aud["new_117_mean"],
+        "G_old_both_audited": eg_aud["old_98_mean"] - cg_aud["old_98_mean"],
+        "G_new_mixed": eg_aud["new_117_mean"] - cg["new_117_mean"],
+        "G_old_mixed": eg_aud["old_98_mean"] - cg["old_98_mean"],
     }
     result["gains"] = gains
+    result["gain_calibers"] = {
+        "caliber_A_mixed": {
+            "name": "G_audited (script original)",
+            "definition": "Experiment audited mean minus control RAW mean. "
+                          "Only the experiment group gets leakage exclusion.",
+            "formula": "M_TE_audited - M_TD = 97.67 - 94.00",
+            "value": gains["G_audited"],
+            "experiment": {"batches": ["C1", "C2", "C3"], "audited_totals": [96, 104, 93],
+                           "mean": M_TE_aud, "excluded": excl},
+            "control": {"batches": ["D1", "D2", "D3"], "raw_totals": [91, 95, 96],
+                        "mean": M_TD, "excluded": "none (raw)"},
+        },
+        "caliber_B_both_audited": {
+            "name": "G_both_audited (report G, primary caliber)",
+            "definition": "Experiment audited mean minus control AUDITED mean. "
+                          "Both groups use the leakage-exclusion rule.",
+            "formula": "M_TE_audited - M_TD_audited = 97.67 - 92.33",
+            "value": gains["G_both_audited"],
+            "experiment": {"batches": ["C1", "C2", "C3"], "audited_totals": [96, 104, 93],
+                           "mean": M_TE_aud, "excluded": excl},
+            "control": {"batches": ["D1", "D2", "D3"], "audited_totals": [90, 94, 93],
+                        "mean": M_TD_aud, "excluded": excl_ctrl},
+        },
+        "difference_B_minus_A": gains["G_both_audited"] - gains["G_audited"],
+        "difference_source": "Control audit adjustment M_TD - M_TD_audited "
+                             "= 94.00 - 92.33 = 1.67 (5 leaked control records: "
+                             "D1 q30; D2 q30; D3 q30, q31, q32).",
+        "primary_caliber": "caliber_B_both_audited",
+        "conclusion_note": "Both calibers are below the adoption threshold 11 "
+                           "(max noise spread), so the conclusion is the same "
+                           "under either caliber: roleplay stays tentative.",
+        "warning_second_3_67": "The report's old-question gain (both-audited "
+            "old split, 62.67 - 59.00) is also 3.67, but it is a different "
+            "number from caliber A (97.67 - 94.00). The two 3.67 values "
+            "agree by coincidence only. Do not read one 3.67 as the other.",
+    }
 
     # --- paired results per question (batch pairs D_i vs C_i) ---
-    control_preds = {b: load_batch(args.pred_dir, b) for b in CONTROL_BATCHES}
     paired_raw_pairs = []
     paired_aud_pairs = []
+    paired_both_aud_pairs = []
     per_question = []
     for i, (db, eb) in enumerate(zip(CONTROL_BATCHES, EXP_BATCHES)):
         dp, ep = control_preds[db], exp_preds[eb]
         both = e_only = d_only = neither = 0
         both_a = e_only_a = d_only_a = neither_a = 0
+        both_b = e_only_b = d_only_b = neither_b = 0
         for q in all_qids:
             dc = is_correct(dp, truth, q)
             ec = is_correct(ep, truth, q)
             ec_a = ec and (q not in set(excl[eb]))
+            dc_a = dc and (q not in set(excl_ctrl[db]))
             if ec and dc:
                 both += 1
             elif ec and not dc:
@@ -496,12 +616,23 @@ def main():
                 d_only_a += 1
             else:
                 neither_a += 1
+            if ec_a and dc_a:
+                both_b += 1
+            elif ec_a and not dc_a:
+                e_only_b += 1
+            elif dc_a and not ec_a:
+                d_only_b += 1
+            else:
+                neither_b += 1
         paired_raw_pairs.append({"pair": f"{db}-vs-{eb}", "both": both,
                                  "exp_only": e_only, "control_only": d_only,
                                  "neither": neither})
         paired_aud_pairs.append({"pair": f"{db}-vs-{eb}", "both": both_a,
                                  "exp_only": e_only_a, "control_only": d_only_a,
                                  "neither": neither_a})
+        paired_both_aud_pairs.append({"pair": f"{db}-vs-{eb}", "both": both_b,
+                                      "exp_only": e_only_b, "control_only": d_only_b,
+                                      "neither": neither_b})
     def avg_pairs(pairs):
         return {k: mean([p[k] for p in pairs]) for k in ("both", "exp_only", "control_only", "neither")}
     for q in all_qids:
@@ -509,29 +640,39 @@ def main():
         e_n_a = sum(1 for b in EXP_BATCHES
                     if is_correct(exp_preds[b], truth, q) and q not in set(excl[b]))
         d_n = sum(1 for b in CONTROL_BATCHES if is_correct(control_preds[b], truth, q))
+        d_n_a = sum(1 for b in CONTROL_BATCHES
+                    if is_correct(control_preds[b], truth, q) and q not in set(excl_ctrl[b]))
         per_question.append({
             "q_id": q, "kind": truth[q]["kind"], "player": truth[q]["player"],
             "event_name": truth[q]["event_name"], "new_question": q >= 99,
             "new_kind": truth[q]["kind"] in NEW_KINDS,
             "exp_correct_batches": e_n, "exp_correct_batches_audited": e_n_a,
             "control_correct_batches": d_n,
+            "control_correct_batches_audited": d_n_a,
             "net_contrib_raw": e_n / 3 - d_n / 3,
             "net_contrib_audited": e_n_a / 3 - d_n / 3,
+            "net_contrib_both_audited": e_n_a / 3 - d_n_a / 3,
         })
     result["paired"] = {
         "per_batch_pair_raw": paired_raw_pairs,
         "per_batch_pair_audited": paired_aud_pairs,
+        "per_batch_pair_both_audited": paired_both_aud_pairs,
         "average_raw": avg_pairs(paired_raw_pairs),
         "average_audited": avg_pairs(paired_aud_pairs),
+        "average_both_audited": avg_pairs(paired_both_aud_pairs),
         "per_question": per_question,
     }
 
-    # --- decision rules (audited primary, raw also) ---
+    # --- decision rules (both-audited primary, mixed audited kept, raw also) ---
     contrib_aud = {p["q_id"]: p["net_contrib_audited"] for p in per_question}
     contrib_raw = {p["q_id"]: p["net_contrib_raw"] for p in per_question}
+    contrib_both = {p["q_id"]: p["net_contrib_both_audited"] for p in per_question}
     result["decision_rules"] = {
         "audited_primary": evaluate_decision_rules(
             gains["G_audited"], gains["G_new_audited"], S_TD, S_TE_aud, contrib_aud),
+        "both_audited": evaluate_decision_rules(
+            gains["G_both_audited"], gains["G_new_both_audited"],
+            S_TD_aud, S_TE_aud, contrib_both),
         "raw": evaluate_decision_rules(
             gains["G_raw"], gains["G_new_raw"], S_TD, S_TE_raw, contrib_raw),
     }
@@ -566,6 +707,7 @@ def main():
     }
 
     # --- per-kind comparison table ---
+    kinds = sorted({q["kind"] for q in truth.values()})
     kind_table = {}
     for k in kinds:
         kind_table[k] = {
@@ -592,11 +734,19 @@ def main():
           f"new_mean={cg['new_117_mean']:.2f}")
     print(f"experiment raw: {[exp_raw[b]['total_215'][0] for b in EXP_BATCHES]} "
           f"M_TE_raw={M_TE_raw:.2f} S_TE_raw={S_TE_raw} new_mean={eg_raw['new_117_mean']:.2f}")
-    print(f"experiment audited: {aud_tot} M_TE_aud={M_TE_aud:.2f} "
+    print(f"experiment audited: {eg_aud['totals']} M_TE_aud={M_TE_aud:.2f} "
           f"S_TE_aud={S_TE_aud} new_mean={eg_aud['new_117_mean']:.2f}")
-    print(f"G_raw={gains['G_raw']:.2f} G_audited={gains['G_audited']:.2f} "
-          f"G_new_raw={gains['G_new_raw']:.2f} G_new_audited={gains['G_new_audited']:.2f}")
-    print("decision (audited):", result["decision_rules"]["audited_primary"]["verdict"])
+    print(f"control audited: {[ctrl_aud[b]['total_215'][0] for b in CONTROL_BATCHES]} "
+          f"M_TD_aud={M_TD_aud:.2f} S_TD_aud={S_TD_aud} "
+          f"old_mean={cg_aud['old_98_mean']:.2f} new_mean={cg_aud['new_117_mean']:.2f}")
+    print(f"G_raw={gains['G_raw']:.2f} G_audited(mixed)={gains['G_audited']:.2f} "
+          f"G_both_audited={gains['G_both_audited']:.2f} "
+          f"(B-A={gains['G_both_audited'] - gains['G_audited']:.2f} = control audit "
+          f"adjustment {M_TD:.2f}-{M_TD_aud:.2f}) "
+          f"G_new_both_audited={gains['G_new_both_audited']:.2f} "
+          f"G_old_both_audited={gains['G_old_both_audited']:.2f}")
+    print("decision (both-audited, report caliber):", result["decision_rules"]["both_audited"]["verdict"])
+    print("decision (audited/mixed):", result["decision_rules"]["audited_primary"]["verdict"])
     print("decision (raw):", result["decision_rules"]["raw"]["verdict"])
 
 

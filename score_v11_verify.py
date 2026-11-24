@@ -5,13 +5,15 @@ Re-reads testset-v7.json, all D1-D3 and C1-C3 prediction files, and the
 audit exclusion list from scratch, with its own loops (no import of
 score_v11). Recomputes: per-batch totals, old/new split, per-kind,
 per-player, model-release 66, capex 10, confidence (pooled + per batch),
-guidance/boundary citation rates, audited experiment scores, gains
-(raw + audited), paired averages (raw + audited), decision-rule
+guidance/boundary citation rates, audited experiment scores, audited
+control scores, gains (raw + mixed audited + both-audited), paired
+averages (raw + mixed audited + both-audited), decision-rule
 booleans, roleplay-harm counts. Compares every number against
 runs/round11-vision11-2026-11-22/score-v11.json and exits non-zero
-on any mismatch.
+on any mismatch. The both-audited checks run only when the scored
+file carries the new keys (score_v11.py writes them since 2026-11-25).
 
-Usage: python3 score_v11_verify.py
+Usage: python3 score_v11_verify.py [SCORED_JSON]
 """
 import glob
 import json
@@ -23,8 +25,11 @@ RUN = os.path.join(BASE, "runs", "round11-vision11-2026-11-22")
 CTRL_DIR = os.path.join(RUN, "predictions")
 EXP_DIR = os.path.join(BASE, "runs", "baseline-retest-2026-11-22", "predictions")
 SCORE_PATH = os.path.join(RUN, "score-v11.json")
+if len(sys.argv) > 1:
+    SCORE_PATH = sys.argv[1]
 AUDIT_PATH = os.path.join(BASE, "runs", "baseline-retest-2026-11-22",
                           "audit-baseline-v7.json")
+AUDIT_CTRL_PATH = os.path.join(RUN, "audit-v11.json")
 
 MODEL = {"claude", "chatgpt", "gemini", "r1", "v3", "tongyi", "llama",
          "kimi", "muse", "glm", "minimax"}
@@ -68,6 +73,10 @@ def main():
     scored = json.load(open(SCORE_PATH))
     audit = json.load(open(AUDIT_PATH))
     excl = audit["leakage_exclusion"]["by_batch"]
+    audit_ctrl = json.load(open(AUDIT_CTRL_PATH))
+    excl_ctrl = {"D1": [], "D2": [], "D3": []}
+    for rec in audit_ctrl["exclusions"]["exclude"]:
+        excl_ctrl[rec["batch"]].append(rec["q_id"])
 
     ctrl = {b: read_batch(CTRL_DIR, f"predictions-{b}") for b in ("D1", "D2", "D3")}
     exp = {b: read_batch(EXP_DIR, f"predictions-{b}") for b in ("C1", "C2", "C3")}
@@ -129,6 +138,41 @@ def main():
             c = sum(1 for q in kq if correct(p, q) and q not in ex)
             check(f"audited.{b}.kind.{kind}", c, s["by_kind"].get(kind, [0, 0])[0])
 
+    # ---- audited control (both-audited caliber) ----
+    # Same convention as the experiment audit: denominator stays 215,
+    # an excluded record counts as not correct. Only checked when the
+    # scored file carries the new keys.
+    if "control_audited" in scored:
+        for b in ("D1", "D2", "D3"):
+            p = ctrl[b]
+            s = scored["control_audited"][b]
+            ex = set(excl_ctrl[b])
+            tot = sum(1 for q in qids if correct(p, q) and q not in ex)
+            check(f"control_audited.{b}.total", tot, s["total_215"][0])
+            check(f"control_audited.{b}.old", sum(1 for q in old_ids if correct(p, q) and q not in ex), s["old_98"][0])
+            check(f"control_audited.{b}.new", sum(1 for q in new_ids if correct(p, q) and q not in ex), s["new_117"][0])
+            check(f"control_audited.{b}.capex", sum(1 for q in capex_ids if correct(p, q) and q not in ex), s["capex_10"][0])
+            check(f"control_audited.{b}.model", sum(1 for q in model_ids if correct(p, q) and q not in ex), s["model_release_66"][0])
+            for kind in sorted(set(truth_kind.values())):
+                kq = [q for q in qids if truth_kind[q] == kind]
+                c = sum(1 for q in kq if correct(p, q) and q not in ex)
+                check(f"control_audited.{b}.kind.{kind}", c, s["by_kind"].get(kind, [0, 0])[0])
+        cg_aud = scored["control_audited_group"]
+        check("control_audited.mean",
+              sum(sum(1 for q in qids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                  for b in ("D1", "D2", "D3")) / 3, cg_aud["mean"])
+        check("control_audited.spread",
+              max(sum(1 for q in qids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                  for b in ("D1", "D2", "D3"))
+              - min(sum(1 for q in qids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                      for b in ("D1", "D2", "D3")), cg_aud["spread"])
+        check("control_audited.old_mean",
+              sum(sum(1 for q in old_ids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                  for b in ("D1", "D2", "D3")) / 3, cg_aud["old_98_mean"])
+        check("control_audited.new_mean",
+              sum(sum(1 for q in new_ids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                  for b in ("D1", "D2", "D3")) / 3, cg_aud["new_117_mean"])
+
     # ---- group means ----
     cg = scored["control_group"]
     check("control.mean", sum(sum(1 for q in qids if correct(ctrl[b], q)) for b in ("D1", "D2", "D3")) / 3,
@@ -165,6 +209,25 @@ def main():
     m_td_new = sum(sum(1 for q in new_ids if correct(ctrl[b], q)) for b in ("D1", "D2", "D3")) / 3
     check("gains.G_new_raw", m_te_new_raw - m_td_new, g["G_new_raw"])
     check("gains.G_new_audited", m_te_new_aud - m_td_new, g["G_new_audited"])
+    # ---- both-audited caliber (report G): only in new output ----
+    if "G_both_audited" in g:
+        m_td_aud = sum(sum(1 for q in qids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                       for b in ("D1", "D2", "D3")) / 3
+        m_td_old_aud = sum(sum(1 for q in old_ids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                           for b in ("D1", "D2", "D3")) / 3
+        m_td_new_aud = sum(sum(1 for q in new_ids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                           for b in ("D1", "D2", "D3")) / 3
+        m_te_old_aud = sum(sum(1 for q in old_ids if correct(exp[b], q) and q not in set(excl[b]))
+                           for b in ("C1", "C2", "C3")) / 3
+        check("gains.M_TD_audited", m_td_aud, g["M_TD_audited"])
+        check("gains.G_both_audited", m_te_aud - m_td_aud, g["G_both_audited"])
+        check("gains.G_mixed_alias", m_te_aud - m_td, g["G_mixed_audited_exp_raw_control"])
+        check("gains.G_new_both_audited", m_te_new_aud - m_td_new_aud, g["G_new_both_audited"])
+        check("gains.G_old_both_audited", m_te_old_aud - m_td_old_aud, g["G_old_both_audited"])
+        check("gains.caliber_difference", (m_te_aud - m_td_aud) - (m_te_aud - m_td),
+              scored["gain_calibers"]["difference_B_minus_A"])
+        check("gains.caliber_difference_is_control_adjustment", m_td - m_td_aud,
+              scored["gain_calibers"]["difference_B_minus_A"])
 
     # ---- paired averages ----
     for audited in (False, True):
@@ -184,6 +247,25 @@ def main():
                     sums["neither"] += 1
         for k, v in sums.items():
             check(f"paired.{key}.{k}", v / 3, scored["paired"][key][k])
+
+    # ---- paired averages, both-audited ----
+    if "average_both_audited" in scored["paired"]:
+        sums = {"both": 0, "exp_only": 0, "control_only": 0, "neither": 0}
+        for db, eb in zip(("D1", "D2", "D3"), ("C1", "C2", "C3")):
+            for q in qids:
+                dc = correct(ctrl[db], q) and q not in set(excl_ctrl[db])
+                ec = correct(exp[eb], q) and q not in set(excl[eb])
+                if ec and dc:
+                    sums["both"] += 1
+                elif ec:
+                    sums["exp_only"] += 1
+                elif dc:
+                    sums["control_only"] += 1
+                else:
+                    sums["neither"] += 1
+        for k, v in sums.items():
+            check(f"paired.average_both_audited.{k}", v / 3,
+                  scored["paired"]["average_both_audited"][k])
 
     # ---- decision rules (audited primary) ----
     dr = scored["decision_rules"]["audited_primary"]
@@ -205,6 +287,31 @@ def main():
     check("decision.audited.(d)", len(pos) >= 2 and max(contrib.values()) < G / 2,
           dr["(d) gain from >=2 questions, no single question > half of gain"]["pass"])
 
+    # ---- decision rules, both-audited caliber (report G) ----
+    if "both_audited" in scored["decision_rules"]:
+        dr_b = scored["decision_rules"]["both_audited"]
+        G_b = m_te_aud - (sum(sum(1 for q in qids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                              for b in ("D1", "D2", "D3")) / 3)
+        m_td_new_aud = sum(sum(1 for q in new_ids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                           for b in ("D1", "D2", "D3")) / 3
+        G_new_b = m_te_new_aud - m_td_new_aud
+        s_td_aud = (max(sum(1 for q in qids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                        for b in ("D1", "D2", "D3"))
+                    - min(sum(1 for q in qids if correct(ctrl[b], q) and q not in set(excl_ctrl[b]))
+                          for b in ("D1", "D2", "D3")))
+        contrib_b = {}
+        for q in qids:
+            e = sum(1 for b in ("C1", "C2", "C3") if correct(exp[b], q) and q not in set(excl[b])) / 3
+            d = sum(1 for b in ("D1", "D2", "D3") if correct(ctrl[b], q) and q not in set(excl_ctrl[b])) / 3
+            contrib_b[q] = e - d
+        pos_b = [q for q, c in contrib_b.items() if c > 0]
+        check("decision.both_audited.(a)", G_b > max(s_td_aud, s_te_aud),
+              dr_b["(a) G > max(S_TD,S_TE)"]["pass"])
+        check("decision.both_audited.(b)", G_b >= 3, dr_b["(b) G >= 3"]["pass"])
+        check("decision.both_audited.(c)", G_new_b > 0, dr_b["(c) G_new > 0"]["pass"])
+        check("decision.both_audited.(d)", len(pos_b) >= 2 and max(contrib_b.values()) < G_b / 2,
+              dr_b["(d) gain from >=2 questions, no single question > half of gain"]["pass"])
+
     # ---- roleplay harms ----
     rh = scored["roleplay_harms"]
     strict = [q for q in qids if truth_kind[q] in NEW_KINDS
@@ -219,9 +326,10 @@ def main():
         for f in failures[:50]:
             print("  ", f)
         sys.exit(1)
-    print("VERIFY PASS: all recomputed numbers match score-v11.json "
+    print("VERIFY PASS: all recomputed numbers match " + SCORE_PATH + " "
           "(totals, old/new, kind, player, model, capex, confidence, G/B, "
-          "audited scores, gains, paired averages, decision rules, harms)")
+          "audited scores, gains incl. both-audited caliber, paired averages, "
+          "decision rules, harms)")
 
 
 if __name__ == "__main__":
