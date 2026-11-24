@@ -1,0 +1,176 @@
+{
+ "category": "DE",
+ "excluded": [
+  {
+   "event_name": "OpenAI 与 Google Cloud 合作",
+   "reason": "无双方官方公告：路透 2025-06-10 独家报道援引三名匿名消息人士，双方均拒绝置评；不合一手来源标准（须公司官方公告或报道公司披露），先不进"
+  }
+ ],
+ "questions": [
+  {
+   "action": "Google 史上最大收购，补强云安全",
+   "event_name": "Google 收 Wiz，$32B 全现金",
+   "event_real_date": 20250318,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "GOOG",
+   "source": "Google 官方公告，2025-03-18：签最终协议，以 320 亿美元全现金收购云安全公司 Wiz，待监管批准，预计 2026 年交割",
+   "verify_note": "日期与金额以 Google 官方公告及 Alphabet SEC 8-K 为准；2026-03-11 完成交割为后续事件，不作本题日期",
+   "verify_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204425000027/googexhibit99131825.htm"
+  },
+  {
+   "action": "Meta 以近半股权绑定数据标注龙头，Wang 转任 Meta 首席 AI 官",
+   "event_name": "Meta 投 Scale AI $14.3B，换 49% 无投票权股份",
+   "event_real_date": 20250612,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "META",
+   "source": "Scale AI 官方公告，2025-06-12：Meta 投资 143 亿美元，持 49% 无投票权股份，估值超 290 亿美元；Wang 加入 Meta",
+   "verify_note": "金额 143 亿美元为路透/彭博等报道的数字，Scale 官方公告未披露金额，只称重大投资、估值超 290 亿美元；Meta 10-Q 记约 137.9 亿美元",
+   "verify_url": "https://www.businesswire.com/news/home/20250612873954/en/Scale-AI-Announces-Next-Phase-of-Companys-Evolution"
+  },
+  {
+   "action": "OpenAI 史上最大收购，进军 AI 硬件",
+   "event_name": "OpenAI 收 Jony Ive 的 io，$65 亿全股权",
+   "event_real_date": 20250521,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "OAI",
+   "source": "OpenAI 官方公告，2025-05-21：收购 Jony Ive 的 AI 硬件公司 io，全股权交易估值 65 亿美元；OpenAI 已持 23%，再付约 50 亿美元",
+   "verify_note": "65 亿美元为交易总估值，OpenAI 官方公告未写金额，金额据华尔街日报/彭博报道；已持 23% 故新增支付约 50 亿美元",
+   "verify_url": "https://techcrunch.com/2025/05/21/jony-ive-to-lead-openais-design-work-following-6-5b-acquisition-of-his-company/"
+  },
+  {
+   "action": "收购告吹本身就是事件，Google 用授权加挖人替代收购",
+   "event_name": "OpenAI 收 Windsurf $30 亿告吹",
+   "event_real_date": 20250711,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "OAI",
+   "source": "TechCrunch，2025-07-11：OpenAI 以 30 亿美元收购 Windsurf 的交易告吹，独家谈判期到期；Google 同日付约 24 亿美元获非独家授权并聘走 CEO Varun Mohan、联合创始人 Douglas Chen 及部分顶尖研究员",
+   "verify_note": "30 亿美元为 2025-05 彭博报道的已达成协议价；告吹主因是微软对 OpenAI 收购 IP 的权利争议；Google 的 24 亿美元据彭博报道，Google 未入股 Windsurf；Cognition 于 07-14 收购 Windsurf 剩余部分",
+   "verify_url": "https://techcrunch.com/2025/07/11/windsurfs-ceo-goes-to-google-openais-acquisition-falls-apart/"
+  },
+  {
+   "action": "马斯克把社交平台并入 AI 公司，数据、模型、算力合一",
+   "event_name": "xAI 收 X，全股票",
+   "event_real_date": 20250328,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "MUSK",
+   "source": "马斯克 X 发帖，2025-03-28：xAI 以全股票交易收购 X，xAI 估值 800 亿美元，X 股权价值 330 亿美元（450 亿美元减 120 亿美元债务）",
+   "verify_note": "以马斯克本人公告为准，TechCrunch 等同日报道确认；X 股权价值 330 亿美元，企业价值 450 亿美元",
+   "verify_url": "https://techcrunch.com/2025/03/29/elon-musk-says-xai-acquired-x/"
+  },
+  {
+   "action": "史上最大私人合并，火箭、星链、Grok 与 X 并入一家",
+   "event_name": "SpaceX 收 xAI，全股票",
+   "event_real_date": 20260202,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "MUSK",
+   "source": "SpaceX 官方公告，2026-02-02：SpaceX 收购 xAI；据彭博报道，合并后公司估值 1.25 万亿美元（SpaceX 1 万亿、xAI 2500 亿美元）",
+   "verify_note": "SpaceX 官方公告未披露条款与估值，1.25 万亿美元为彭博/路透援引知情人士的数字；同日 Nevada 州备案显示交易完成",
+   "verify_url": "https://techcrunch.com/2026/02/02/elon-musk-spacex-acquires-xai-data-centers-space-merger/"
+  },
+  {
+   "action": "编码工具史上最大收购，SpaceX 补齐 AI 编程短板",
+   "event_name": "SpaceX 收 Cursor，$60B 全股票",
+   "event_real_date": 20260616,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "MUSK",
+   "source": "SpaceX 8-K 与路透，2026-06-16：SpaceX 签最终合并协议，以 600 亿美元全股票收购 Anysphere（Cursor），预计 2026 年 Q3 交割",
+   "verify_note": "以宣布日 2026-06-16 为准；交割日为 2026-08-14，二者已区分；4 月 SpaceX 已先拿到以 600 亿美元收购或付 100 亿美元继续合作的期权",
+   "verify_url": "https://news.crunchbase.com/ma/spcx-acquires-ai-coding-cursor-largest-startup-ma-deal-2026/"
+  },
+  {
+   "action": "Meta 拿下通用 agent 爆款，补强 agent 能力",
+   "event_name": "Meta 收 Manus，约 $20 亿",
+   "event_real_date": 20251229,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "META",
+   "source": "Meta 官方公告，2025-12-29：收购新加坡 AI agent 公司 Manus；据华尔街日报报道，Meta 支付超 20 亿美元",
+   "verify_note": "Meta 官方公告未披露价格，超 20 亿美元为华尔街日报援引知情人士的数字；Manus 已切断与中国的运营及所有权联系，交易后停掉中国业务",
+   "verify_url": "https://techcrunch.com/2025/12/29/meta-just-bought-manus-an-ai-startup-everyone-has-been-talking-about/"
+  },
+  {
+   "action": "中国首次公开动用外资安全审查叫停已完成的中美 AI 收购",
+   "event_name": "中国发改委叫停 Meta 收 Manus",
+   "event_real_date": 20260427,
+   "kind": "acquisition",
+   "origin": "testset-complete",
+   "player": "META",
+   "source": "中国发改委外资安全审查工作机制办公室决定，2026-04-27：禁止外资收购 Manus 项目，要求各方撤销交易；TechCrunch 同日报道",
+   "verify_note": "以发改委决定日期为准；决定未点名 Meta；Meta 于 2026-06-11 完成业务切割，Manus 后由腾讯牵头财团回购",
+   "verify_url": "https://techcrunch.com/2026/04/27/china-vetoes-metas-2b-manus-deal-after-months-long-probe/"
+  },
+  {
+   "action": "OpenAI 结束非营利 capped-profit 结构，基金会控股营利性公益公司",
+   "event_name": "OpenAI 完成重组为营利性公益公司（PBC）",
+   "event_real_date": 20251028,
+   "kind": "partnership",
+   "origin": "testset-complete",
+   "player": "OAI",
+   "source": "OpenAI 官方公告，2025-10-28：完成资本重组，OpenAI Foundation 持股 26% 约 1300 亿美元，微软持股约 27% 约 1350 亿美元，总估值 5000 亿美元；微软模型 IP 权延至 2032 年",
+   "verify_note": "基金会持股 26%、微软约 27% 及估值数字以 OpenAI 官方公告与 TechCrunch 同日报道为准；加州与特拉华州总检察长同日不持异议",
+   "verify_url": "https://techcrunch.com/2025/10/28/openai-completes-its-for-profit-recapitalization/"
+  },
+  {
+   "action": "史上最大单笔 AI 投资意向，芯片与资本绑定 10GW 算力",
+   "event_name": "英伟达拟投 OpenAI 最高 $1000 亿",
+   "event_real_date": 20250922,
+   "kind": "partnership",
+   "origin": "testset-complete",
+   "player": "NVDA",
+   "source": "英伟达与 OpenAI 联合公告，2025-09-22：签意向书，部署至少 10GW 英伟达系统，英伟达拟随部署进度投资最高 1000 亿美元；首批 1GW 于 2026 年下半年上线 Vera Rubin 平台",
+   "verify_note": "只是意向书，非最终协议，投资为随每 GW 部署逐步兑现的最高额；英伟达 Q3 10-Q 明确提示不保证达成最终协议",
+   "verify_url": "https://investor.nvidia.com/news/press-release-details/2025/OpenAI-and-NVIDIA-Announce-Strategic-Partnership-to-Deploy-10-Gigawatts-of-NVIDIA-Systems/default.aspx"
+  },
+  {
+   "action": "意向与落地之差本身就是可测事件，1000 亿缩水为 300 亿股权",
+   "event_name": "英伟达对 OpenAI 投资缩水至 $300 亿股权",
+   "event_real_date": 20260227,
+   "kind": "partnership",
+   "origin": "testset-complete",
+   "player": "NVDA",
+   "source": "OpenAI 官方公告，2026-02-27：1100 亿美元新一轮融资，英伟达出资 300 亿美元，软银 300 亿美元，亚马逊 500 亿美元，投前估值 7300 亿美元",
+   "verify_note": "300 亿美元为本轮直接股权投资，与 2025-09 意向书的最高 1000 亿美元（随部署兑现）口径不同；黄仁勋 2026-03 称原 1000 亿美元可能不在计划内；本轮当时仍开放、未关闭",
+   "verify_url": "https://techcrunch.com/2026/02/27/openai-raises-110b-in-one-of-the-largest-private-funding-rounds-in-history/"
+  },
+  {
+   "action": "Anthropic 锁定下一代 TPU 算力，摆脱单一芯片依赖",
+   "event_name": "Anthropic 与 Google、Broadcom 签 TPU 协议",
+   "event_real_date": 20260406,
+   "kind": "partnership",
+   "origin": "testset-complete",
+   "player": "ANTH",
+   "source": "Anthropic 官方公告，2026-04-06：与 Google、Broadcom 签协议，获多 GW 下一代 TPU 算力，2027 年起上线；Broadcom 同日 SEC 8-K 称约 3.5GW，用量视 Anthropic 商业表现而定；同日披露 run-rate 超 300 亿美元",
+   "verify_note": "Anthropic 官方只写多 GW，未写具体数字；3.5GW 来自 Broadcom 8-K，附商业表现条件；协议金额未披露",
+   "verify_url": "https://incrypted.com/en/anthropic-struck-a-deal-with-google-and-broadcom-for-gigawatt-scale-ai-capacity/"
+  },
+  {
+   "action": "OpenAI 算力来源多元化，首次大规模押注非英伟达芯片",
+   "event_name": "OpenAI 与 AMD 签 6GW 协议",
+   "event_real_date": 20251006,
+   "kind": "partnership",
+   "origin": "testset-complete",
+   "player": "OAI",
+   "source": "AMD 与 OpenAI 联合公告，2025-10-06：签 6GW 协议，OpenAI 部署多代 AMD Instinct GPU，首批 1GW MI450 于 2026 年下半年上线",
+   "verify_note": "计划只写 2025-10（月份），一手来源确认确切日为 2025-10-06，已按 SPEC 以一手来源为准改用 8 位日期；协议含 AMD 向 OpenAI 发最高 1.6 亿股认股权证",
+   "verify_url": "https://www.sec.gov/Archives/edgar/data/2488/000119312525230895/d28189dex991.htm"
+  },
+  {
+   "action": "Meta 重组全部 AI 业务，Wang 挂帅冲超级智能",
+   "event_name": "Meta 成立 Superintelligence Labs（MSL）",
+   "event_real_date": 20250630,
+   "kind": "partnership",
+   "origin": "testset-complete",
+   "player": "META",
+   "source": "扎克伯格内部备忘录，2025-06-30：Meta 全部 AI 团队并入新设的 Meta Superintelligence Labs，Alexandr Wang 任首席 AI 官，Nat Friedman 联合领导产品与应用研究",
+   "verify_note": "以内部备忘录日期为准，备忘录全文经 CNBC 刊出、TechCrunch 与彭博同日报道；非 Meta 对外官方公告",
+   "verify_url": "https://techcrunch.com/2025/06/30/meta-restructures-its-ai-unit-under-superintelligence-labs/"
+  }
+ ]
+}
