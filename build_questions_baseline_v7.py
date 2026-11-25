@@ -21,6 +21,13 @@ player_history_counts, player_most_frequent, player_last_kind,
 player_last3. No answer field: no kind, no event_name, no action,
 no source, no prev_round_kinds.
 
+Capex questions (q10-q19) also carry forward_guidance: a list of
+citable pre-round_date guidance entries from
+design/capex-forward-guidance-2026-11-25.json, each {date, type,
+origin, url, text, signal, note}. Attached at assembly time (after
+the old-98 validation), so the validation diff is unaffected. Field
+names avoid every banned name (no "source", no "kind").
+
 Player history (v5/v8 logic + the task's date rule):
   - prefix = the player's own moves in rounds strictly BEFORE this
     question's round (round order) AND with date strictly before this
@@ -291,6 +298,31 @@ def main():
     print(f"vocabulary: {len(vocab)} kinds "
           f"(34 round-8 + {len(vocab) - 34} new)")
 
+    # ---- B2 (2026-11-25): capex forward guidance. Loaded from the
+    # design data file, validated here (every entry strictly before its
+    # question's round_date, every guided question is a capex question),
+    # attached at assembly time below. ----
+    guidance_path = ROOT / "design" / "capex-forward-guidance-2026-11-25.json"
+    guidance_by_qid = {}
+    if guidance_path.exists():
+        gdoc = json.loads(guidance_path.read_text(encoding="utf-8"))
+        for g in gdoc["guidance"]:
+            qid = g["q_id"]
+            if qid not in truth:
+                fail(f"guidance q{qid}: not in testset-v7")
+            if truth[qid]["kind"] != "capex":
+                fail(f"guidance q{qid}: kind is {truth[qid]['kind']}, "
+                     f"not capex")
+            for e in g["entries"]:
+                if e["date"] >= truth[qid]["round_date"]:
+                    fail(f"guidance q{qid}: entry date {e['date']} not "
+                         f"before round_date {truth[qid]['round_date']}")
+            guidance_by_qid[qid] = g["entries"]
+        print(f"capex forward guidance: {len(guidance_by_qid)} questions "
+              f"covered: {sorted(guidance_by_qid)}")
+    else:
+        print("capex forward guidance: data file absent, none attached")
+
     # ---- Validation: recompute the 98 old questions from the ROUND-8
     # trace, diff vs round-8 files. The round-8 trace is used here because
     # this worktree's trace has since changed 35 S5 moves (hp/gold,
@@ -383,6 +415,13 @@ def main():
             vocab_out = vocab
         for ctx in sorted(by_round_new.get(key, []), key=lambda c: c["q_id"]):
             items.append(question_item(ctx))
+        # B2: attach citable forward guidance to capex questions here
+        # (assembly time, after old-98 validation -- the validation
+        # compares question_item() output, so it never sees this field).
+        for item in items:
+            g = guidance_by_qid.get(item["q_id"])
+            if g is not None:
+                item["forward_guidance"] = g
         files[key] = {
             "round": f"S{season} {label}",
             "season": season,
