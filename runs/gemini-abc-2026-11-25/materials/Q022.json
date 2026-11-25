@@ -1,0 +1,38 @@
+{
+  "question_id": "Q022",
+  "player": "英伟达",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "先跌后稳。市场找解释"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门等于长期订单承诺"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "单日蒸发约 6000 亿美元"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-02-26",
+      "type": "earnings_guidance",
+      "statement": "英伟达在 2025 财年 Q4 电话会上说，预计 2026 财年 Q1 收入约 430 亿美元（上下浮动 2%），Blackwell Ultra 将在 2026 财年下半年推出，汽车业务收入在 2026 财年预计达约 50 亿美元。"
+    },
+    {
+      "date": "2025-05-28",
+      "type": "earnings_guidance",
+      "statement": "英伟达在 2026 财年 Q1 财报中说，预计 Q2 收入约 450 亿美元（上下浮动 2%），其中已计入因出口管制损失的约 80 亿美元 H20 收入，Blackwell 将继续放量。"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "packs": 54,
+  "guidance_total": 75,
+  "leak_exclusions_applied": [
+    "Q012|2024-12-04|MUSK",
+    "Q021|2025-03-10|ORCL",
+    "Q025|2025-02-12|OAI",
+    "Q040|2026-07-31|DPSK"
+  ],
+  "b_exclusions_applied": [
+    "Q054|S5-R11-036"
+  ],
+  "date_violations": [],
+  "date_violation_count": 0,
+  "packs_containing_2200": [],
+  "leak_excluded_present": [],
+  "S5-R11-036_in_Q054_pack": false,
+  "Q044_guidance_count": 0
+}

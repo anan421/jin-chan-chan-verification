@@ -1,0 +1,77 @@
+{
+  "question_id": "Q048",
+  "player": "台积电",
+  "round": "2026-11",
+  "date": "2026-11-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "R1 证明旧制程也能打。订单结构变"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门芯片总盘代工落位"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被带跌。订单簿未掉"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "passive_impact",
+      "raw_action": "GW 园区芯片排期拉满"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "passive_impact",
+      "raw_action": "先进封装订单新高"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "地缘折价计提"
+    },
+    {
+      "date": "20261001",
+      "round": "2026-10",
+      "nature": "passive_impact",
+      "raw_action": "跟涨。产能即权力"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-01-16",
+      "type": "earnings_guidance",
+      "statement": "台积电在 2024 年 Q4 电话会上说，预计 2025 年资本预算为 380-420 亿美元，其中约 70% 投向先进制程技术，AI 加速器收入在 2025 年将翻倍。"
+    },
+    {
+      "date": "2025-03-03",
+      "type": "announced_plan",
+      "statement": "台积电 CEO 魏哲家与特朗普在白宫宣布，台积电将在美国追加投资 1000 亿美元，在亚利桑那州新建 5 座先进晶圆厂，使其在美总投资达到约 1650 亿美元。"
+    },
+    {
+      "date": "2026-10-15",
+      "type": "earnings_guidance",
+      "statement": "台积电在三季度财报电话会上指引四季度收入523亿至543亿美元，全年收入同比增长约44%。"
+    },
+    {
+      "date": "2026-10-15",
+      "type": "earnings_guidance",
+      "statement": "台积电在三季度财报电话会上重申2026年全年资本预算为600亿至640亿美元，并预计2026至2028年资本开支将显著高于过去三年。"
+    },
+    {
+      "date": "2026-10-15",
+      "type": "announced_plan",
+      "statement": "台积电在三季度财报电话会上表示正在台南新增两座3纳米晶圆厂，量产分别定于2027年上半年和2028年上半年。"
+    }
+  ]
+}

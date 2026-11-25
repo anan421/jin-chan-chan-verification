@@ -1,0 +1,326 @@
+[
+  {
+    "question_id": "Q001",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q002",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q003",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q004",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q005",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q006",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q007",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q008",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q009",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q010",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q011",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q012",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q013",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；唯一主动条目R1-0528发布。"
+  },
+  {
+    "question_id": "Q014",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "指引是已发生的3月发布，不触发(a)；历史唯一可归类条目是智能云加速投入。"
+  },
+  {
+    "question_id": "Q015",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；托管收费无法归类，退回众数。"
+  },
+  {
+    "question_id": "Q016",
+    "prediction": "chip_supply",
+    "rule": "a",
+    "reason": "Ascend 920预计2025年下半年量产，覆盖7月，指向芯片供应。"
+  },
+  {
+    "question_id": "Q017",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；主动条目模型2比基建1。"
+  },
+  {
+    "question_id": "Q018",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "800亿美元计划属2025财年不覆盖7月1日；4月30日无总额方向表述不触发(a)；历史全被动，退回众数。"
+  },
+  {
+    "question_id": "Q019",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q020",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "Stargate四年计划覆盖7月，建设方指向基建。"
+  },
+  {
+    "question_id": "Q021",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "Stargate四年计划与6月资本开支指引覆盖7月，指向基建。"
+  },
+  {
+    "question_id": "Q022",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "Blackwell Ultra在2026财年下半年推出，7月1日不在时限内；历史全被动，退回众数。"
+  },
+  {
+    "question_id": "Q023",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；历史全被动，退回众数。"
+  },
+  {
+    "question_id": "Q024",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "Colossus扩容计划在12个月内，覆盖7月，指向基建。"
+  },
+  {
+    "question_id": "Q025",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "7月22日Stargate新增4.5GW协议覆盖8月，指向基建。"
+  },
+  {
+    "question_id": "Q026",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；上一轮有记录不能选hold；K2发布属模型。"
+  },
+  {
+    "question_id": "Q027",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "Stargate四年计划与电力翻倍、资本开支指引覆盖8月，指向基建。"
+  },
+  {
+    "question_id": "Q028",
+    "prediction": "capital_deal",
+    "rule": "a",
+    "reason": "四年1000亿美元计划覆盖8月，软银为Stargate财务方，指向资本运作。"
+  },
+  {
+    "question_id": "Q029",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "指引是已发生的R1发布；上一轮有记录不能选hold；主动条目全是模型发布。"
+  },
+  {
+    "question_id": "Q030",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "3月占比表述无总额，不触发(a)；上一轮有记录不能选hold；可归类条目平局退回玩家众数。"
+  },
+  {
+    "question_id": "Q031",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "2025年资本开支750亿上调至850亿美元，有总额与投向，覆盖11月，指向基建。"
+  },
+  {
+    "question_id": "Q032",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "3800亿元三年计划覆盖11月，9月追加同指基建。"
+  },
+  {
+    "question_id": "Q033",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "Stargate四年计划在12个月内，9月资本开支约350亿美元同指基建。"
+  },
+  {
+    "question_id": "Q034",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "Colossus扩容计划在12个月边界内，覆盖12月，指向基建。"
+  },
+  {
+    "question_id": "Q035",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "500亿美元算力基建投资、首批站点2026年内上线，覆盖2月，指向基建。"
+  },
+  {
+    "question_id": "Q036",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "指引无总额方向表述与事后口径，均不触发(a)；可归类条目平局退回玩家众数。"
+  },
+  {
+    "question_id": "Q037",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；主动条目模型3比基建2。"
+  },
+  {
+    "question_id": "Q038",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "500亿美元算力基建投资、首批站点2026年内上线，覆盖7月，指向基建。"
+  },
+  {
+    "question_id": "Q039",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "无指引；三条主动记录全是模型发布。"
+  },
+  {
+    "question_id": "Q040",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "包里只有已发生的R1指引，无指向8月的下一动作；最近两条主动记录同属模型线。"
+  },
+  {
+    "question_id": "Q041",
+    "prediction": "capital_deal",
+    "rule": "a",
+    "reason": "54亿美元收购ABB计划于2026年中至年底完成，覆盖9月，指向资本运作。"
+  },
+  {
+    "question_id": "Q042",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "Colossus计划超12个月时效；上一轮有记录不能选hold；最近两条主动记录同属模型上线。"
+  },
+  {
+    "question_id": "Q043",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "500亿美元算力基建投资、首批站点2026年内上线，覆盖10月，指向基建。"
+  },
+  {
+    "question_id": "Q044",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "无指引；唯一可归类主动条目是自建能源团队扩容。"
+  },
+  {
+    "question_id": "Q045",
+    "prediction": "model_release",
+    "rule": "a",
+    "reason": "9月10日点名V4.1-Pro是下一个模型，路由持续到它发布，覆盖11月，指向模型发布。"
+  },
+  {
+    "question_id": "Q046",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "Stargate四年计划按 stated horizon 覆盖2026年11月，建设方指向基建。"
+  },
+  {
+    "question_id": "Q047",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "空包，规则(d)。"
+  },
+  {
+    "question_id": "Q048",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "2026-10-15资本预算600亿至640亿美元与台南新厂，覆盖11月，指向基建。"
+  },
+  {
+    "question_id": "Q049",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "2026年6月与9月资本开支900亿至950亿美元指引新鲜，覆盖11月，指向基建。"
+  },
+  {
+    "question_id": "Q050",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "2025年指引已过期，不覆盖2026年11月；最近两条主动记录同属模型线。"
+  },
+  {
+    "question_id": "Q051",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "2025年指引已过期，不覆盖2026年11月；最近两条主动记录同属模型线。"
+  },
+  {
+    "question_id": "Q052",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "3800亿元三年计划按 stated horizon 覆盖11月，9月20GW目标新鲜，同指基建。"
+  },
+  {
+    "question_id": "Q053",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "9月25日与10月31日两条数据中心扩容指引覆盖11月，指向基建。"
+  },
+  {
+    "question_id": "Q054",
+    "prediction": "capital_deal",
+    "rule": "a",
+    "reason": "11月10日IPO发行价区间与260亿美元私募配售最新最具体，指向资本运作。"
+  }
+]

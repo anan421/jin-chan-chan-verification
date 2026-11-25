@@ -1,0 +1,326 @@
+[
+  {
+    "question_id": "Q001",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q002",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q003",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q004",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q005",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q006",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q007",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q008",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q009",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q010",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q011",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q012",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q013",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "唯一主动条目R1-0528发布属模型发布。"
+  },
+  {
+    "question_id": "Q014",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "唯一可归类主动条目是智能云加速投入，属基建；两条免费条目无法归入6类。"
+  },
+  {
+    "question_id": "Q015",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "托管收费无法归入6类，退回历史众数model_release。"
+  },
+  {
+    "question_id": "Q016",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "唯一主动条目盘古5.5发布属模型发布。"
+  },
+  {
+    "question_id": "Q017",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "主动条目模型2比基建1，取众数model_release。"
+  },
+  {
+    "question_id": "Q018",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "全是被动点评，退回历史众数model_release。"
+  },
+  {
+    "question_id": "Q019",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q020",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "全是被动点评，退回历史众数model_release。"
+  },
+  {
+    "question_id": "Q021",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "全是被动点评，退回历史众数model_release。"
+  },
+  {
+    "question_id": "Q022",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "全是被动点评，退回历史众数model_release。"
+  },
+  {
+    "question_id": "Q023",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "全是被动点评，退回历史众数model_release。"
+  },
+  {
+    "question_id": "Q024",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "唯一主动条目Colossus扩容对标属基建。"
+  },
+  {
+    "question_id": "Q025",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "主动条目资本运作与基建各一，平局取最近一条核电重启合同，属基建。"
+  },
+  {
+    "question_id": "Q026",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "上一轮有K2发布记录，不能选hold；唯一主动条目即K2发布。"
+  },
+  {
+    "question_id": "Q027",
+    "prediction": "infra_capex",
+    "rule": "b",
+    "reason": "上一轮有主动记录，不能选hold；最近两条主动记录同属基建。"
+  },
+  {
+    "question_id": "Q028",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "全是被动点评，退回历史众数infra_capex。"
+  },
+  {
+    "question_id": "Q029",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "上一轮有V3.1发布记录，不能选hold；主动条目全是模型发布。"
+  },
+  {
+    "question_id": "Q030",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "上一轮有混元接入微信记录，不能选hold；可归类条目基建与模型平局且同日，退回玩家历史众数infra_capex。"
+  },
+  {
+    "question_id": "Q031",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "两条主动条目同属模型发布，取众数。"
+  },
+  {
+    "question_id": "Q032",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "上一轮有记录，不能选hold；主动条目模型2比基建1。"
+  },
+  {
+    "question_id": "Q033",
+    "prediction": "infra_capex",
+    "rule": "b",
+    "reason": "最近两条主动记录同属基建，连续动作线。"
+  },
+  {
+    "question_id": "Q034",
+    "prediction": "infra_capex",
+    "rule": "b",
+    "reason": "最近两条主动记录同属基建，连续动作线。"
+  },
+  {
+    "question_id": "Q035",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录Opus 4.5发布与Cowork预览上线同属模型发布线。"
+  },
+  {
+    "question_id": "Q036",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "可归类条目基建与模型平局且同日，退回玩家历史众数infra_capex。"
+  },
+  {
+    "question_id": "Q037",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "主动条目模型3比基建2，取众数。"
+  },
+  {
+    "question_id": "Q038",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录Opus 4.8与Fable 5发布同属模型线。"
+  },
+  {
+    "question_id": "Q039",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "三条主动记录全是Kimi模型发布，连续线。"
+  },
+  {
+    "question_id": "Q040",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录V3.2与V4预览发布同属模型线。"
+  },
+  {
+    "question_id": "Q041",
+    "prediction": "capital_deal",
+    "rule": "c",
+    "reason": "唯一主动条目星门后续注资承诺属资本运作。"
+  },
+  {
+    "question_id": "Q042",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "上一轮有Grok Bot记录，不能选hold；最近两条主动记录同属模型上线。"
+  },
+  {
+    "question_id": "Q043",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录Opus 5与Fable 5发布同属模型线。"
+  },
+  {
+    "question_id": "Q044",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "唯一可归类主动条目是自建能源团队扩容，属基建。"
+  },
+  {
+    "question_id": "Q045",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录V4-Pro GA与V4.1 Flash发布同属模型线。"
+  },
+  {
+    "question_id": "Q046",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录GPT-5.1与GPT-5.2发布同属模型线。"
+  },
+  {
+    "question_id": "Q047",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q048",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "全是被动点评，退回历史众数infra_capex。"
+  },
+  {
+    "question_id": "Q049",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "主动条目基建2比资本运作1，取众数。"
+  },
+  {
+    "question_id": "Q050",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录Gemini 3 Pro与3.1 Pro发布同属模型线。"
+  },
+  {
+    "question_id": "Q051",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录Gemini 3 Pro与3.1 Pro发布同属模型线。"
+  },
+  {
+    "question_id": "Q052",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录Qwen3.8-Flash-Next与Omni-Flash发布同属模型线。"
+  },
+  {
+    "question_id": "Q053",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "最近两条主动记录Grok Build与Grok Bot上线同属模型线。"
+  },
+  {
+    "question_id": "Q054",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "最近两条主动记录分属两类，取全部主动条目众数模型发布。"
+  }
+]

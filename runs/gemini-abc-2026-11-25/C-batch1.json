@@ -1,0 +1,326 @@
+[
+  {
+    "question_id": "Q001",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q002",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q003",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q004",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q005",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q006",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q007",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q008",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q009",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q010",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q011",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q012",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q013",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；唯一主动条目R1-0528发布属模型。"
+  },
+  {
+    "question_id": "Q014",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "指引是3月已发生的ERNIE 4.5发布，无指向6月的下一动作，不触发(a)；历史里唯一可归类主动条目是智能云加速投入。"
+  },
+  {
+    "question_id": "Q015",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；托管收费无法归类，退回历史众数。"
+  },
+  {
+    "question_id": "Q016",
+    "prediction": "chip_supply",
+    "rule": "a",
+    "reason": "指引点名Ascend 920预计2025年下半年量产，时限覆盖7月，下一动作类型是芯片量产供应，属chip_supply。"
+  },
+  {
+    "question_id": "Q017",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；主动条目模型2比基建1。"
+  },
+  {
+    "question_id": "Q018",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "指引里800亿美元计划属2025财年，6月30日结束，不覆盖7月1日；4月30日2026财年开支增长是无总额的方向表述，不触发(a)；历史全被动，退回众数。"
+  },
+  {
+    "question_id": "Q019",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q020",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里Stargate四年5000亿美元计划覆盖7月，甲骨文为建设运营方；3月电力容量翻倍与6月资本开支超250亿美元同指基建。"
+  },
+  {
+    "question_id": "Q021",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里Stargate四年5000亿美元计划覆盖7月，6月资本开支超250亿美元同指基建；3月10日条目已按泄漏排除，不用。"
+  },
+  {
+    "question_id": "Q022",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "指引里Blackwell Ultra在2026财年下半年推出，7月1日不在该时限内；Blackwell放量是收入口径表述，无 dated 计划，不触发(a)；历史全被动，退回众数。"
+  },
+  {
+    "question_id": "Q023",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；历史全被动，退回历史众数。"
+  },
+  {
+    "question_id": "Q024",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2024-12-04 Colossus扩至100万块GPU的进行中计划在12个月内，覆盖7月，指向基建扩容。"
+  },
+  {
+    "question_id": "Q025",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里7月22日Stargate新增4.5GW协议是刚签署的在建算力计划，覆盖8月，指向基建。"
+  },
+  {
+    "question_id": "Q026",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；上一轮有K2发布记录不能选hold；唯一主动条目即K2发布。"
+  },
+  {
+    "question_id": "Q027",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里Stargate四年计划覆盖8月，3月电力容量翻倍与6月资本开支超250亿美元同指基建。"
+  },
+  {
+    "question_id": "Q028",
+    "prediction": "capital_deal",
+    "rule": "a",
+    "reason": "指引里软银四年1000亿美元投资计划覆盖8月，且两条Stargate条目点名软银负责财务；出资方下一动作类型是资本运作。"
+  },
+  {
+    "question_id": "Q029",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "指引是1月已发生的R1发布，无指向11月的下一动作；上一轮有V3.1记录不能选hold；主动条目全是模型发布。"
+  },
+  {
+    "question_id": "Q030",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "指引里3月资本开支占收入低双位数百分比是无总额的方向表述，不触发(a)；上一轮有记录不能选hold；可归类条目平局退回玩家众数infra_capex。"
+  },
+  {
+    "question_id": "Q031",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2025年资本开支750亿美元后上调至850亿美元，有总额与投向（服务器、数据中心、网络），时限覆盖11月，指向基建。"
+  },
+  {
+    "question_id": "Q032",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里3800亿元三年基建计划覆盖11月，9月24日追加并点名未来一年内开设数据中心，同指基建。"
+  },
+  {
+    "question_id": "Q033",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里Stargate四年计划在12个月内，9月资本开支约350亿美元同指基建，覆盖12月。"
+  },
+  {
+    "question_id": "Q034",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2024-12-04 Colossus扩容计划在12个月边界内，覆盖12月，指向基建扩容。"
+  },
+  {
+    "question_id": "Q035",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2025-11-12投资500亿美元建美国算力基建，首批站点2026年内上线，覆盖2月，指向基建。"
+  },
+  {
+    "question_id": "Q036",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "指引里3月是无总额的占比方向表述，11月是事后口径下调，均不触发(a)；可归类条目平局退回玩家众数infra_capex。"
+  },
+  {
+    "question_id": "Q037",
+    "prediction": "model_release",
+    "rule": "c",
+    "reason": "无指引；主动条目模型3比基建2。"
+  },
+  {
+    "question_id": "Q038",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2025-11-12投资500亿美元建美国算力基建，首批站点2026年内上线，覆盖7月，指向基建。"
+  },
+  {
+    "question_id": "Q039",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "无指引；三条主动记录全是Kimi模型发布，连续线。"
+  },
+  {
+    "question_id": "Q040",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "包里只有2025-01-20的R1发布指引，是已发生事件，无指向8月的下一动作；7月31日条目已按泄漏排除，不用；最近两条主动记录同属模型线。"
+  },
+  {
+    "question_id": "Q041",
+    "prediction": "capital_deal",
+    "rule": "a",
+    "reason": "指引里2025-11-11点名54亿美元收购ABB机器人业务计划于2026年中至年底完成，覆盖9月，指向资本运作；星门5000亿美元落实路径同指软银出资方角色。"
+  },
+  {
+    "question_id": "Q042",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "指引里Colossus扩容计划是2024-12-04的，距9月已20个月，超12个月时效，不触发(a)；Grok 3/4是已发生发布；上一轮有Grok Bot记录不能选hold；最近两条主动记录同属模型上线。"
+  },
+  {
+    "question_id": "Q043",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2025-11-12投资500亿美元建美国算力基建，首批站点2026年内上线，覆盖10月，指向基建。"
+  },
+  {
+    "question_id": "Q044",
+    "prediction": "infra_capex",
+    "rule": "c",
+    "reason": "无指引（指引库无亚马逊条目）；唯一可归类主动条目是自建能源团队扩容，属基建。"
+  },
+  {
+    "question_id": "Q045",
+    "prediction": "model_release",
+    "rule": "a",
+    "reason": "指引里9月10日点名V4.1-Pro是公开点名的下一个模型，临时路由持续到它发布，时限覆盖11月，指向模型发布；7月31日的很快到来已在8月兑现，不指向11月。"
+  },
+  {
+    "question_id": "Q046",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里Stargate四年5000亿美元计划按 stated horizon 覆盖2026年11月，OpenAI为建设方，指向基建；2月路线图与8月GPT-5发布均已发生，不指向11月。"
+  },
+  {
+    "question_id": "Q047",
+    "prediction": "model_release",
+    "rule": "d",
+    "reason": "材料包为空，无指引，按规则(d)选model_release。"
+  },
+  {
+    "question_id": "Q048",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2026-10-15重申2026年资本预算600亿至640亿美元，并点名台南新增两座3纳米厂，时限覆盖11月，指向基建。"
+  },
+  {
+    "question_id": "Q049",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里2026-06-10与09-10的2027财年资本开支900亿至950亿美元指引新鲜且覆盖11月，指向基建；Stargate四年计划也覆盖11月。"
+  },
+  {
+    "question_id": "Q050",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "指引里最新的是2025-07-23的2025年资本开支指引，2025年已过，不覆盖2026年11月，不触发(a)；最近两条主动记录同属模型发布线。"
+  },
+  {
+    "question_id": "Q051",
+    "prediction": "model_release",
+    "rule": "b",
+    "reason": "指引里最新的是2025-07-23的2025年资本开支指引，不覆盖2026年11月，不触发(a)；最近两条主动记录同属模型发布线。"
+  },
+  {
+    "question_id": "Q052",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里3800亿元三年计划按 stated horizon 覆盖2026年11月，9月22日20GW目标新鲜，同指基建。"
+  },
+  {
+    "question_id": "Q053",
+    "prediction": "infra_capex",
+    "rule": "a",
+    "reason": "指引里9月25日Colossus 2年底前再装66万颗与10月31日Gun Range/Spam园区11月底投运，都覆盖11月，指向基建扩容。"
+  },
+  {
+    "question_id": "Q054",
+    "prediction": "capital_deal",
+    "rule": "a",
+    "reason": "指引里2026-11-10的S-1/A No.2最新最具体：IPO发行价区间70–78美元、8.25亿股与260亿美元私募配售，8天前，指向资本运作；500亿美元基建计划是一年前条目，次于最新信号。"
+  }
+]

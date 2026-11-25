@@ -1,0 +1,39 @@
+{
+  "question_id": "Q014",
+  "player": "百度 · 百度智能云",
+  "round": "2025-06",
+  "date": "2025-06-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "文心宣布全面免费。守入口"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "百度宣布智能云加速投入"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "百度被带跌最重。搜索叙事受损"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "文心一言 4 月起免费。抢用户。"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-03-16",
+      "type": "announced_plan",
+      "statement": "百度发布 ERNIE 4.5 与推理模型 ERNIE X1，称 X1 性能与 DeepSeek R1 相当但价格仅一半，并说将把两个模型逐步接入百度搜索等产品生态，文心一言提前免费开放。"
+    }
+  ]
+}

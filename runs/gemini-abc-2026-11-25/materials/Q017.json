@@ -1,0 +1,39 @@
+{
+  "question_id": "Q017",
+  "player": "字节跳动",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "豆包日活登顶国内。流量路线封神"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Trae 上线。AI 编程入场。"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "火山引擎宣布自有园区计划"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "港股与概念股被带跌有限"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "豆包 Seed-1.6 发布。推理成本再降。"
+    }
+  ],
+  "guidance": []
+}

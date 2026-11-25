@@ -1,0 +1,71 @@
+{
+  "question_id": "Q041",
+  "player": "软银",
+  "round": "2026-09",
+  "date": "2026-09-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "ARM 被效率阵容利好。股价稳"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门金主落位。史上最大下注"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门声量撑估值"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "passive_impact",
+      "raw_action": "无直接动作"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "active_action",
+      "raw_action": "星门后续注资承诺"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "下注集中风险被点名"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2024-12-16",
+      "type": "ceo_statement",
+      "statement": "软银 CEO 孙正义与当选总统特朗普联合宣布，软银将在未来四年向美国投资 1000 亿美元，重点投向 AI 与相关基础设施，并创造至少 10 万个就业岗位。"
+    },
+    {
+      "date": "2025-01-21",
+      "type": "announced_plan",
+      "statement": "软银与 OpenAI、甲骨文联合宣布 Stargate 项目，计划四年内向美国 AI 基础设施投资最多 5000 亿美元，立即部署 1000 亿美元，软银负责财务、孙正义任董事长。"
+    },
+    {
+      "date": "2025-01-21",
+      "type": "announced_plan",
+      "statement": "软银与 OpenAI、甲骨文在白宫宣布成立 Stargate 合资公司，计划四年内投资 5000 亿美元建设美国 AI 基建，首期投入 1000 亿美元，软银承担财务责任并由孙正义任董事长。"
+    },
+    {
+      "date": "2025-11-11",
+      "type": "earnings_guidance",
+      "statement": "软银集团在2025财年二季度投资者说明会上表示OpenAI第二轮225亿美元追加投资定于2025年12月完成，65亿美元收购Ampere交易计划于2025年底前完成。"
+    },
+    {
+      "date": "2025-11-11",
+      "type": "earnings_guidance",
+      "statement": "软银集团在2025财年二季度投资者说明会上表示54亿美元收购ABB机器人业务计划于2026年中至年底完成，星门（Stargate）项目有明确路径落实全部5000亿美元、10GW承诺。"
+    }
+  ]
+}

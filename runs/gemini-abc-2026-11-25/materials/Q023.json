@@ -1,0 +1,27 @@
+{
+  "question_id": "Q023",
+  "player": "苹果",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "端侧路线相对抗跌"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "不参与星门。守现金"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被带跌有限。现金厚"
+    }
+  ],
+  "guidance": []
+}

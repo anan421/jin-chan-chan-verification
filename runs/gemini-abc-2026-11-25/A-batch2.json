@@ -1,0 +1,326 @@
+[
+  {
+    "question_id": "Q001",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q002",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q003",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q004",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q005",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q006",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q007",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q008",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q009",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q010",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q011",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q012",
+    "prediction": "model_release",
+    "rule": "empty-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q013",
+    "prediction": "infra_capex",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q014",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q015",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q016",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q017",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q018",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q019",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q020",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q021",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q022",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q023",
+    "prediction": "model_release",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q024",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q025",
+    "prediction": "capital_deal",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q026",
+    "prediction": "infra_capex",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q027",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q028",
+    "prediction": "infra_capex",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q029",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q030",
+    "prediction": "infra_capex",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q031",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q032",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q033",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q034",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q035",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q036",
+    "prediction": "hold_defend",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q037",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q038",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q039",
+    "prediction": "hold_defend",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q040",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q041",
+    "prediction": "capital_deal",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q042",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q043",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q044",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q045",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q046",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q047",
+    "prediction": "infra_capex",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q048",
+    "prediction": "infra_capex",
+    "rule": "global-mode-fallback",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q049",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q050",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q051",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q052",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q053",
+    "prediction": "infra_capex",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  },
+  {
+    "question_id": "Q054",
+    "prediction": "model_release",
+    "rule": "player-mode",
+    "reason": "script: history mode per run doc section 2"
+  }
+]

@@ -1,0 +1,73 @@
+{
+  "question_id": "Q042",
+  "player": "马斯克 · xAI",
+  "round": "2026-09",
+  "date": "2026-09-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "跟进开源推理。慢一轮"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Colossus 扩容对标"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "未上市。无股价扣血"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "active_action",
+      "raw_action": "自建燃气电厂抢时间"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "passive_impact",
+      "raw_action": "Grok 追赶但争议不断"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "active_action",
+      "raw_action": "债务加股权双线融资。最累"
+    },
+    {
+      "date": "20260501",
+      "round": "2026-05",
+      "nature": "active_action",
+      "raw_action": "Grok Build 早期 beta 上线。终端编程 Agent。"
+    },
+    {
+      "date": "20260801",
+      "round": "2026-08",
+      "nature": "active_action",
+      "raw_action": "Grok Bot 早期 beta 上线。X 内 Agent。"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2024-12-04",
+      "type": "announced_plan",
+      "statement": "xAI 宣布将把孟菲斯 Colossus 超算从 10 万块 GPU 扩至至少 100 万块 GPU，英伟达、戴尔与超微也将在孟菲斯设立业务。"
+    },
+    {
+      "date": "2025-02-19",
+      "type": "announced_plan",
+      "statement": "xAI 发布 Grok 3 测试版，称其在 Colossus 上以 10 倍于前代的算力训练，并表示正准备在 20 万块 GPU 的集群上训练更大的模型。"
+    },
+    {
+      "date": "2025-07-09",
+      "type": "announced_plan",
+      "statement": "xAI 发布 Grok 4 与多智能体版本 Grok 4 Heavy，称其为迄今最智能的模型，具备原生工具调用与实时搜索能力。"
+    }
+  ]
+}

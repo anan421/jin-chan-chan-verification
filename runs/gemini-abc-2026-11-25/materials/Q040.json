@@ -1,0 +1,75 @@
+{
+  "question_id": "Q040",
+  "player": "DeepSeek",
+  "round": "2026-08",
+  "date": "2026-08-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "不建园区。轻资产到底"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "下载量继续冲高。声望吃满"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "R1-0528 发布。推理再进一步。"
+    },
+    {
+      "date": "20250120",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "R1 发布。AIME 79.8% 对 o1 的 79.2%"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "passive_impact",
+      "raw_action": "无园区负担。轻资产占优"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "passive_impact",
+      "raw_action": "新版模型编程场景跟进"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "active_action",
+      "raw_action": "DeepSeek V3.1 发布。编程场景跟进。"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "被云厂托管抽成。循环里最下游"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "active_action",
+      "raw_action": "DeepSeek V3.2 发布。效率再进一步。"
+    },
+    {
+      "date": "20260401",
+      "round": "2026-04",
+      "nature": "active_action",
+      "raw_action": "DeepSeek V4 预览发布。下一代效率。"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-01-20",
+      "type": "announced_plan",
+      "statement": "DeepSeek 发布推理模型 DeepSeek-R1 与 R1-Zero，权重以 MIT 协议开源，称其性能与 OpenAI o1 相当，并同步开源 6 个蒸馏小模型。"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "question_id": "Q013",
+  "player": "DeepSeek",
+  "round": "2025-01",
+  "date": "2025-01-20",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "不建园区。轻资产到底"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "下载量继续冲高。声望吃满"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "R1-0528 发布。推理再进一步。"
+    }
+  ],
+  "guidance": []
+}

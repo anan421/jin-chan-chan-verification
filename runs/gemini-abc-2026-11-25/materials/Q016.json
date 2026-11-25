@@ -1,0 +1,39 @@
+{
+  "question_id": "Q016",
+  "player": "华为 · 昇腾",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "昇腾成 R1 落地主平台。卖卡封神"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "国产园区算力底座订单落位"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "国产替代叙事升温。相对受益"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "盘古 5.5 发布。政企模型换代。"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-04-10",
+      "type": "announced_plan",
+      "statement": "华为在合作伙伴大会上发布下一代 AI 芯片 Ascend 920，预计 2025 年下半年量产，定位为受出口管制影响的英伟达 H20 的国产替代。"
+    }
+  ]
+}

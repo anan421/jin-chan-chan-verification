@@ -1,0 +1,27 @@
+{
+  "question_id": "Q015",
+  "player": "亚马逊",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "托管 R1 同类模型收费"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "评估 GW 级园区跟进"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被带跌。云订单未变"
+    }
+  ],
+  "guidance": []
+}

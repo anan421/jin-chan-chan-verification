@@ -1,0 +1,330 @@
+{
+  "A": {
+    "batch_correct": [
+      16,
+      16,
+      16
+    ],
+    "mean_correct": 16.0,
+    "mean_accuracy": 0.2962962962962963,
+    "per_class": {
+      "model_release": {
+        "n": 16,
+        "hits_per_batch": [
+          11,
+          11,
+          11
+        ],
+        "mean_hits": 11.0,
+        "mean_rate": 0.6875
+      },
+      "infra_capex": {
+        "n": 16,
+        "hits_per_batch": [
+          4,
+          4,
+          4
+        ],
+        "mean_hits": 4.0,
+        "mean_rate": 0.25
+      },
+      "capital_deal": {
+        "n": 12,
+        "hits_per_batch": [
+          1,
+          1,
+          1
+        ],
+        "mean_hits": 1.0,
+        "mean_rate": 0.08333333333333333
+      },
+      "chip_supply": {
+        "n": 3,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      },
+      "policy_regulatory": {
+        "n": 1,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      },
+      "hold_defend": {
+        "n": 6,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      }
+    }
+  },
+  "B": {
+    "batch_correct": [
+      16,
+      16,
+      16
+    ],
+    "mean_correct": 16.0,
+    "mean_accuracy": 0.2962962962962963,
+    "per_class": {
+      "model_release": {
+        "n": 16,
+        "hits_per_batch": [
+          13,
+          13,
+          13
+        ],
+        "mean_hits": 13.0,
+        "mean_rate": 0.8125
+      },
+      "infra_capex": {
+        "n": 16,
+        "hits_per_batch": [
+          2,
+          2,
+          2
+        ],
+        "mean_hits": 2.0,
+        "mean_rate": 0.125
+      },
+      "capital_deal": {
+        "n": 12,
+        "hits_per_batch": [
+          1,
+          1,
+          1
+        ],
+        "mean_hits": 1.0,
+        "mean_rate": 0.08333333333333333
+      },
+      "chip_supply": {
+        "n": 3,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      },
+      "policy_regulatory": {
+        "n": 1,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      },
+      "hold_defend": {
+        "n": 6,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      }
+    }
+  },
+  "C": {
+    "batch_correct": [
+      19,
+      19,
+      19
+    ],
+    "mean_correct": 19.0,
+    "mean_accuracy": 0.35185185185185186,
+    "per_class": {
+      "model_release": {
+        "n": 16,
+        "hits_per_batch": [
+          10,
+          10,
+          10
+        ],
+        "mean_hits": 10.0,
+        "mean_rate": 0.625
+      },
+      "infra_capex": {
+        "n": 16,
+        "hits_per_batch": [
+          5,
+          5,
+          5
+        ],
+        "mean_hits": 5.0,
+        "mean_rate": 0.3125
+      },
+      "capital_deal": {
+        "n": 12,
+        "hits_per_batch": [
+          3,
+          3,
+          3
+        ],
+        "mean_hits": 3.0,
+        "mean_rate": 0.25
+      },
+      "chip_supply": {
+        "n": 3,
+        "hits_per_batch": [
+          1,
+          1,
+          1
+        ],
+        "mean_hits": 1.0,
+        "mean_rate": 0.3333333333333333
+      },
+      "policy_regulatory": {
+        "n": 1,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      },
+      "hold_defend": {
+        "n": 6,
+        "hits_per_batch": [
+          0,
+          0,
+          0
+        ],
+        "mean_hits": 0.0,
+        "mean_rate": 0.0
+      }
+    }
+  },
+  "noise_band": 0,
+  "threshold": 11,
+  "mcnemar_pooled": {
+    "C_right_B_wrong": 18,
+    "B_right_C_wrong": 9,
+    "p": 0.12207812070846558,
+    "net": 9
+  },
+  "mcnemar_per_batch": [
+    {
+      "C_right_B_wrong": 6,
+      "B_right_C_wrong": 3,
+      "p": 0.5078125,
+      "net": 3
+    },
+    {
+      "C_right_B_wrong": 6,
+      "B_right_C_wrong": 3,
+      "p": 0.5078125,
+      "net": 3
+    },
+    {
+      "C_right_B_wrong": 6,
+      "B_right_C_wrong": 3,
+      "p": 0.5078125,
+      "net": 3
+    }
+  ],
+  "gain_C_minus_B": 3.0,
+  "weakest_B": 0.0,
+  "weakest_C": 0.0,
+  "sensitivity_49": {
+    "dropped": [
+      "Q012",
+      "Q021",
+      "Q025",
+      "Q040",
+      "Q054"
+    ],
+    "B_mean": 15.0,
+    "C_mean": 16.0,
+    "gain": 1.0,
+    "mcnemar": {
+      "C_right_B_wrong": 12,
+      "B_right_C_wrong": 9,
+      "p": 0.6636238098144531,
+      "net": 3
+    },
+    "weakest_B": 0.0,
+    "weakest_C": 0.0,
+    "distinct_win_qids": [
+      "Q016",
+      "Q020",
+      "Q028",
+      "Q052"
+    ]
+  },
+  "conditions": {
+    "1_gain_gt_threshold": false,
+    "2_mcnemar_p_lt_0.05": false,
+    "3_gain_ge_3": true,
+    "4_gain_from_ge_2_questions": true,
+    "5_weakest_not_worse": true,
+    "6_gain_not_on_leakage": false,
+    "6_subset_detail": {
+      "cond1": false,
+      "cond2": false,
+      "cond3": false,
+      "cond4": true,
+      "cond5": true
+    }
+  },
+  "condition4_detail": {
+    "distinct_win_qids": [
+      "Q016",
+      "Q020",
+      "Q021",
+      "Q028",
+      "Q052",
+      "Q054"
+    ],
+    "win_counts_per_qid": {
+      "Q016": 3,
+      "Q020": 3,
+      "Q021": 3,
+      "Q028": 3,
+      "Q052": 3,
+      "Q054": 3
+    },
+    "max_single_qid_share_of_net": 0.3333333333333333
+  },
+  "adopt": false,
+  "section_6_2": {
+    "gain_positive": true,
+    "true_new_info_qids": [
+      "Q016",
+      "Q020",
+      "Q021",
+      "Q028",
+      "Q052",
+      "Q054"
+    ],
+    "true_new_info_count": 6,
+    "per_class_C_minus_B_hits": {
+      "model_release": -3.0,
+      "infra_capex": 3.0,
+      "capital_deal": 2.0,
+      "chip_supply": 1.0,
+      "policy_regulatory": 0.0,
+      "hold_defend": 0.0
+    },
+    "systematic_harm": true,
+    "provisional": false
+  },
+  "verdict": "discard"
+}

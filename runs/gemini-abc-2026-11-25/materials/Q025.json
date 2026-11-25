@@ -1,0 +1,44 @@
+{
+  "question_id": "Q025",
+  "player": "OpenAI",
+  "round": "2025-08",
+  "date": "2025-08-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "o1 先手被追平大半"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "星门绕开微软独家。羁绊松动"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被带跌。资本开支被质问"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "active_action",
+      "raw_action": "签核电重启合同。三哩岛入局"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-01-21",
+      "type": "announced_plan",
+      "statement": "OpenAI 与软银、甲骨文联合宣布成立 Stargate 项目，计划四年内向美国 AI 基础设施投资最多 5000 亿美元，立即部署 1000 亿美元，先在得州建大型数据中心。"
+    },
+    {
+      "date": "2025-07-22",
+      "type": "announced_plan",
+      "statement": "OpenAI 与甲骨文达成协议，将在 Stargate 框架下新增最多 4.5GW 的美国数据中心算力，使在建 Stargate 总容量超过 5GW，涉及超过 200 万块芯片。"
+    }
+  ]
+}

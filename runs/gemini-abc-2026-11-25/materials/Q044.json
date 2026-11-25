@@ -1,0 +1,45 @@
+{
+  "question_id": "Q044",
+  "player": "亚马逊",
+  "round": "2026-10",
+  "date": "2026-10-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "托管 R1 同类模型收费"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "评估 GW 级园区跟进"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被带跌。云订单未变"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "active_action",
+      "raw_action": "自建能源团队扩容"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "passive_impact",
+      "raw_action": "Bedrock 企业收入稳增"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "相对低调。扣血最少"
+    }
+  ],
+  "guidance": []
+}

@@ -1,0 +1,48 @@
+{
+  "question_id": "Q020",
+  "player": "甲骨文",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "DeepSeek 冲击下企业单未丢"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门执行人落位。声量暴涨"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门订单预期撑住股价"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-01-21",
+      "type": "announced_plan",
+      "statement": "甲骨文与 OpenAI、软银联合宣布 Stargate 项目，计划四年内向美国 AI 基础设施投资最多 5000 亿美元，立即部署 1000 亿美元，甲骨文为初始出资方并负责建设运营首批得州数据中心。"
+    },
+    {
+      "date": "2025-01-21",
+      "type": "announced_plan",
+      "statement": "甲骨文与 OpenAI、软银在白宫宣布成立 Stargate 合资公司，计划四年内投资 5000 亿美元建设美国 AI 基建，首期投入 1000 亿美元，首个数据中心位于得州阿比林。"
+    },
+    {
+      "date": "2025-03-10",
+      "type": "earnings_guidance",
+      "statement": "甲骨文在 2025 财年 Q3 电话会上说，预计可用电力容量今年翻倍、到下一财年末（2027 年中）翻三倍，第 101 个云区域已上线，并预计很快签下首个大型 Stargate 合同。"
+    },
+    {
+      "date": "2025-06-11",
+      "type": "earnings_guidance",
+      "statement": "甲骨文在 2025 财年 Q4 电话会上把 2026 财年收入指引上调至超过 670 亿美元，预计云总收入增长超 40%、云基础设施收入增长超 70%、RPO 增长超 100%，2026 财年资本开支将超过 250 亿美元。"
+    }
+  ]
+}

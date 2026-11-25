@@ -1,0 +1,157 @@
+{
+  "question_id": "Q038",
+  "player": "Anthropic",
+  "round": "2026-07",
+  "date": "2026-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "企业市场不看价格看合规。抗跌"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "宣布自有数据中心计划跟进"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "私募估值不受公开市场影响"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Claude Code 有限预览上线。编程 Agent 开局。"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Claude 3.7 Sonnet 发布。编程口碑起。"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Claude Opus 4 与 Sonnet 4 发布。编程最强。"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Claude Code 正式 GA。订阅收入起飞。"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "passive_impact",
+      "raw_action": "靠云厂电力间接受益"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "passive_impact",
+      "raw_action": "Claude 编程场景成王牌"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "active_action",
+      "raw_action": "Claude Opus 4.1 发布。编程再进一步。"
+    },
+    {
+      "date": "20250901",
+      "round": "2025-09",
+      "nature": "active_action",
+      "raw_action": "Claude Sonnet 4.5 发布。主力换代。"
+    },
+    {
+      "date": "20251001",
+      "round": "2025-10",
+      "nature": "active_action",
+      "raw_action": "Claude Haiku 4.5 发布。轻量主力。"
+    },
+    {
+      "date": "20251101",
+      "round": "2025-11",
+      "nature": "active_action",
+      "raw_action": "Claude Opus 4.5 发布。编程标杆再抬。"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "承诺采购规模被盘问"
+    },
+    {
+      "date": "20260101",
+      "round": "2026-01",
+      "nature": "active_action",
+      "raw_action": "Claude Cowork 研究预览上线。Agent 进文件夹。"
+    },
+    {
+      "date": "20260201",
+      "round": "2026-02",
+      "nature": "active_action",
+      "raw_action": "Claude Opus 4.6 发布。旗舰换代。"
+    },
+    {
+      "date": "20260201",
+      "round": "2026-02",
+      "nature": "active_action",
+      "raw_action": "Claude Sonnet 4.6 发布。主力换代。"
+    },
+    {
+      "date": "20260201",
+      "round": "2026-02",
+      "nature": "passive_impact",
+      "raw_action": "五角大楼传召 Amodei。威胁断供与国防生产法。"
+    },
+    {
+      "date": "20260201",
+      "round": "2026-02",
+      "nature": "active_action",
+      "raw_action": "拒绝移除护栏。列为供应链风险，起诉五角大楼。"
+    },
+    {
+      "date": "20260401",
+      "round": "2026-04",
+      "nature": "active_action",
+      "raw_action": "Claude Opus 4.7 发布。旗舰迭代。"
+    },
+    {
+      "date": "20260501",
+      "round": "2026-05",
+      "nature": "active_action",
+      "raw_action": "Claude Opus 4.8 发布。旗舰迭代。"
+    },
+    {
+      "date": "20260601",
+      "round": "2026-06",
+      "nature": "active_action",
+      "raw_action": "Claude Fable 5 发布。长篇写作模型。"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-02-24",
+      "type": "announced_plan",
+      "statement": "Anthropic 发布 Claude 3.7 Sonnet，称其为业内首个混合推理模型，同一模型可快速回答或延长思考，并同步推出 agentic 编程工具 Claude Code 的研究预览版。"
+    },
+    {
+      "date": "2025-05-22",
+      "type": "announced_plan",
+      "statement": "Anthropic 在首届开发者大会上发布 Claude Opus 4 与 Claude Sonnet 4，称 Opus 4 可在复杂长程任务中持续工作数小时，Sonnet 4 为 3.7 的升级版，同时 Claude Code 全面可用。"
+    },
+    {
+      "date": "2025-11-12",
+      "type": "announced_plan",
+      "statement": "Anthropic宣布投资500亿美元建设美国算力基础设施，与Fluidstack在得州和纽约建设定制数据中心，更多站点随后推进，首批站点于2026年内陆续上线。"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "question_id": "Q024",
+  "player": "马斯克 · xAI",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "跟进开源推理。慢一轮"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Colossus 扩容对标"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "未上市。无股价扣血"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2024-12-04",
+      "type": "announced_plan",
+      "statement": "xAI 宣布将把孟菲斯 Colossus 超算从 10 万块 GPU 扩至至少 100 万块 GPU，英伟达、戴尔与超微也将在孟菲斯设立业务。"
+    },
+    {
+      "date": "2025-02-19",
+      "type": "announced_plan",
+      "statement": "xAI 发布 Grok 3 测试版，称其在 Colossus 上以 10 倍于前代的算力训练，并表示正准备在 20 万块 GPU 的集群上训练更大的模型。"
+    }
+  ]
+}

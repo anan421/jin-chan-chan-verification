@@ -1,0 +1,73 @@
+{
+  "question_id": "Q036",
+  "player": "腾讯 · 腾讯云",
+  "round": "2026-03",
+  "date": "2026-03-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "元宝接入 DeepSeek。借船出海"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "腾讯宣布重投入期。利润换人口"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "腾讯被带跌。游戏基本盘稳"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "腾讯云一键部署 R1。分发跟进。"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "混元 A13B 发布。开源小模型。"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "passive_impact",
+      "raw_action": "腾讯云园区并网排队中"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "active_action",
+      "raw_action": "混元接入微信生态场景"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "投资新军换云单。循环最克制"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-03-19",
+      "type": "earnings_guidance",
+      "statement": "腾讯总裁刘炽平在 Q4 财报后简报会上说，腾讯 2025 年资本开支将升至收入的低双位数百分比（约 12%-14%），重点投向自研混元大模型、多模态能力与开源项目。"
+    },
+    {
+      "date": "2025-03-19",
+      "type": "earnings_guidance",
+      "statement": "腾讯总裁刘炽平在财报后电话会上表示2025年资本开支将进一步增加，占收入的低双位数百分比，重点投向AI，加大自研混元模型投入并扩展多模态与开源能力。"
+    },
+    {
+      "date": "2025-11-13",
+      "type": "earnings_guidance",
+      "statement": "腾讯在三季度财报电话会上表示2025年全年资本开支预计低于此前指引区间，但仍高于2024年水平，原因是AI芯片供应受限。"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "question_id": "Q018",
+  "player": "微软",
+  "round": "2025-07",
+  "date": "2025-07-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门绕开独家。羁绊松动"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "星门被迫跟投评估"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被带跌。开支被质问"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-01-03",
+      "type": "ceo_statement",
+      "statement": "微软副董事长兼总裁 Brad Smith 在博客中说，微软 2025 财年将投资约 800 亿美元建设 AI 数据中心，用于训练 AI 模型和部署 AI 与云应用，其中一半以上在美国。"
+    },
+    {
+      "date": "2025-01-29",
+      "type": "earnings_guidance",
+      "statement": "微软在 2025 财年 Q2 电话会上说，预计 Q3 仍受 AI 算力制约，但到 2025 财年末，凭借大规模资本投入，算力将大致跟上近期需求。"
+    },
+    {
+      "date": "2025-04-30",
+      "type": "earnings_guidance",
+      "statement": "微软在 2025 财年 Q3 电话会上说，Q4 资本开支将环比增长，2026 财年资本开支仍将增长但增速低于 2025 财年，Azure 在 Q4 将按固定汇率增长 34%-35%。"
+    }
+  ]
+}

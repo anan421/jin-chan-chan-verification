@@ -1,0 +1,97 @@
+{
+  "question_id": "Q050",
+  "player": "谷歌",
+  "round": "2026-11",
+  "date": "2026-11-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "自研推理线相对抗跌"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被迫评估更大园区计划"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "TPU 自研路线相对抗跌"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Veo 3 发布。视频带音频。"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "Gemini 2.5 Pro 与 Flash GA。主力就位。"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "passive_impact",
+      "raw_action": "能源团队老练。并网占优"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "passive_impact",
+      "raw_action": "Gemini 世代企业单大涨"
+    },
+    {
+      "date": "20251101",
+      "round": "2025-11",
+      "nature": "active_action",
+      "raw_action": "Google Antigravity 公开预览。Agent 开发平台。"
+    },
+    {
+      "date": "20251101",
+      "round": "2025-11",
+      "nature": "active_action",
+      "raw_action": "Gemini 3 Pro 发布。旗舰换代。"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "现金自研为主。相对干净"
+    },
+    {
+      "date": "20260201",
+      "round": "2026-02",
+      "nature": "active_action",
+      "raw_action": "Gemini 3.1 Pro 发布。推理加强。"
+    },
+    {
+      "date": "20261001",
+      "round": "2026-10",
+      "nature": "passive_impact",
+      "raw_action": "跟涨"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-02-04",
+      "type": "earnings_guidance",
+      "statement": "Alphabet 在 2024 年 Q4 财报中说，预计 2025 年资本开支约为 750 亿美元，主要投向服务器、数据中心和网络等技术基础设施。"
+    },
+    {
+      "date": "2025-04-24",
+      "type": "earnings_guidance",
+      "statement": "Alphabet 在 2025 年 Q1 电话会上重申 2025 年资本开支约为 750 亿美元，Q1 已投入 172 亿美元。"
+    },
+    {
+      "date": "2025-07-23",
+      "type": "earnings_guidance",
+      "statement": "Alphabet 在 2025 年 Q2 财报中把 2025 年资本开支指引上调至约 850 亿美元（原约 750 亿美元），原因是云产品与服务需求强劲增长。"
+    }
+  ]
+}

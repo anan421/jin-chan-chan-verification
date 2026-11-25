@@ -1,0 +1,27 @@
+{
+  "question_id": "Q039",
+  "player": "月之暗面 · Kimi",
+  "round": "2026-07",
+  "date": "2026-07-01",
+  "history": [
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "active_action",
+      "raw_action": "Kimi K2 发布。Agent 模型出圈。"
+    },
+    {
+      "date": "20251101",
+      "round": "2025-11",
+      "nature": "active_action",
+      "raw_action": "Kimi K2 Thinking 发布。深度思考。"
+    },
+    {
+      "date": "20260101",
+      "round": "2026-01",
+      "nature": "active_action",
+      "raw_action": "Kimi K2.5 发布。Agent 再进一步。"
+    }
+  ],
+  "guidance": []
+}

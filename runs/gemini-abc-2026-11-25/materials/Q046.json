@@ -1,0 +1,102 @@
+{
+  "question_id": "Q046",
+  "player": "OpenAI",
+  "round": "2026-11",
+  "date": "2026-11-01",
+  "history": [
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "o1 先手被追平大半"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "active_action",
+      "raw_action": "星门绕开微软独家。羁绊松动"
+    },
+    {
+      "date": "20250101",
+      "round": "2025-01",
+      "nature": "passive_impact",
+      "raw_action": "被带跌。资本开支被质问"
+    },
+    {
+      "date": "20250701",
+      "round": "2025-07",
+      "nature": "active_action",
+      "raw_action": "签核电重启合同。三哩岛入局"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "passive_impact",
+      "raw_action": "旗舰发布反响平淡"
+    },
+    {
+      "date": "20250801",
+      "round": "2025-08",
+      "nature": "active_action",
+      "raw_action": "GPT-5 发布。反响平淡。期望太高。"
+    },
+    {
+      "date": "20250901",
+      "round": "2025-09",
+      "nature": "active_action",
+      "raw_action": "Sora 2 发布。视频真实感再升。"
+    },
+    {
+      "date": "20251001",
+      "round": "2025-10",
+      "nature": "active_action",
+      "raw_action": "ChatGPT Atlas 发布。浏览器 Agent。"
+    },
+    {
+      "date": "20251101",
+      "round": "2025-11",
+      "nature": "active_action",
+      "raw_action": "GPT-5.1 推出。修补 GPT-5 口碑。"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "passive_impact",
+      "raw_action": "循环图最大投资方。被点名"
+    },
+    {
+      "date": "20251201",
+      "round": "2025-12",
+      "nature": "active_action",
+      "raw_action": "GPT-5.2 发布。旗舰修补。"
+    },
+    {
+      "date": "20261001",
+      "round": "2026-10",
+      "nature": "passive_impact",
+      "raw_action": "跟涨。羁绊估值新高"
+    }
+  ],
+  "guidance": [
+    {
+      "date": "2025-01-21",
+      "type": "announced_plan",
+      "statement": "OpenAI 与软银、甲骨文联合宣布成立 Stargate 项目，计划四年内向美国 AI 基础设施投资最多 5000 亿美元，立即部署 1000 亿美元，先在得州建大型数据中心。"
+    },
+    {
+      "date": "2025-02-12",
+      "type": "ceo_statement",
+      "statement": "OpenAI CEO Sam Altman 在 X 上公布路线图：先在几周内发布 GPT-4.5（内部代号 Orion，最后一款非思维链模型），再在几个月内发布 GPT-5，GPT-5 将整合 GPT 系列与 o 系列（含 o3）技术。"
+    },
+    {
+      "date": "2025-07-22",
+      "type": "announced_plan",
+      "statement": "OpenAI 与甲骨文达成协议，将在 Stargate 框架下新增最多 4.5GW 的美国数据中心算力，使在建 Stargate 总容量超过 5GW，涉及超过 200 万块芯片。"
+    },
+    {
+      "date": "2025-08-07",
+      "type": "announced_plan",
+      "statement": "OpenAI 发布 GPT-5，作为统一系统向所有 ChatGPT 免费用户默认开放，整合快速模型与深度推理模型，Altman 称其为通向 AGI 路上的重要一步。"
+    }
+  ]
+}
